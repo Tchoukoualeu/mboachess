@@ -28,22 +28,6 @@ type ProfilePayload = {
   message?: string;
 };
 
-function normalizeUsername(input: string): string | null {
-  const s = input.trim().replace(/^@/, "").toLowerCase();
-  if (!s) return null;
-  if (!/^[a-z0-9_-]{1,50}$/i.test(s)) return null;
-  return s;
-}
-
-export function parseUsernamesList(text: string): string[] {
-  const out: string[] = [];
-  for (const line of text.split(/[\n,;]+/)) {
-    const n = normalizeUsername(line);
-    if (n && !out.includes(n)) out.push(n);
-  }
-  return out;
-}
-
 export async function fetchPlayerSnapshot(
   username: string
 ): Promise<PlayerLookupResult> {
