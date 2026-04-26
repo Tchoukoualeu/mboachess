@@ -1,6 +1,6 @@
 /** Per Chess.com, include a contact; generic Node fetch is often throttled. */
 export const CHESSCOM_USER_AGENT =
-  "mboadchess/1.0 (https://vercel.com; contact: mboadchess+api@local)";
+  "mboachess/1.0 (https://vercel.com; contact: mboachess+api@local)";
 
 /** Chess.com retires the /is-online endpoint; 5 min matches their old behavior. */
 export const ONLINE_WITHIN_SEC = 5 * 60;

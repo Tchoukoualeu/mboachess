@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Chess.com player lookup | mboadchess",
+  title: "Chess.com player lookup | mboachess",
   description:
     "Look up blitz and rapid ratings and recent online activity for Chess.com usernames.",
 };
