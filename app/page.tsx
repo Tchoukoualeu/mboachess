@@ -1,3 +1,5 @@
+import { SubmitUsernameForm } from "@/components/SubmitUsernameForm"
+import { getSubmittedUsernames } from "@/lib/chesscomUsernames"
 import { fetchPlayerSnapshot, ONLINE_WITHIN_SEC } from "@/lib/chesscom"
 
 export const dynamic = "force-dynamic"
@@ -29,9 +31,18 @@ function formatRating(
   return "Unrated"
 }
 
+function uniqueSortedUsernames(
+  a: readonly string[],
+  b: string[]
+): string[] {
+  return [...new Set([...a, ...b])].sort((x, y) => x.localeCompare(y))
+}
+
 export default async function Home() {
+  const fromDb = await getSubmittedUsernames()
+  const usernames = uniqueSortedUsernames(TRACKED_USERNAMES, fromDb)
   const rows = []
-  for (const u of TRACKED_USERNAMES) {
+  for (const u of usernames) {
     rows.push(await fetchPlayerSnapshot(u))
     await new Promise((r) => setTimeout(r, 120))
   }
@@ -39,11 +50,18 @@ export default async function Home() {
   return (
     <div className="min-h-dvh flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
       <div className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 sm:px-6">
-        <header className="mb-8">
+        <header className="mb-6">
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
             Mboachess.com
           </h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+            Blitz and rapid ratings and activity from the Chess.com public API.
+            Online (green dot) uses recent profile and game times within{" "}
+            {ONLINE_WITHIN_SEC / 60} minutes.
+          </p>
         </header>
+
+        <SubmitUsernameForm />
 
         <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
           <table className="w-full min-w-xl text-left text-sm">

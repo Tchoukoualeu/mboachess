@@ -2,7 +2,16 @@
 
 **mboachess** is a small, free tool for the chess community. The goal is to help **promote chess for all Cameroonian players**—and anyone who wants to follow friends or teammates on [Chess.com](https://www.chess.com/)—by surfacing public ratings and activity in one place.
 
-The app is a [Next.js](https://nextjs.org) dashboard: a table of **blitz** and **rapid** ratings, **online**-style status (from recent public profile activity), and **last seen** time. It reads the [Chess.com Published-Data (Pub) API](https://support.chess.com/en/articles/9650547-what-is-the-pubapi-and-how-do-i-use-it) on each request; there is no database.
+The app is a [Next.js](https://nextjs.org) dashboard: a table of **blitz** and **rapid** ratings, **online**-style status, and **last seen** time. It reads the [Chess.com Published-Data (Pub) API](https://support.chess.com/en/articles/9650547-what-is-the-pubapi-and-how-do-i-use-it) on each request. Visitors can **submit a Chess.com username**; it is stored in **MongoDB** and merged with the default list in `app/page.tsx`.
+
+## Environment
+
+Create `.env.local` (see [`.env.example`](.env.example)):
+
+- **`MONGODB_URI`** — required for saving usernames. Use [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) or any MongoDB you control.
+- **`MONGODB_DB_NAME`** — optional; default database name is `mboachess`.
+
+If `MONGODB_URI` is missing, the site still runs and the table works for the static list only; **Save** will return a 503 from the API.
 
 ## Development
 
@@ -15,7 +24,8 @@ Open [http://localhost:3000](http://localhost:3000). For production: `npm run bu
 
 ## Changing the player list
 
-Edit the `TRACKED_USERNAMES` array in `app/page.tsx` (lowercase usernames, as used in Chess.com profile URLs). Chess.com client logic for fetching a player lives in `lib/chesscom.ts`.
+- **Admins / defaults:** edit the `TRACKED_USERNAMES` array in `app/page.tsx` (lowercase usernames, as in Chess.com profile URLs).
+- **Public submissions:** usernames are stored in the `player_usernames` collection. Chess.com fetch logic is in `lib/chesscom.ts`; persistence and validation are in `lib/chesscomUsernames.ts` and `lib/mongodb.ts`.
 
 ## Online column
 
@@ -23,11 +33,11 @@ Edit the `TRACKED_USERNAMES` array in `app/page.tsx` (lowercase usernames, as us
 
 ## Stack
 
-- Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4
+- Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, MongoDB (official driver)
 
 ## Deploy
 
-Standard Next.js deploy (e.g. [Vercel](https://vercel.com/docs) or any Node host). No special env vars are required for the public Chess.com API.
+Standard Next.js deploy (e.g. [Vercel](https://vercel.com/docs) or any Node host). Set **`MONGODB_URI`** (and optional **`MONGODB_DB_NAME`**) in the project’s environment. Allow your deployment’s outbound IP (or `0.0.0.0/0` for serverless) in MongoDB Atlas **Network Access** if you use a cluster.
 
 ## Contributing
 
