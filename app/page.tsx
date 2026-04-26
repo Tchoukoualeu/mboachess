@@ -2,7 +2,11 @@ import { GitHubLink } from "@/components/GitHubLink"
 import { RatingLeaders } from "@/components/RatingLeaders"
 import { SubmitUsernameForm } from "@/components/SubmitUsernameForm"
 import { getSubmittedUsernames } from "@/lib/chesscomUsernames"
-import { fetchPlayerSnapshot, ONLINE_WITHIN_SEC } from "@/lib/chesscom"
+import {
+  type PlayerLookupResult,
+  fetchPlayerSnapshot,
+  ONLINE_WITHIN_SEC,
+} from "@/lib/chesscom"
 import { topByRating } from "@/lib/ratingLeaders"
 
 export const dynamic = "force-dynamic"
@@ -41,6 +45,16 @@ function uniqueSortedUsernames(
   return [...new Set([...a, ...b])].sort((x, y) => x.localeCompare(y))
 }
 
+/** Highest rapid first; missing/unrated rapid at the bottom, then by username. */
+function sortByRapidDesc(rows: PlayerLookupResult[]) {
+  rows.sort((a, b) => {
+    const aNum = typeof a.rapid === "number" ? a.rapid : Number.NEGATIVE_INFINITY
+    const bNum = typeof b.rapid === "number" ? b.rapid : Number.NEGATIVE_INFINITY
+    if (bNum !== aNum) return bNum - aNum
+    return a.username.localeCompare(b.username, undefined, { sensitivity: "base" })
+  })
+}
+
 export default async function Home() {
   const fromDb = await getSubmittedUsernames()
   const usernames = uniqueSortedUsernames(TRACKED_USERNAMES, fromDb)
@@ -49,6 +63,8 @@ export default async function Home() {
     rows.push(await fetchPlayerSnapshot(u))
     await new Promise((r) => setTimeout(r, 120))
   }
+
+  sortByRapidDesc(rows)
 
   const blitzLeader = topByRating(rows, "blitz")
   const rapidLeader = topByRating(rows, "rapid")
