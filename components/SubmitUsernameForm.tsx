@@ -62,7 +62,7 @@ export function SubmitUsernameForm() {
   }
 
   return (
-    <div className="mb-8 max-w-xl">
+    <div className="mb-4 max-w-xl sm:mb-6">
       <form
         onSubmit={onSubmit}
         className="flex flex-col gap-3 sm:flex-row sm:items-end"

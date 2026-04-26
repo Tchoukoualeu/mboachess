@@ -15,12 +15,15 @@ export type PlayerLookupResult = {
   rapid: number | null;
   online: boolean;
   lastOnline: number | null;
+  /** Chess.com `avatar` URL; null if not set or on error. */
+  avatarUrl: string | null;
   error?: string;
 };
 
 type ProfilePayload = {
   username: string;
   last_online?: number;
+  avatar?: string;
   code?: number;
   message?: string;
 };
@@ -86,11 +89,16 @@ export async function fetchPlayerSnapshot(
       rapid: null,
       online: false,
       lastOnline: null,
+      avatarUrl: null,
       error: msg,
     };
   }
 
   const profile = (await profileRes.json()) as ProfilePayload;
+  const avatarUrl =
+    typeof profile.avatar === "string" && profile.avatar.startsWith("http")
+      ? profile.avatar
+      : null;
   const now = Date.now() / 1000;
 
   if (!statsRes.ok) {
@@ -103,6 +111,7 @@ export async function fetchPlayerSnapshot(
       rapid: null,
       online,
       lastOnline: lastActivity,
+      avatarUrl,
       error: "Stats unavailable",
     };
   }
@@ -118,6 +127,7 @@ export async function fetchPlayerSnapshot(
       rapid: null,
       online,
       lastOnline: lastActivity,
+      avatarUrl,
       error: stats.message,
     };
   }
@@ -134,5 +144,6 @@ export async function fetchPlayerSnapshot(
     rapid,
     online,
     lastOnline: lastActivity,
+    avatarUrl,
   };
 }
