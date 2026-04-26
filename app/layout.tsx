@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import queenIcon from "./queen.png";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,6 +17,9 @@ export const metadata: Metadata = {
   title: "Chess.com player lookup | mboachess",
   description:
     "Look up blitz and rapid ratings and recent online activity for Chess.com usernames.",
+  icons: {
+    icon: [{ url: queenIcon.src, type: "image/png" }],
+  },
 };
 
 export default function RootLayout({
