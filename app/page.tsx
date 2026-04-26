@@ -41,15 +41,8 @@ export default async function Home() {
       <div className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 sm:px-6">
         <header className="mb-8">
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Chess.com players
+            Mboachess.com
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-            Blitz and rapid ratings from the public API. The online indicator
-            uses the most recent of your profile &quot;last online&quot; time and
-            the last blitz, rapid, or bullet game on your stats, within the
-            last {ONLINE_WITHIN_SEC / 60} minutes. Chess.com does not publish a
-            real-time online API.
-          </p>
         </header>
 
         <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
