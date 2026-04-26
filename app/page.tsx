@@ -1,3 +1,4 @@
+import { GitHubLink } from "@/components/GitHubLink"
 import { SubmitUsernameForm } from "@/components/SubmitUsernameForm"
 import { getSubmittedUsernames } from "@/lib/chesscomUsernames"
 import { fetchPlayerSnapshot, ONLINE_WITHIN_SEC } from "@/lib/chesscom"
@@ -50,15 +51,20 @@ export default async function Home() {
   return (
     <div className="min-h-dvh flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
       <div className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 sm:px-6">
-        <header className="mb-6">
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Mboachess.com
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-            Blitz and rapid ratings and activity from the Chess.com public API.
-            Online (green dot) uses recent profile and game times within{" "}
-            {ONLINE_WITHIN_SEC / 60} minutes.
-          </p>
+        <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              Mboachess.com
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+              Blitz and rapid ratings and activity from the Chess.com public
+              API. Online (green dot) uses recent profile and game times within{" "}
+              {ONLINE_WITHIN_SEC / 60} minutes.
+            </p>
+          </div>
+          <div className="shrink-0 sm:pt-1">
+            <GitHubLink />
+          </div>
         </header>
 
         <SubmitUsernameForm />
