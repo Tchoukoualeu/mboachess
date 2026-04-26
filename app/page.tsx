@@ -44,9 +44,11 @@ export default async function Home() {
             Chess.com players
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-            Blitz and rapid ratings from the public API. “Online” is true if
-            activity was reported in the last {ONLINE_WITHIN_SEC / 60} minutes
-            (Chess.com no longer exposes a dedicated online flag).
+            Blitz and rapid ratings from the public API. The online indicator
+            uses the most recent of your profile &quot;last online&quot; time and
+            the last blitz, rapid, or bullet game on your stats, within the
+            last {ONLINE_WITHIN_SEC / 60} minutes. Chess.com does not publish a
+            real-time online API.
           </p>
         </header>
 
@@ -57,7 +59,9 @@ export default async function Home() {
                 <th className="px-4 py-3 font-medium">Username</th>
                 <th className="px-4 py-3 font-medium">Blitz</th>
                 <th className="px-4 py-3 font-medium">Rapid</th>
-                <th className="px-4 py-3 font-medium">Online</th>
+                <th className="px-4 py-3 font-medium" scope="col">
+                  Online
+                </th>
                 <th className="px-4 py-3 font-medium text-zinc-500 dark:text-zinc-400">
                   Last seen
                 </th>
@@ -89,14 +93,15 @@ export default async function Home() {
                   </td>
                   <td className="px-4 py-3">
                     <span
+                      role="img"
+                      aria-label={r.online ? "Online" : "Offline"}
+                      title={r.online ? "Online" : "Offline"}
                       className={
                         r.online
-                          ? "inline-flex rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-200"
-                          : "inline-flex rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+                          ? "inline-block h-3 w-3 rounded-full bg-emerald-500 dark:bg-emerald-400"
+                          : "inline-block h-3 w-3 rounded-full bg-zinc-300 dark:bg-zinc-500"
                       }
-                    >
-                      {r.online ? "Yes" : "No"}
-                    </span>
+                    />
                   </td>
                   <td className="px-4 py-3 text-zinc-600 tabular-nums dark:text-zinc-400">
                     {formatLastSeen(r.lastOnline)}

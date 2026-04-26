@@ -2,8 +2,12 @@
 export const CHESSCOM_USER_AGENT =
   "mboachess/1.0 (https://vercel.com; contact: mboachess+api@local)";
 
-/** Chess.com retires the /is-online endpoint; 5 min matches their old behavior. */
-export const ONLINE_WITHIN_SEC = 5 * 60;
+/**
+ * Treated as “online” if the latest public activity is within this window.
+ * Uses the newest of: profile `last_online` and blitz/rapid/bullet `last.date`
+ * from stats (the profile timestamp alone is often stale while playing).
+ */
+export const ONLINE_WITHIN_SEC = 15 * 60;
 
 export type PlayerLookupResult = {
   username: string;
@@ -14,19 +18,42 @@ export type PlayerLookupResult = {
   error?: string;
 };
 
-type StatsPayload = {
-  chess_blitz?: { last?: { rating?: number } };
-  chess_rapid?: { last?: { rating?: number } };
+type ProfilePayload = {
+  username: string;
+  last_online?: number;
   code?: number;
   message?: string;
 };
 
-type ProfilePayload = {
-  username: string;
-  last_online: number;
+type GameStatsLast = { last?: { rating?: number; date?: number } };
+
+type StatsPayload = {
+  chess_blitz?: GameStatsLast;
+  chess_rapid?: GameStatsLast;
+  chess_bullet?: GameStatsLast;
   code?: number;
   message?: string;
 };
+
+/** Latest Unix activity time from public profile + live rating stats. */
+function latestActivitySeconds(
+  profile: ProfilePayload,
+  stats: StatsPayload | null
+): number | null {
+  const times: number[] = [];
+  if (typeof profile.last_online === "number" && profile.last_online > 0) {
+    times.push(profile.last_online);
+  }
+  if (!stats) {
+    return times.length ? Math.max(...times) : null;
+  }
+  for (const key of ["chess_blitz", "chess_rapid", "chess_bullet"] as const) {
+    const d = stats[key]?.last?.date;
+    if (typeof d === "number" && d > 0) times.push(d);
+  }
+  if (times.length === 0) return null;
+  return Math.max(...times);
+}
 
 export async function fetchPlayerSnapshot(
   username: string
@@ -64,34 +91,40 @@ export async function fetchPlayerSnapshot(
   }
 
   const profile = (await profileRes.json()) as ProfilePayload;
-  const lastOnline = profile.last_online ?? null;
   const now = Date.now() / 1000;
-  const online =
-    lastOnline != null && now - lastOnline < ONLINE_WITHIN_SEC;
 
   if (!statsRes.ok) {
+    const lastActivity = latestActivitySeconds(profile, null);
+    const online =
+      lastActivity != null && now - lastActivity < ONLINE_WITHIN_SEC;
     return {
       username: profile.username || username,
       blitz: null,
       rapid: null,
       online,
-      lastOnline,
+      lastOnline: lastActivity,
       error: "Stats unavailable",
     };
   }
 
   const stats = (await statsRes.json()) as StatsPayload;
   if (typeof stats.code === "number" && stats.message) {
+    const lastActivity = latestActivitySeconds(profile, null);
+    const online =
+      lastActivity != null && now - lastActivity < ONLINE_WITHIN_SEC;
     return {
       username: profile.username || username,
       blitz: null,
       rapid: null,
       online,
-      lastOnline,
+      lastOnline: lastActivity,
       error: stats.message,
     };
   }
 
+  const lastActivity = latestActivitySeconds(profile, stats);
+  const online =
+    lastActivity != null && now - lastActivity < ONLINE_WITHIN_SEC;
   const blitz = stats.chess_blitz?.last?.rating ?? null;
   const rapid = stats.chess_rapid?.last?.rating ?? null;
 
@@ -100,6 +133,6 @@ export async function fetchPlayerSnapshot(
     blitz,
     rapid,
     online,
-    lastOnline,
+    lastOnline: lastActivity,
   };
 }

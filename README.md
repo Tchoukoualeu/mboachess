@@ -19,7 +19,7 @@ Edit the `TRACKED_USERNAMES` array in `app/page.tsx` (lowercase usernames, as us
 
 ## Online column
 
-**Online** is `true` when the profile’s `last_online` timestamp is within the last 5 minutes. Chess.com does not expose a dedicated public “is online” field anymore; this is a simple proxy.
+**Online** is shown when the latest public activity is within about **15 minutes**—the newest of: profile `last_online` and the “last game” time (`last.date`) on blitz, rapid, or bullet stats. That picks up play activity even when the profile `last_online` value lags. Chess.com does not offer a true live online flag; this is an approximation. The UI uses a **green** dot for online and **gray** for offline.
 
 ## Stack
 
