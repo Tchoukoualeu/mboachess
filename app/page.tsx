@@ -1,4 +1,5 @@
 import { GitHubLink } from "@/components/GitHubLink"
+import { WhatsAppLink } from "@/components/WhatsAppLink"
 import { RatingLeaders } from "@/components/RatingLeaders"
 import { SubmitUsernameForm } from "@/components/SubmitUsernameForm"
 import { getSubmittedUsernames } from "@/lib/chesscomUsernames"
@@ -83,8 +84,9 @@ export default async function Home() {
               {ONLINE_WITHIN_SEC / 60} minutes.
             </p>
           </div>
-          <div className="shrink-0 sm:pt-1">
+          <div className="flex shrink-0 items-center gap-2 sm:pt-1">
             <GitHubLink />
+            <WhatsAppLink />
           </div>
         </header>
 
