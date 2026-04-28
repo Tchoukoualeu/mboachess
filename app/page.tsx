@@ -2,6 +2,7 @@ import { GitHubLink } from "@/components/GitHubLink"
 import { WhatsAppLink } from "@/components/WhatsAppLink"
 import { RatingLeaders } from "@/components/RatingLeaders"
 import { SubmitUsernameForm } from "@/components/SubmitUsernameForm"
+import Link from "next/link"
 import { getSubmittedUsernames } from "@/lib/chesscomUsernames"
 import {
   type PlayerLookupResult,
@@ -82,6 +83,16 @@ export default async function Home() {
               Blitz and rapid ratings and activity from the Chess.com public
               API. Online (green dot) uses recent profile and game times within{" "}
               {ONLINE_WITHIN_SEC / 60} minutes.
+            </p>
+            <p className="mt-2 max-w-2xl text-xs leading-5 text-zinc-600 sm:text-sm sm:leading-6 dark:text-zinc-400">
+              Looking for <span className="font-medium">chess cameroon</span>? See{" "}
+              <Link
+                href="/chess-cameroon"
+                className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
+              >
+                Chess Cameroon
+              </Link>
+              .
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2 sm:pt-1">
