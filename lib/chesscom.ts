@@ -17,6 +17,8 @@ export type PlayerLookupResult = {
   lastOnline: number | null;
   /** Chess.com `avatar` URL; null if not set or on error. */
   avatarUrl: string | null;
+  /** ISO country code (e.g., "CM", "US"); null if not available. */
+  countryCode: string | null;
   error?: string;
 };
 
@@ -24,6 +26,7 @@ type ProfilePayload = {
   username: string;
   last_online?: number;
   avatar?: string;
+  country?: string;
   code?: number;
   message?: string;
 };
@@ -37,6 +40,13 @@ type StatsPayload = {
   code?: number;
   message?: string;
 };
+
+/** Extract country code from Chess.com country URL (e.g., ".../country/CM" -> "CM"). */
+function extractCountryCode(countryUrl: string | undefined): string | null {
+  if (!countryUrl || typeof countryUrl !== "string") return null;
+  const match = countryUrl.match(/\/country\/([A-Z]{2})$/i);
+  return match ? match[1].toUpperCase() : null;
+}
 
 /** Latest Unix activity time from public profile + live rating stats. */
 function latestActivitySeconds(
@@ -90,6 +100,7 @@ export async function fetchPlayerSnapshot(
       online: false,
       lastOnline: null,
       avatarUrl: null,
+      countryCode: null,
       error: msg,
     };
   }
@@ -99,6 +110,7 @@ export async function fetchPlayerSnapshot(
     typeof profile.avatar === "string" && profile.avatar.startsWith("http")
       ? profile.avatar
       : null;
+  const countryCode = extractCountryCode(profile.country);
   const now = Date.now() / 1000;
 
   if (!statsRes.ok) {
@@ -112,6 +124,7 @@ export async function fetchPlayerSnapshot(
       online,
       lastOnline: lastActivity,
       avatarUrl,
+      countryCode,
       error: "Stats unavailable",
     };
   }
@@ -128,6 +141,7 @@ export async function fetchPlayerSnapshot(
       online,
       lastOnline: lastActivity,
       avatarUrl,
+      countryCode,
       error: stats.message,
     };
   }
@@ -145,5 +159,6 @@ export async function fetchPlayerSnapshot(
     online,
     lastOnline: lastActivity,
     avatarUrl,
+    countryCode,
   };
 }

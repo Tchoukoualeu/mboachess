@@ -13,6 +13,79 @@ import { topByRating } from "@/lib/ratingLeaders"
 
 export const dynamic = "force-dynamic"
 
+/** Convert ISO country code to flag emoji (e.g., "CM" -> "🇨🇲"). */
+function countryCodeToFlag(code: string): string {
+  return code
+    .toUpperCase()
+    .split("")
+    .map((char) => String.fromCodePoint(127397 + char.charCodeAt(0)))
+    .join("")
+}
+
+/** Map common country codes to full country names. */
+const COUNTRY_NAMES: Record<string, string> = {
+  CM: "Cameroon",
+  US: "United States",
+  GB: "United Kingdom",
+  FR: "France",
+  DE: "Germany",
+  ES: "Spain",
+  IT: "Italy",
+  CA: "Canada",
+  AU: "Australia",
+  BR: "Brazil",
+  AR: "Argentina",
+  MX: "Mexico",
+  IN: "India",
+  CN: "China",
+  JP: "Japan",
+  KR: "South Korea",
+  RU: "Russia",
+  UA: "Ukraine",
+  PL: "Poland",
+  NL: "Netherlands",
+  BE: "Belgium",
+  CH: "Switzerland",
+  AT: "Austria",
+  SE: "Sweden",
+  NO: "Norway",
+  DK: "Denmark",
+  FI: "Finland",
+  PT: "Portugal",
+  GR: "Greece",
+  TR: "Turkey",
+  ZA: "South Africa",
+  EG: "Egypt",
+  NG: "Nigeria",
+  KE: "Kenya",
+  GH: "Ghana",
+  MA: "Morocco",
+  TN: "Tunisia",
+  DZ: "Algeria",
+  SN: "Senegal",
+  CI: "Ivory Coast",
+  UG: "Uganda",
+  TZ: "Tanzania",
+  ET: "Ethiopia",
+  ZW: "Zimbabwe",
+  BW: "Botswana",
+  RW: "Rwanda",
+  CD: "DR Congo",
+  CG: "Congo",
+  GA: "Gabon",
+  ML: "Mali",
+  BF: "Burkina Faso",
+  NE: "Niger",
+  TD: "Chad",
+  CF: "Central African Republic",
+  GQ: "Equatorial Guinea",
+}
+
+function getCountryName(code: string | null): string {
+  if (!code) return "Unknown"
+  return COUNTRY_NAMES[code.toUpperCase()] || code.toUpperCase()
+}
+
 const TRACKED_USERNAMES = [
   "menxele",
   "brlliantmoves",
@@ -105,11 +178,18 @@ export default async function Home() {
 
         <SubmitUsernameForm />
 
+        <div className="mb-4 flex items-center justify-between rounded-lg bg-zinc-100 px-4 py-3 dark:bg-zinc-800/50">
+          <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Total players: <span className="text-emerald-700 dark:text-emerald-400">{rows.length}</span>
+          </p>
+        </div>
+
         <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
           <table className="w-full min-w-xl text-left text-sm">
             <thead>
               <tr className="border-b border-zinc-200 dark:border-zinc-800">
                 <th className="px-4 py-3 font-medium">Username</th>
+                <th className="px-4 py-3 font-medium">Country</th>
                 <th className="px-4 py-3 font-medium">Blitz</th>
                 <th className="px-4 py-3 font-medium">Rapid</th>
                 <th className="px-4 py-3 font-medium" scope="col">
@@ -137,6 +217,18 @@ export default async function Home() {
                     >
                       {r.username}
                     </a>
+                  </td>
+                  <td className="px-4 py-3">
+                    {r.countryCode ? (
+                      <div className="group relative inline-block cursor-help">
+                        <span className="text-2xl">{countryCodeToFlag(r.countryCode)}</span>
+                        <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-zinc-100 dark:text-zinc-900">
+                          {getCountryName(r.countryCode)}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-zinc-400">—</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 tabular-nums">
                     {formatRating(r.blitz, r.error)}
