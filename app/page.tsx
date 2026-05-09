@@ -178,6 +178,16 @@ export default async function Home() {
                 >
                   Upcoming Tournaments
                 </Link>
+                {" • "}
+              </p>
+              <p>
+                Find{" "}
+                <Link
+                  href="/clubs"
+                  className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
+                >
+                  Chess Clubs
+                </Link>
               </p>
             </div>
           </div>
@@ -189,34 +199,65 @@ export default async function Home() {
 
         <RatingLeaders blitzLeader={blitzLeader} rapidLeader={rapidLeader} />
 
-        <Link
-          href="/tournaments"
-          className="mb-4 block rounded-xl border border-emerald-200 bg-emerald-50 p-4 transition hover:border-emerald-300 hover:bg-emerald-100 dark:border-emerald-900/50 dark:bg-emerald-900/20 dark:hover:border-emerald-800 dark:hover:bg-emerald-900/30 sm:mb-6 sm:p-6"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-emerald-900 dark:text-emerald-100">
-                Upcoming Tournaments
-              </h2>
-              <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">
-                View and add chess tournaments in your area
-              </p>
+        <div className="mb-4 grid gap-4 sm:mb-6 sm:grid-cols-2">
+          <Link
+            href="/tournaments"
+            className="block rounded-xl border border-emerald-200 bg-emerald-50 p-4 transition hover:border-emerald-300 hover:bg-emerald-100 dark:border-emerald-900/50 dark:bg-emerald-900/20 dark:hover:border-emerald-800 dark:hover:bg-emerald-900/30 sm:p-6"
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-emerald-900 dark:text-emerald-100">
+                  Tournaments
+                </h2>
+                <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">
+                  View and add upcoming chess tournaments
+                </p>
+              </div>
+              <svg
+                className="h-5 w-5 shrink-0 text-emerald-700 dark:text-emerald-300"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
             </div>
-            <svg
-              className="h-6 w-6 text-emerald-700 dark:text-emerald-300"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </div>
-        </Link>
+          </Link>
+
+          <Link
+            href="/clubs"
+            className="block rounded-xl border border-blue-200 bg-blue-50 p-4 transition hover:border-blue-300 hover:bg-blue-100 dark:border-blue-900/50 dark:bg-blue-900/20 dark:hover:border-blue-800 dark:hover:bg-blue-900/30 sm:p-6"
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                  Chess Clubs
+                </h2>
+                <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                  Find and join local chess clubs
+                </p>
+              </div>
+              <svg
+                className="h-5 w-5 shrink-0 text-blue-700 dark:text-blue-300"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </div>
+          </Link>
+        </div>
 
         <SubmitUsernameForm />
 
