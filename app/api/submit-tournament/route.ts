@@ -55,6 +55,9 @@ export async function POST(request: Request) {
         ? data.description
         : undefined,
     link: data.link && typeof data.link === "string" ? data.link : undefined,
+    phone:
+      data.phone && typeof data.phone === "string" ? data.phone : undefined,
+    isOnline: data.isOnline === true ? true : undefined,
   }
 
   const result = await saveTournament(tournament)
