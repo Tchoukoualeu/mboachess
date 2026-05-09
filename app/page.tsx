@@ -113,20 +113,21 @@ function formatRating(
   return "Unrated"
 }
 
-function uniqueSortedUsernames(
-  a: readonly string[],
-  b: string[]
-): string[] {
+function uniqueSortedUsernames(a: readonly string[], b: string[]): string[] {
   return [...new Set([...a, ...b])].sort((x, y) => x.localeCompare(y))
 }
 
 /** Highest rapid first; missing/unrated rapid at the bottom, then by username. */
 function sortByRapidDesc(rows: PlayerLookupResult[]) {
   rows.sort((a, b) => {
-    const aNum = typeof a.rapid === "number" ? a.rapid : Number.NEGATIVE_INFINITY
-    const bNum = typeof b.rapid === "number" ? b.rapid : Number.NEGATIVE_INFINITY
+    const aNum =
+      typeof a.rapid === "number" ? a.rapid : Number.NEGATIVE_INFINITY
+    const bNum =
+      typeof b.rapid === "number" ? b.rapid : Number.NEGATIVE_INFINITY
     if (bNum !== aNum) return bNum - aNum
-    return a.username.localeCompare(b.username, undefined, { sensitivity: "base" })
+    return a.username.localeCompare(b.username, undefined, {
+      sensitivity: "base",
+    })
   })
 }
 
@@ -157,16 +158,28 @@ export default async function Home() {
               API. Online (green dot) uses recent profile and game times within{" "}
               {ONLINE_WITHIN_SEC / 60} minutes.
             </p>
-            <p className="mt-2 max-w-2xl text-xs leading-5 text-zinc-600 sm:text-sm sm:leading-6 dark:text-zinc-400">
-              Looking for <span className="font-medium">chess cameroon</span>? See{" "}
-              <Link
-                href="/chess-cameroon"
-                className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
-              >
-                Chess Cameroon
-              </Link>
-              .
-            </p>
+            <div className="mt-2 flex flex-wrap gap-x-1 text-xs leading-5 text-zinc-600 sm:text-sm sm:leading-6 dark:text-zinc-400">
+              <p>
+                Looking for <span className="font-medium">chess cameroon</span>?
+                See{" "}
+                <Link
+                  href="/chess-cameroon"
+                  className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
+                >
+                  Chess Cameroon
+                </Link>
+                {" • "}
+              </p>
+              <p>
+                View{" "}
+                <Link
+                  href="/tournaments"
+                  className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
+                >
+                  Upcoming Tournaments
+                </Link>
+              </p>
+            </div>
           </div>
           <div className="flex shrink-0 items-center gap-2 sm:pt-1">
             <GitHubLink />
@@ -176,11 +189,43 @@ export default async function Home() {
 
         <RatingLeaders blitzLeader={blitzLeader} rapidLeader={rapidLeader} />
 
+        <Link
+          href="/tournaments"
+          className="mb-4 block rounded-xl border border-emerald-200 bg-emerald-50 p-4 transition hover:border-emerald-300 hover:bg-emerald-100 dark:border-emerald-900/50 dark:bg-emerald-900/20 dark:hover:border-emerald-800 dark:hover:bg-emerald-900/30 sm:mb-6 sm:p-6"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-emerald-900 dark:text-emerald-100">
+                Upcoming Tournaments
+              </h2>
+              <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">
+                View and add chess tournaments in your area
+              </p>
+            </div>
+            <svg
+              className="h-6 w-6 text-emerald-700 dark:text-emerald-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </div>
+        </Link>
+
         <SubmitUsernameForm />
 
         <div className="mb-4 flex items-center justify-between rounded-lg bg-zinc-100 px-4 py-3 dark:bg-zinc-800/50">
           <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Total players: <span className="text-emerald-700 dark:text-emerald-400">{rows.length}</span>
+            Total players:{" "}
+            <span className="text-emerald-700 dark:text-emerald-400">
+              {rows.length}
+            </span>
           </p>
         </div>
 
@@ -221,7 +266,9 @@ export default async function Home() {
                   <td className="px-4 py-3">
                     {r.countryCode ? (
                       <div className="group relative inline-block cursor-help">
-                        <span className="text-2xl">{countryCodeToFlag(r.countryCode)}</span>
+                        <span className="text-2xl">
+                          {countryCodeToFlag(r.countryCode)}
+                        </span>
                         <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-zinc-100 dark:text-zinc-900">
                           {getCountryName(r.countryCode)}
                         </span>
