@@ -275,7 +275,6 @@ export default async function Home() {
             <thead>
               <tr className="border-b border-zinc-200 dark:border-zinc-800">
                 <th className="px-4 py-3 font-medium">Username</th>
-                <th className="px-4 py-3 font-medium">Country</th>
                 <th className="px-4 py-3 font-medium">Blitz</th>
                 <th className="px-4 py-3 font-medium">Rapid</th>
                 <th className="px-4 py-3 font-medium" scope="col">
@@ -284,6 +283,7 @@ export default async function Home() {
                 <th className="px-4 py-3 font-medium text-zinc-500 dark:text-zinc-400">
                   Last seen
                 </th>
+                <th className="px-4 py-3 font-medium">Country</th>
               </tr>
             </thead>
             <tbody>
@@ -303,20 +303,6 @@ export default async function Home() {
                     >
                       {r.username}
                     </a>
-                  </td>
-                  <td className="px-4 py-3">
-                    {r.countryCode ? (
-                      <div className="group relative inline-block cursor-help">
-                        <span className="text-2xl">
-                          {countryCodeToFlag(r.countryCode)}
-                        </span>
-                        <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-zinc-100 dark:text-zinc-900">
-                          {getCountryName(r.countryCode)}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-zinc-400">—</span>
-                    )}
                   </td>
                   <td className="px-4 py-3 tabular-nums">
                     {formatRating(r.blitz, r.error)}
@@ -338,6 +324,20 @@ export default async function Home() {
                   </td>
                   <td className="px-4 py-3 text-zinc-600 tabular-nums dark:text-zinc-400">
                     {formatLastSeen(r.lastOnline)}
+                  </td>
+                  <td className="px-4 py-3">
+                    {r.countryCode ? (
+                      <div className="group relative inline-block cursor-help">
+                        <span className="text-2xl">
+                          {countryCodeToFlag(r.countryCode)}
+                        </span>
+                        <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-zinc-100 dark:text-zinc-900">
+                          {getCountryName(r.countryCode)}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-zinc-400">—</span>
+                    )}
                   </td>
                 </tr>
               ))}

@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Chess.com player lookup | mboachess",
+  title: "Mboachess - Chess in Cameroon | Players, Clubs & Tournaments",
   description:
-    "Look up blitz and rapid ratings and recent online activity for Chess.com usernames.",
+    "The hub for chess in Cameroon. Track Cameroonian chess players' ratings, discover local chess clubs, view upcoming tournaments, and connect with the chess community across Cameroon.",
   icons: {
     icon: [{ url: queenIcon.src, type: "image/png" }],
   },
