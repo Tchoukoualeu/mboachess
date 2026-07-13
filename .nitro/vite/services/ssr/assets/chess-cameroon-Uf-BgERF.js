@@ -1,5 +1,5 @@
 import { V as jsxRuntimeExports } from "../server.js";
-import { L as Link } from "./router-CKdnlwL4.js";
+import { L as Link } from "./router-b0Uay8yT.js";
 import "node:async_hooks";
 import "node:stream";
 import "node:stream/web";
@@ -7,24 +7,12 @@ import "util";
 import "crypto";
 import "async_hooks";
 import "stream";
-import "./chesscomUsernames-Cvwz24GZ.js";
-import "./mongodb-BSnNLwqh.js";
-import "timers/promises";
-import "timers";
-import "fs";
-import "http";
-import "process";
-import "events";
-import "dns";
-import "url";
-import "zlib";
-import "net";
-import "fs/promises";
-import "tls";
-import "child_process";
-import "./tournaments-Ijxn2pDm.js";
-import "./contentCreators-BNaY_jwK.js";
-import "./clubs-BYYazxhC.js";
+import "./chesscomUsernames-D6JZLzLJ.js";
+import "./mongodb-yGO5SLfS.js";
+import "mongodb";
+import "./tournaments-C429zNlO.js";
+import "./contentCreators-I2ZrPeOm.js";
+import "./clubs-SttmtQTi.js";
 function ChessCameroonPage() {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("main", { className: "mx-auto w-full max-w-4xl flex-1 px-4 py-6 sm:px-6 sm:py-10", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("header", { className: "space-y-3", children: [

@@ -1,4 +1,4 @@
-import { i as isMongoConfigured, g as getDb } from "./mongodb-BSnNLwqh.js";
+import { i as isMongoConfigured, g as getDb } from "./mongodb-yGO5SLfS.js";
 const COLLECTION = "contentCreators";
 async function getContentCreators() {
   if (!isMongoConfigured()) return [];

@@ -4,38 +4,9 @@ import { ReadableStream as ReadableStream$1 } from "node:stream/web";
 import require$$0 from "util";
 import require$$1 from "crypto";
 import require$$2 from "async_hooks";
-import require$$0$1 from "stream";
+import require$$5 from "stream";
 function getDefaultExportFromCjs(x2) {
   return x2 && x2.__esModule && Object.prototype.hasOwnProperty.call(x2, "default") ? x2["default"] : x2;
-}
-function getAugmentedNamespace(n) {
-  if (Object.prototype.hasOwnProperty.call(n, "__esModule")) return n;
-  var f2 = n.default;
-  if (typeof f2 == "function") {
-    var a = function a2() {
-      var isInstance = false;
-      try {
-        isInstance = this instanceof a2;
-      } catch {
-      }
-      if (isInstance) {
-        return Reflect.construct(f2, arguments, this.constructor);
-      }
-      return f2.apply(this, arguments);
-    };
-    a.prototype = f2.prototype;
-  } else a = {};
-  Object.defineProperty(a, "__esModule", { value: true });
-  Object.keys(n).forEach(function(k2) {
-    var d = Object.getOwnPropertyDescriptor(n, k2);
-    Object.defineProperty(a, k2, d.get ? d : {
-      enumerable: true,
-      get: function() {
-        return n[k2];
-      }
-    });
-  });
-  return a;
 }
 var react = { exports: {} };
 var react_production = {};
@@ -9536,7 +9507,7 @@ var hasRequiredReactDomServer_node_production;
 function requireReactDomServer_node_production() {
   if (hasRequiredReactDomServer_node_production) return reactDomServer_node_production;
   hasRequiredReactDomServer_node_production = 1;
-  var util = require$$0, crypto = require$$1, async_hooks = require$$2, React2 = requireReact(), ReactDOM = requireReactDom(), stream = require$$0$1, REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy"), REACT_SCOPE_TYPE = /* @__PURE__ */ Symbol.for("react.scope"), REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), REACT_LEGACY_HIDDEN_TYPE = /* @__PURE__ */ Symbol.for("react.legacy_hidden"), REACT_MEMO_CACHE_SENTINEL = /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
+  var util = require$$0, crypto = require$$1, async_hooks = require$$2, React2 = requireReact(), ReactDOM = requireReactDom(), stream = require$$5, REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy"), REACT_SCOPE_TYPE = /* @__PURE__ */ Symbol.for("react.scope"), REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), REACT_LEGACY_HIDDEN_TYPE = /* @__PURE__ */ Symbol.for("react.legacy_hidden"), REACT_MEMO_CACHE_SENTINEL = /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
   function getIteratorFn(maybeIterable) {
     if (null === maybeIterable || "object" !== typeof maybeIterable) return null;
     maybeIterable = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable["@@iterator"];
@@ -17097,7 +17068,7 @@ function getResponse() {
 }
 var HEADERS = { TSS_SHELL: "X-TSS_SHELL" };
 async function getStartManifest(matchedRoutes) {
-  const { tsrStartManifest } = await import("./assets/_tanstack-start-manifest_v-vF_tNkDK.js");
+  const { tsrStartManifest } = await import("./assets/_tanstack-start-manifest_v-BkNAeWZq.js");
   const startManifest = tsrStartManifest();
   let routes = startManifest.routes;
   routes[rootRouteId];
@@ -17119,19 +17090,19 @@ async function getStartManifest(matchedRoutes) {
 const manifest = {
   "294a222c04dc5ccb27cb2ceb9d4f62d1c45feffa6870b8202173512c283cd9e9": {
     functionName: "loadContentCreators_createServerFn_handler",
-    importer: () => import("./assets/contentCreators-BvPMQ_Pp.js")
+    importer: () => import("./assets/contentCreators-DyVZVVhF.js")
   },
   "478496646ceea7bd195c647ef46aa47bbd45720a47d199d1367f3b613a1db6ff": {
     functionName: "loadHomeData_createServerFn_handler",
-    importer: () => import("./assets/home-BiT5C-e0.js")
+    importer: () => import("./assets/home-MhGzyCSK.js")
   },
   "a30f3410c46a25cb7f7e241b4fa9cc3bdaf8cd8d0ecc4ab5c03f469951f2630c": {
     functionName: "loadClubs_createServerFn_handler",
-    importer: () => import("./assets/clubs-B41tQzxe.js")
+    importer: () => import("./assets/clubs-C8BbX04S.js")
   },
   "fdff08ca78a27acc5cf8d91fae3be87452758cb92fa0f0f89c91da6180a75eeb": {
     functionName: "loadTournaments_createServerFn_handler",
-    importer: () => import("./assets/tournaments-ff8VcK-V.js")
+    importer: () => import("./assets/tournaments-Cr3kRJ8c.js")
   }
 };
 async function getServerFnById(id, access) {
@@ -18372,7 +18343,7 @@ var getBaseManifest = getProdBaseManifest;
 var createEarlyHintsForRequest = createEarlyHintsCollector;
 async function loadEntries() {
   const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-    import("./assets/router-CKdnlwL4.js").then((n) => n.r),
+    import("./assets/router-b0Uay8yT.js").then((n) => n.r),
     import("./assets/start-HYkvq4Ni.js"),
     import("./assets/empty-plugin-adapters-BFgPZ6_d.js")
   ]);
@@ -18775,8 +18746,6 @@ export {
   TSS_SERVER_FUNCTION as a2,
   getServerFnById as a3,
   createServerFn as a4,
-  getAugmentedNamespace as a5,
-  getDefaultExportFromCjs as a6,
   isNotFound as b,
   invariant as c,
   createServerEntry,

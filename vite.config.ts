@@ -18,6 +18,11 @@ export default defineConfig({
     },
     tsconfigPaths: true,
   },
+  ssr: {
+    // Keep mongodb as a real Node module. Bundling it breaks at runtime
+    // because its CJS internals call `require()` inside an ESM output.
+    external: ["mongodb"],
+  },
   plugins: [
     tailwindcss(),
     tanstackStart({
@@ -27,6 +32,12 @@ export default defineConfig({
       },
     }),
     viteReact(),
-    nitro(),
+    nitro({
+      config: {
+        externals: {
+          external: ["mongodb"],
+        },
+      },
+    }),
   ],
 })
