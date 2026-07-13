@@ -62,37 +62,74 @@ type HomeData = {
   rapidLeader: ReturnType<typeof topByRating>
 }
 
-/** How many Chess.com lookups run at once. */
-const FETCH_CONCURRENCY = 6
-/** How long a computed snapshot is reused before refetching (ms). */
-const CACHE_TTL_MS = 60_000
+/** How many Chess.com lookups run at once on a cold fetch. */
+const FETCH_CONCURRENCY = 8
+/** How long a cached snapshot is considered fresh before a background refresh. */
+const PLAYER_TTL_MS = 60_000
 
-let cache: { key: string; at: number; data: HomeData } | null = null
+type PlayerCacheEntry = {
+  at: number
+  data: PlayerLookupResult
+  refreshing: boolean
+}
+
+const playerCache = new Map<string, PlayerCacheEntry>()
+
+/**
+ * Stale-while-revalidate snapshot for a single player.
+ *
+ * - No cache yet: fetch and block (only happens once per username).
+ * - Cached and fresh: return immediately.
+ * - Cached and stale: return the stale value now and refresh in the
+ *   background so the next request is up to date. This keeps SSR instant
+ *   while ratings stay reasonably current.
+ */
+async function getCachedSnapshot(
+  username: string,
+): Promise<PlayerLookupResult> {
+  const entry = playerCache.get(username)
+  const now = Date.now()
+
+  if (!entry) {
+    const data = await fetchPlayerSnapshot(username)
+    playerCache.set(username, { at: Date.now(), data, refreshing: false })
+    return data
+  }
+
+  if (now - entry.at >= PLAYER_TTL_MS && !entry.refreshing) {
+    entry.refreshing = true
+    void fetchPlayerSnapshot(username)
+      .then((fresh) => {
+        playerCache.set(username, {
+          at: Date.now(),
+          data: fresh,
+          refreshing: false,
+        })
+      })
+      .catch(() => {
+        entry.refreshing = false
+      })
+  }
+
+  return entry.data
+}
 
 export const loadHomeData = createServerFn({ method: "GET" }).handler(
   async (): Promise<HomeData> => {
     const fromDb = await getSubmittedUsernames()
     const usernames = uniqueSortedUsernames(TRACKED_USERNAMES, fromDb)
-    const key = usernames.join(",")
-    const now = Date.now()
-
-    if (cache && cache.key === key && now - cache.at < CACHE_TTL_MS) {
-      return cache.data
-    }
 
     const rows = await mapWithConcurrency(
       usernames,
       FETCH_CONCURRENCY,
-      fetchPlayerSnapshot,
+      getCachedSnapshot,
     )
     sortByRapidDesc(rows)
 
-    const data: HomeData = {
+    return {
       rows,
       blitzLeader: topByRating(rows, "blitz"),
       rapidLeader: topByRating(rows, "rapid"),
     }
-    cache = { key, at: now, data }
-    return data
   },
 )

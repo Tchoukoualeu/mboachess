@@ -15,6 +15,7 @@
 
 # build output
 /.output/
+/.nitro/
 /out/
 /build
 
