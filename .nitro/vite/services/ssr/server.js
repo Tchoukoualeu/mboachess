@@ -17090,7 +17090,7 @@ async function getStartManifest(matchedRoutes) {
 const manifest = {
   "294a222c04dc5ccb27cb2ceb9d4f62d1c45feffa6870b8202173512c283cd9e9": {
     functionName: "loadContentCreators_createServerFn_handler",
-    importer: () => import("./assets/contentCreators-DyVZVVhF.js")
+    importer: () => import("./assets/contentCreators-BFjDJ_1p.js")
   },
   "478496646ceea7bd195c647ef46aa47bbd45720a47d199d1367f3b613a1db6ff": {
     functionName: "loadHomeData_createServerFn_handler",
@@ -17098,11 +17098,11 @@ const manifest = {
   },
   "a30f3410c46a25cb7f7e241b4fa9cc3bdaf8cd8d0ecc4ab5c03f469951f2630c": {
     functionName: "loadClubs_createServerFn_handler",
-    importer: () => import("./assets/clubs-C8BbX04S.js")
+    importer: () => import("./assets/clubs-D0nC5YFB.js")
   },
   "fdff08ca78a27acc5cf8d91fae3be87452758cb92fa0f0f89c91da6180a75eeb": {
     functionName: "loadTournaments_createServerFn_handler",
-    importer: () => import("./assets/tournaments-Cr3kRJ8c.js")
+    importer: () => import("./assets/tournaments-BUPkKRPk.js")
   }
 };
 async function getServerFnById(id, access) {
@@ -18343,7 +18343,7 @@ var getBaseManifest = getProdBaseManifest;
 var createEarlyHintsForRequest = createEarlyHintsCollector;
 async function loadEntries() {
   const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-    import("./assets/router-DycFnjQb.js").then((n) => n.r),
+    import("./assets/router-XR5j5qSS.js").then((n) => n.r),
     import("./assets/start-HYkvq4Ni.js"),
     import("./assets/empty-plugin-adapters-BFgPZ6_d.js")
   ]);

@@ -1,8 +1,8 @@
 import { r as reactExports, i as isPromise, a as isRedirect, b as isNotFound, c as invariant, d as createControlledPromise, e as rootRouteId, f as isServer, g as functionalUpdate, h as arraysEqual, j as createLRUCache, k as compileDecodeCharMap, t as trimPath, l as rewriteBasepath, m as composeRewrites, p as processRouteTree, n as processRouteMasks, o as resolvePath, q as cleanPath, s as trimPathRight, u as parseHref, v as executeRewriteInput, w as isDangerousProtocol, x as redirect, y as findSingleMatch, z as deepEqual, D as DEFAULT_PROTOCOL_ALLOWLIST, A as buildRouteBranch, B as interpolatePath, C as nullReplaceEqualDeep, E as replaceEqualDeep, F as last, G as decodePath, H as findFlatMatch, I as findRouteMatch, J as hasKeys, K as executeRewriteOutput, L as encodePathLikeUrl, M as trimPathLeft, N as joinPaths, O as useRouter, P as dummyMatchContext, Q as matchContext, R as requireReactDom, S as exactPathTest, T as removeTrailingSlash, U as React, V as jsxRuntimeExports, W as isModuleNotFoundError, X as useHydrated, Y as escapeHtml, Z as getAssetCrossOrigin, _ as getScriptPreloadAttrs, $ as appendUniqueUserTags, a0 as resolveManifestCssLink, a1 as Outlet, a2 as TSS_SERVER_FUNCTION, a3 as getServerFnById, a4 as createServerFn } from "../server.js";
 import { n as normalizeChesscomUsername, s as saveUsername } from "./chesscomUsernames-D6JZLzLJ.js";
-import { s as saveTournament } from "./tournaments-C429zNlO.js";
-import { s as saveContentCreator } from "./contentCreators-I2ZrPeOm.js";
-import { s as saveClub } from "./clubs-SttmtQTi.js";
+import { s as saveTournament } from "./tournaments-KO9dVa6V.js";
+import { s as saveContentCreator } from "./contentCreators-1wRkp1sv.js";
+import { s as saveClub } from "./clubs-plQ1mxXw.js";
 var reactUse = reactExports.use;
 function useForwardedRef(ref) {
   const innerRef = reactExports.useRef(null);
@@ -2793,7 +2793,7 @@ var createSsrRpc = (functionId) => {
 const loadTournaments = createServerFn({
   method: "GET"
 }).handler(createSsrRpc("fdff08ca78a27acc5cf8d91fae3be87452758cb92fa0f0f89c91da6180a75eeb"));
-const $$splitComponentImporter$4 = () => import("./tournaments-DS3wMcdp.js");
+const $$splitComponentImporter$4 = () => import("./tournaments-Cy9qlSgF.js");
 const Route$a = createFileRoute("/tournaments")({
   head: () => pageHead({
     title: "Chess Tournaments in Cameroon | mboachess",
@@ -2847,7 +2847,7 @@ Sitemap: https://mboachess.com/sitemap.xml
 const loadContentCreators = createServerFn({
   method: "GET"
 }).handler(createSsrRpc("294a222c04dc5ccb27cb2ceb9d4f62d1c45feffa6870b8202173512c283cd9e9"));
-const $$splitComponentImporter$3 = () => import("./content-creators-BzAGfGR8.js");
+const $$splitComponentImporter$3 = () => import("./content-creators-DSa1BHJ2.js");
 const Route$7 = createFileRoute("/content-creators")({
   head: () => pageHead({
     title: "Chess Content Creators in Cameroon | mboachess",
@@ -2860,7 +2860,7 @@ const Route$7 = createFileRoute("/content-creators")({
 const loadClubs = createServerFn({
   method: "GET"
 }).handler(createSsrRpc("a30f3410c46a25cb7f7e241b4fa9cc3bdaf8cd8d0ecc4ab5c03f469951f2630c"));
-const $$splitComponentImporter$2 = () => import("./clubs-B3eQkagW.js");
+const $$splitComponentImporter$2 = () => import("./clubs-CEFd9vXA.js");
 const Route$6 = createFileRoute("/clubs")({
   head: () => pageHead({
     title: "Chess Clubs in Cameroon | mboachess",
@@ -2870,7 +2870,7 @@ const Route$6 = createFileRoute("/clubs")({
   loader: () => loadClubs(),
   component: lazyRouteComponent($$splitComponentImporter$2, "component")
 });
-const $$splitComponentImporter$1 = () => import("./chess-cameroon-BAYIVqK3.js");
+const $$splitComponentImporter$1 = () => import("./chess-cameroon-B9YNBsRZ.js");
 const Route$5 = createFileRoute("/chess-cameroon")({
   head: () => pageHead({
     title: "Chess Cameroon | clubs, events, and players",
@@ -2883,7 +2883,7 @@ const Route$5 = createFileRoute("/chess-cameroon")({
 const loadHomeData = createServerFn({
   method: "GET"
 }).handler(createSsrRpc("478496646ceea7bd195c647ef46aa47bbd45720a47d199d1367f3b613a1db6ff"));
-const $$splitComponentImporter = () => import("./index-D2oyS0pf.js");
+const $$splitComponentImporter = () => import("./index-C9ltGOjF.js");
 const Route$4 = createFileRoute("/")({
   loader: () => loadHomeData(),
   component: lazyRouteComponent($$splitComponentImporter, "component")

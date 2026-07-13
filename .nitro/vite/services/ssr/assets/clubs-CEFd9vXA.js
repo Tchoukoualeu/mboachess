@@ -1,5 +1,5 @@
 import { O as useRouter, r as reactExports, V as jsxRuntimeExports } from "../server.js";
-import { b as Route, L as Link } from "./router-DycFnjQb.js";
+import { b as Route, L as Link } from "./router-XR5j5qSS.js";
 import "node:async_hooks";
 import "node:stream";
 import "node:stream/web";
@@ -10,9 +10,9 @@ import "stream";
 import "./chesscomUsernames-D6JZLzLJ.js";
 import "./mongodb-yGO5SLfS.js";
 import "mongodb";
-import "./tournaments-C429zNlO.js";
-import "./contentCreators-I2ZrPeOm.js";
-import "./clubs-SttmtQTi.js";
+import "./tournaments-KO9dVa6V.js";
+import "./contentCreators-1wRkp1sv.js";
+import "./clubs-plQ1mxXw.js";
 function AddClubForm() {
   const router = useRouter();
   const [isExpanded, setIsExpanded] = reactExports.useState(false);

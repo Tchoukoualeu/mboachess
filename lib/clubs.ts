@@ -26,7 +26,8 @@ export async function getClubs(): Promise<Club[]> {
     .sort({ name: 1 })
     .toArray()
 
-  return clubs
+  // Normalize BSON values (e.g. ObjectId) so loader data is serializable.
+  return clubs.map((c) => ({ ...c, _id: c._id ? String(c._id) : undefined }))
 }
 
 export type SaveClubResult = "ok" | "unconfigured" | "invalid"

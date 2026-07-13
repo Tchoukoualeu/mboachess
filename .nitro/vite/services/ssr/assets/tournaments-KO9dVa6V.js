@@ -136,9 +136,13 @@ async function getTournaments() {
   if (isMongoConfigured()) {
     const db = await getDb();
     if (db) {
-      dbTournaments = await db.collection(COLLECTION).find({
+      const docs = await db.collection(COLLECTION).find({
         startDate: { $gte: now }
       }).sort({ startDate: 1 }).toArray();
+      dbTournaments = docs.map((t) => ({
+        ...t,
+        _id: t._id ? String(t._id) : void 0
+      }));
     }
   }
   const allTournaments = [...futureSeedTournaments, ...dbTournaments];

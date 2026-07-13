@@ -156,13 +156,18 @@ export async function getTournaments(): Promise<Tournament[]> {
   if (isMongoConfigured()) {
     const db = await getDb()
     if (db) {
-      dbTournaments = await db
+      const docs = await db
         .collection(COLLECTION)
         .find<Tournament>({
           startDate: { $gte: now },
         })
         .sort({ startDate: 1 })
         .toArray()
+      // Normalize BSON values (e.g. ObjectId) so loader data is serializable.
+      dbTournaments = docs.map((t) => ({
+        ...t,
+        _id: t._id ? String(t._id) : undefined,
+      }))
     }
   }
 

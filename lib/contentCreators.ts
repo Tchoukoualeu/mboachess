@@ -29,7 +29,11 @@ export async function getContentCreators(): Promise<ContentCreator[]> {
     .sort({ name: 1 })
     .toArray()
 
-  return creators
+  // Normalize BSON values (e.g. ObjectId) so loader data is serializable.
+  return creators.map((c) => ({
+    ...c,
+    _id: c._id ? String(c._id) : undefined,
+  }))
 }
 
 export type SaveContentCreatorResult = "ok" | "unconfigured" | "invalid"

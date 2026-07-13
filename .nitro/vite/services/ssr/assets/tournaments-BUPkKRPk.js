@@ -1,6 +1,6 @@
 import { c as createServerRpc } from "./createServerRpc-BIv2m3Zx.js";
 import { a4 as createServerFn } from "../server.js";
-import { g as getTournaments } from "./tournaments-C429zNlO.js";
+import { g as getTournaments } from "./tournaments-KO9dVa6V.js";
 import "node:async_hooks";
 import "node:stream";
 import "node:stream/web";
