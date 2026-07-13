@@ -38,6 +38,24 @@ function sortByRapidDesc(rows) {
     });
   });
 }
+async function mapWithConcurrency(items, limit, fn) {
+  const results = new Array(items.length);
+  let next = 0;
+  async function worker() {
+    while (next < items.length) {
+      const index = next++;
+      results[index] = await fn(items[index]);
+    }
+  }
+  const workers = Array.from({
+    length: Math.min(limit, items.length)
+  }, worker);
+  await Promise.all(workers);
+  return results;
+}
+const FETCH_CONCURRENCY = 6;
+const CACHE_TTL_MS = 6e4;
+let cache = null;
 const loadHomeData_createServerFn_handler = createServerRpc({
   id: "478496646ceea7bd195c647ef46aa47bbd45720a47d199d1367f3b613a1db6ff",
   name: "loadHomeData",
@@ -48,17 +66,24 @@ const loadHomeData = createServerFn({
 }).handler(loadHomeData_createServerFn_handler, async () => {
   const fromDb = await getSubmittedUsernames();
   const usernames = uniqueSortedUsernames(TRACKED_USERNAMES, fromDb);
-  const rows = [];
-  for (const u of usernames) {
-    rows.push(await fetchPlayerSnapshot(u));
-    await new Promise((r) => setTimeout(r, 120));
+  const key = usernames.join(",");
+  const now = Date.now();
+  if (cache && cache.key === key && now - cache.at < CACHE_TTL_MS) {
+    return cache.data;
   }
+  const rows = await mapWithConcurrency(usernames, FETCH_CONCURRENCY, fetchPlayerSnapshot);
   sortByRapidDesc(rows);
-  return {
+  const data = {
     rows,
     blitzLeader: topByRating(rows, "blitz"),
     rapidLeader: topByRating(rows, "rapid")
   };
+  cache = {
+    key,
+    at: now,
+    data
+  };
+  return data;
 });
 export {
   loadHomeData_createServerFn_handler

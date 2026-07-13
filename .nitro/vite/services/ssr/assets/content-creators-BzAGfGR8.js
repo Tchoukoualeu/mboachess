@@ -1,5 +1,5 @@
 import { O as useRouter, r as reactExports, V as jsxRuntimeExports } from "../server.js";
-import { a as Route, L as Link } from "./router-b0Uay8yT.js";
+import { a as Route, L as Link } from "./router-DycFnjQb.js";
 import "node:async_hooks";
 import "node:stream";
 import "node:stream/web";

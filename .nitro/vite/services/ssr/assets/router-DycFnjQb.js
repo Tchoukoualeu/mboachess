@@ -2720,7 +2720,7 @@ function renderScripts(router2, scripts, assetScripts) {
     key: `tsr-scripts-${asset.tag}-${i}`
   })) });
 }
-const appCss = "/assets/globals-BXm1FP2o.css";
+const appCss = "/assets/globals-_vWRTwak.css";
 const SITE_URL = "https://mboachess.com";
 const SITE_NAME = "mboachess";
 function pageHead({ title, description, path, type = "website" }) {
@@ -2793,7 +2793,7 @@ var createSsrRpc = (functionId) => {
 const loadTournaments = createServerFn({
   method: "GET"
 }).handler(createSsrRpc("fdff08ca78a27acc5cf8d91fae3be87452758cb92fa0f0f89c91da6180a75eeb"));
-const $$splitComponentImporter$4 = () => import("./tournaments-7dOoD5GJ.js");
+const $$splitComponentImporter$4 = () => import("./tournaments-DS3wMcdp.js");
 const Route$a = createFileRoute("/tournaments")({
   head: () => pageHead({
     title: "Chess Tournaments in Cameroon | mboachess",
@@ -2847,7 +2847,7 @@ Sitemap: https://mboachess.com/sitemap.xml
 const loadContentCreators = createServerFn({
   method: "GET"
 }).handler(createSsrRpc("294a222c04dc5ccb27cb2ceb9d4f62d1c45feffa6870b8202173512c283cd9e9"));
-const $$splitComponentImporter$3 = () => import("./content-creators-BhUcL8Fk.js");
+const $$splitComponentImporter$3 = () => import("./content-creators-BzAGfGR8.js");
 const Route$7 = createFileRoute("/content-creators")({
   head: () => pageHead({
     title: "Chess Content Creators in Cameroon | mboachess",
@@ -2860,7 +2860,7 @@ const Route$7 = createFileRoute("/content-creators")({
 const loadClubs = createServerFn({
   method: "GET"
 }).handler(createSsrRpc("a30f3410c46a25cb7f7e241b4fa9cc3bdaf8cd8d0ecc4ab5c03f469951f2630c"));
-const $$splitComponentImporter$2 = () => import("./clubs-B9q7ak4X.js");
+const $$splitComponentImporter$2 = () => import("./clubs-B3eQkagW.js");
 const Route$6 = createFileRoute("/clubs")({
   head: () => pageHead({
     title: "Chess Clubs in Cameroon | mboachess",
@@ -2870,7 +2870,7 @@ const Route$6 = createFileRoute("/clubs")({
   loader: () => loadClubs(),
   component: lazyRouteComponent($$splitComponentImporter$2, "component")
 });
-const $$splitComponentImporter$1 = () => import("./chess-cameroon-Uf-BgERF.js");
+const $$splitComponentImporter$1 = () => import("./chess-cameroon-BAYIVqK3.js");
 const Route$5 = createFileRoute("/chess-cameroon")({
   head: () => pageHead({
     title: "Chess Cameroon | clubs, events, and players",
@@ -2883,7 +2883,7 @@ const Route$5 = createFileRoute("/chess-cameroon")({
 const loadHomeData = createServerFn({
   method: "GET"
 }).handler(createSsrRpc("478496646ceea7bd195c647ef46aa47bbd45720a47d199d1367f3b613a1db6ff"));
-const $$splitComponentImporter = () => import("./index-BrSUr7aH.js");
+const $$splitComponentImporter = () => import("./index-D2oyS0pf.js");
 const Route$4 = createFileRoute("/")({
   loader: () => loadHomeData(),
   component: lazyRouteComponent($$splitComponentImporter, "component")

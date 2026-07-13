@@ -17068,7 +17068,7 @@ function getResponse() {
 }
 var HEADERS = { TSS_SHELL: "X-TSS_SHELL" };
 async function getStartManifest(matchedRoutes) {
-  const { tsrStartManifest } = await import("./assets/_tanstack-start-manifest_v-BkNAeWZq.js");
+  const { tsrStartManifest } = await import("./assets/_tanstack-start-manifest_v-B8YKfX5J.js");
   const startManifest = tsrStartManifest();
   let routes = startManifest.routes;
   routes[rootRouteId];
@@ -17094,7 +17094,7 @@ const manifest = {
   },
   "478496646ceea7bd195c647ef46aa47bbd45720a47d199d1367f3b613a1db6ff": {
     functionName: "loadHomeData_createServerFn_handler",
-    importer: () => import("./assets/home-MhGzyCSK.js")
+    importer: () => import("./assets/home-DHS_-jmz.js")
   },
   "a30f3410c46a25cb7f7e241b4fa9cc3bdaf8cd8d0ecc4ab5c03f469951f2630c": {
     functionName: "loadClubs_createServerFn_handler",
@@ -18343,7 +18343,7 @@ var getBaseManifest = getProdBaseManifest;
 var createEarlyHintsForRequest = createEarlyHintsCollector;
 async function loadEntries() {
   const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-    import("./assets/router-b0Uay8yT.js").then((n) => n.r),
+    import("./assets/router-DycFnjQb.js").then((n) => n.r),
     import("./assets/start-HYkvq4Ni.js"),
     import("./assets/empty-plugin-adapters-BFgPZ6_d.js")
   ]);

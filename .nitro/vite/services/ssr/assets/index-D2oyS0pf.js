@@ -1,5 +1,5 @@
 import { V as jsxRuntimeExports, O as useRouter, r as reactExports } from "../server.js";
-import { c as Route, L as Link } from "./router-b0Uay8yT.js";
+import { c as Route, L as Link } from "./router-DycFnjQb.js";
 import { O as ONLINE_WITHIN_SEC } from "./chesscom-D1rMt3aW.js";
 import "node:async_hooks";
 import "node:stream";
