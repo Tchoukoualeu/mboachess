@@ -1,5 +1,7 @@
-<!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
+<!-- BEGIN:tanstack-start-agent-rules -->
+# TanStack Start project
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
+This app uses TanStack Start (TanStack Router + Vite + Nitro), not Next.js.
+Routes live in `src/app/`. Server API handlers use TanStack server routes.
+Data fetching uses route loaders; forms call `/api/*` server routes.
+<!-- END:tanstack-start-agent-rules -->

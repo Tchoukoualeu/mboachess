@@ -1,6 +1,4 @@
-"use client"
-
-import { useRouter } from "next/navigation"
+import { useRouter } from "@tanstack/react-router"
 import { useState } from "react"
 
 export function AddTournamentForm() {
@@ -68,7 +66,7 @@ export function AddTournamentForm() {
         phone: "",
         isOnline: false,
       })
-      router.refresh()
+      await router.invalidate()
     } catch {
       setMessage({ type: "err", text: "Network error. Try again." })
     } finally {

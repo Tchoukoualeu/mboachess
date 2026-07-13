@@ -1,6 +1,4 @@
-"use client";
-
-import { useRouter } from "next/navigation";
+import { useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 
 export function SubmitUsernameForm() {
@@ -45,7 +43,7 @@ export function SubmitUsernameForm() {
           text: "That username is already in the list.",
         });
         setValue("");
-        router.refresh();
+        await router.invalidate();
         return;
       }
       setMessage({
@@ -53,7 +51,7 @@ export function SubmitUsernameForm() {
         text: "Your username was added. It will show in the table below.",
       });
       setValue("");
-      router.refresh();
+      await router.invalidate();
     } catch {
       setMessage({ type: "err", text: "Network error. Try again." });
     } finally {

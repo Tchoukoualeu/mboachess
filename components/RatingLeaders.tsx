@@ -1,4 +1,3 @@
-import Image from "next/image"
 import type { PlayerLookupResult } from "@/lib/chesscom"
 import { CrownIcon } from "@/components/CrownIcon"
 
@@ -48,13 +47,12 @@ function Leader({
         </div>
         <div className="relative h-full w-full overflow-hidden rounded-full border border-amber-200/90 bg-zinc-100 dark:border-amber-600/40 dark:bg-zinc-800">
           {leader.avatarUrl ? (
-            <Image
+            <img
               src={leader.avatarUrl}
               alt=""
               width={AVATAR_PX}
               height={AVATAR_PX}
               className="h-full w-full object-cover"
-              sizes="(max-width: 640px) 40px, 48px"
             />
           ) : (
             <span className="flex h-full w-full items-center justify-center text-sm font-semibold text-zinc-500 sm:text-base">

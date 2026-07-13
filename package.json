@@ -3,32 +3,35 @@
   "version": "0.1.0",
   "license": "MIT",
   "private": false,
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/Tchoukoualeu/mboachess.git"
   },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "vite dev",
+    "build": "vite build",
+    "start": "node .output/server/index.mjs",
     "lint": "eslint"
   },
   "dependencies": {
-    "browserslist": "^4.28.6",
+    "@tanstack/react-router": "^1.166.2",
+    "@tanstack/react-start": "^1.166.2",
     "mongodb": "^7.2.0",
-    "next": "^16.2.10",
-    "postcss": "^8.5.19",
+    "nitro": "^3.0.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "sharp": "^0.35.3"
+    "vite": "^7.0.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/vite": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^5.0.0",
+    "@eslint/js": "^9.9.0",
     "eslint": "^9.9.0",
-    "eslint-config-next": "16.2.4",
+    "typescript-eslint": "^8.0.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

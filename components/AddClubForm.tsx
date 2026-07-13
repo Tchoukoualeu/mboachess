@@ -1,6 +1,4 @@
-"use client"
-
-import { useRouter } from "next/navigation"
+import { useRouter } from "@tanstack/react-router"
 import { useState } from "react"
 
 export function AddClubForm() {
@@ -63,7 +61,7 @@ export function AddClubForm() {
         website: "",
         meetingSchedule: "",
       })
-      router.refresh()
+      await router.invalidate()
     } catch {
       setMessage({ type: "err", text: "Network error. Try again." })
     } finally {

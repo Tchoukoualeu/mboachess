@@ -2,14 +2,16 @@
 
 **mboachess** is a small, free tool for the chess community. The goal is to help **promote chess for all Cameroonian players**—and anyone who wants to follow friends or teammates on [Chess.com](https://www.chess.com/)—by surfacing public ratings and activity in one place.
 
-The app is a [Next.js](https://nextjs.org) dashboard: a table of **blitz** and **rapid** ratings, **online**-style status, and **last seen** time. It reads the [Chess.com Published-Data (Pub) API](https://support.chess.com/en/articles/9650547-what-is-the-pubapi-and-how-do-i-use-it) on each request. Visitors can **submit a Chess.com username**; it is stored in **MongoDB** and merged with the default list in `app/page.tsx`.
+The app is a [TanStack Start](https://tanstack.com/start) dashboard: a table of **blitz** and **rapid** ratings, **online**-style status, and **last seen** time. It reads the [Chess.com Published-Data (Pub) API](https://support.chess.com/en/articles/9650547-what-is-the-pubapi-and-how-do-i-use-it) on each request. Visitors can **submit a Chess.com username**; it is stored in **MongoDB** and merged with the default list in `server/home.ts`.
 
 ## Environment
 
-Create `.env.local` (see [`.env.example`](.env.example)):
+Create `.env` (or `.env.local`):
 
 - **`MONGODB_URI`** — required for saving usernames. Use [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) or any MongoDB you control.
 - **`MONGODB_DB_NAME`** — optional; default database name is `mboachess`.
+- **`VITE_GITHUB_URL`** — optional override for the GitHub link.
+- **`VITE_WHATSAPP_URL`** — optional override for the WhatsApp community link.
 
 If `MONGODB_URI` is missing, the site still runs and the table works for the static list only; **Save** will return a 503 from the API.
 
@@ -24,7 +26,7 @@ Open [http://localhost:3000](http://localhost:3000). For production: `npm run bu
 
 ## Changing the player list
 
-- **Admins / defaults:** edit the `TRACKED_USERNAMES` array in `app/page.tsx` (lowercase usernames, as in Chess.com profile URLs).
+- **Admins / defaults:** edit the `TRACKED_USERNAMES` array in `server/home.ts` (lowercase usernames, as in Chess.com profile URLs).
 - **Public submissions:** usernames are stored in the `player_usernames` collection. Chess.com fetch logic is in `lib/chesscom.ts`; persistence and validation are in `lib/chesscomUsernames.ts` and `lib/mongodb.ts`.
 
 ## Online column
@@ -33,11 +35,11 @@ Open [http://localhost:3000](http://localhost:3000). For production: `npm run bu
 
 ## Stack
 
-- Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, MongoDB (official driver)
+- TanStack Start, TanStack Router, Vite, Nitro, React 19, TypeScript, Tailwind CSS 4, MongoDB (official driver)
 
 ## Deploy
 
-Standard Next.js deploy (e.g. [Vercel](https://vercel.com/docs) or any Node host). Set **`MONGODB_URI`** (and optional **`MONGODB_DB_NAME`**) in the project’s environment. Allow your deployment’s outbound IP (or `0.0.0.0/0` for serverless) in MongoDB Atlas **Network Access** if you use a cluster.
+Build with `npm run build` and run `npm start` (Nitro server at `.output/server/index.mjs`). Deploy to any Node host, or use a Nitro preset for Vercel, Cloudflare, etc. Set **`MONGODB_URI`** (and optional **`MONGODB_DB_NAME`**) in the project’s environment. Allow your deployment’s outbound IP (or `0.0.0.0/0` for serverless) in MongoDB Atlas **Network Access** if you use a cluster.
 
 ## Contributing
 

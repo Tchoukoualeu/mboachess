@@ -1,6 +1,4 @@
-"use client"
-
-import { useRouter } from "next/navigation"
+import { useRouter } from "@tanstack/react-router"
 import { useState } from "react"
 
 export function AddContentCreatorForm() {
@@ -69,7 +67,7 @@ export function AddContentCreatorForm() {
         contentType: "",
         description: "",
       })
-      router.refresh()
+      await router.invalidate()
     } catch {
       setMessage({ type: "err", text: "Network error. Try again." })
     } finally {
