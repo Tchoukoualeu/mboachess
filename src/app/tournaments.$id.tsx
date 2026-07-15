@@ -96,7 +96,7 @@ function TournamentDetailPage() {
               <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-700 dark:text-zinc-300">
                 Description
               </h2>
-              <p className="whitespace-pre-line text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+              <p className="whitespace-pre-line break-words text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                 {tournament.description}
               </p>
             </div>
