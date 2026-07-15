@@ -178,6 +178,14 @@ export async function getTournaments(): Promise<Tournament[]> {
   return allTournaments
 }
 
+export async function getTournamentByIndex(
+  index: number,
+): Promise<Tournament | null> {
+  const tournaments = await getTournaments()
+  if (index < 0 || index >= tournaments.length) return null
+  return tournaments[index]
+}
+
 export type SaveTournamentResult = "ok" | "unconfigured" | "invalid"
 
 export async function saveTournament(

@@ -17,6 +17,13 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "components/**/*.tsx", "lib/**/*.ts", "server/**/*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "components/**/*.tsx",
+    "lib/**/*.ts",
+    "server/**/*.ts",
+    "vite-env.d.ts"
+  ],
   "exclude": ["node_modules", ".output"]
 }

@@ -72,9 +72,11 @@ function TournamentsPage() {
             {tournaments.map((tournament, index) => {
               const daysUntil = getDaysUntil(tournament.startDate)
               return (
-                <div
+                <Link
                   key={index}
-                  className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900/50 sm:p-6"
+                  to="/tournaments/$id"
+                  params={{ id: String(index) }}
+                  className="block rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900/50 sm:p-6"
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0 flex-1">
@@ -194,6 +196,7 @@ function TournamentsPage() {
                               href={tournament.link}
                               target="_blank"
                               rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
                               className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
                             >
                               Tournament Link
@@ -217,6 +220,7 @@ function TournamentsPage() {
                             </svg>
                             <a
                               href={`tel:${tournament.phone.split("/")[0].trim()}`}
+                              onClick={(e) => e.stopPropagation()}
                               className="text-emerald-700 hover:underline dark:text-emerald-400"
                             >
                               {tournament.phone}
@@ -234,7 +238,7 @@ function TournamentsPage() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               )
             })}
           </div>

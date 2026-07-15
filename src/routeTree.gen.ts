@@ -16,6 +16,7 @@ import { Route as ContentCreatorsRouteImport } from './app/content-creators'
 import { Route as ClubsRouteImport } from './app/clubs'
 import { Route as ChessCameroonRouteImport } from './app/chess-cameroon'
 import { Route as IndexRouteImport } from './app/index'
+import { Route as TournamentsIdRouteImport } from './app/tournaments.$id'
 import { Route as ApiSubmitUsernameRouteImport } from './app/api/submit-username'
 import { Route as ApiSubmitTournamentRouteImport } from './app/api/submit-tournament'
 import { Route as ApiSubmitCreatorRouteImport } from './app/api/submit-creator'
@@ -56,6 +57,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TournamentsIdRoute = TournamentsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => TournamentsRoute,
+} as any)
 const ApiSubmitUsernameRoute = ApiSubmitUsernameRouteImport.update({
   id: '/api/submit-username',
   path: '/api/submit-username',
@@ -84,11 +90,12 @@ export interface FileRoutesByFullPath {
   '/content-creators': typeof ContentCreatorsRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/tournaments': typeof TournamentsRoute
+  '/tournaments': typeof TournamentsRouteWithChildren
   '/api/submit-club': typeof ApiSubmitClubRoute
   '/api/submit-creator': typeof ApiSubmitCreatorRoute
   '/api/submit-tournament': typeof ApiSubmitTournamentRoute
   '/api/submit-username': typeof ApiSubmitUsernameRoute
+  '/tournaments/$id': typeof TournamentsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -97,11 +104,12 @@ export interface FileRoutesByTo {
   '/content-creators': typeof ContentCreatorsRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/tournaments': typeof TournamentsRoute
+  '/tournaments': typeof TournamentsRouteWithChildren
   '/api/submit-club': typeof ApiSubmitClubRoute
   '/api/submit-creator': typeof ApiSubmitCreatorRoute
   '/api/submit-tournament': typeof ApiSubmitTournamentRoute
   '/api/submit-username': typeof ApiSubmitUsernameRoute
+  '/tournaments/$id': typeof TournamentsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -111,11 +119,12 @@ export interface FileRoutesById {
   '/content-creators': typeof ContentCreatorsRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/tournaments': typeof TournamentsRoute
+  '/tournaments': typeof TournamentsRouteWithChildren
   '/api/submit-club': typeof ApiSubmitClubRoute
   '/api/submit-creator': typeof ApiSubmitCreatorRoute
   '/api/submit-tournament': typeof ApiSubmitTournamentRoute
   '/api/submit-username': typeof ApiSubmitUsernameRoute
+  '/tournaments/$id': typeof TournamentsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/api/submit-creator'
     | '/api/submit-tournament'
     | '/api/submit-username'
+    | '/tournaments/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/api/submit-creator'
     | '/api/submit-tournament'
     | '/api/submit-username'
+    | '/tournaments/$id'
   id:
     | '__root__'
     | '/'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/api/submit-creator'
     | '/api/submit-tournament'
     | '/api/submit-username'
+    | '/tournaments/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -166,7 +178,7 @@ export interface RootRouteChildren {
   ContentCreatorsRoute: typeof ContentCreatorsRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  TournamentsRoute: typeof TournamentsRoute
+  TournamentsRoute: typeof TournamentsRouteWithChildren
   ApiSubmitClubRoute: typeof ApiSubmitClubRoute
   ApiSubmitCreatorRoute: typeof ApiSubmitCreatorRoute
   ApiSubmitTournamentRoute: typeof ApiSubmitTournamentRoute
@@ -224,6 +236,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tournaments/$id': {
+      id: '/tournaments/$id'
+      path: '/$id'
+      fullPath: '/tournaments/$id'
+      preLoaderRoute: typeof TournamentsIdRouteImport
+      parentRoute: typeof TournamentsRoute
+    }
     '/api/submit-username': {
       id: '/api/submit-username'
       path: '/api/submit-username'
@@ -255,6 +274,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface TournamentsRouteChildren {
+  TournamentsIdRoute: typeof TournamentsIdRoute
+}
+
+const TournamentsRouteChildren: TournamentsRouteChildren = {
+  TournamentsIdRoute: TournamentsIdRoute,
+}
+
+const TournamentsRouteWithChildren = TournamentsRoute._addFileChildren(
+  TournamentsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChessCameroonRoute: ChessCameroonRoute,
@@ -262,7 +293,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContentCreatorsRoute: ContentCreatorsRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  TournamentsRoute: TournamentsRoute,
+  TournamentsRoute: TournamentsRouteWithChildren,
   ApiSubmitClubRoute: ApiSubmitClubRoute,
   ApiSubmitCreatorRoute: ApiSubmitCreatorRoute,
   ApiSubmitTournamentRoute: ApiSubmitTournamentRoute,
