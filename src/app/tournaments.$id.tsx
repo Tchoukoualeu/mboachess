@@ -54,7 +54,7 @@ function TournamentDetailPage() {
           </div>
         </header>
 
-        <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-md dark:border-zinc-800 dark:bg-zinc-900/50 sm:p-8">
+        <div className="sm:rounded-xl sm:border sm:border-zinc-200 sm:bg-white sm:p-8 sm:shadow-md sm:dark:border-zinc-800 sm:dark:bg-zinc-900/50">
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0 flex-1">
               <div className="mb-2 flex flex-wrap items-center gap-2">
