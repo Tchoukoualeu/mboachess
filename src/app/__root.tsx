@@ -25,7 +25,7 @@ export const Route = createRootRoute({
         },
         ...seo.meta,
       ],
-      links: [{ rel: "stylesheet", href: appCss }, ...seo.links],
+      links: [{ rel: "icon", href: "/queen.png", type: "image/png" }, { rel: "stylesheet", href: appCss }, ...seo.links],
     }
   },
   component: RootLayout,
