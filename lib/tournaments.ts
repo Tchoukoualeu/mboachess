@@ -3,7 +3,7 @@ import { getDb, isMongoConfigured } from "./mongodb"
 const COLLECTION = "tournaments"
 
 // Seed tournaments from FECADE 2026 calendar
-const SEED_TOURNAMENTS: Omit<Tournament, "_id" | "createdAt">[] = [
+const SEED_TOURNAMENTS: Omit<Tournament, "_id" | "id" | "createdAt">[] = [
   // May
   {
     name: "Tournoi de l'Unité - Blitz",
@@ -129,6 +129,7 @@ const SEED_TOURNAMENTS: Omit<Tournament, "_id" | "createdAt">[] = [
 
 export type Tournament = {
   _id?: string
+  id: string // Unique stable identifier for all tournaments
   name: string
   startDate: Date
   endDate?: Date
@@ -140,6 +141,21 @@ export type Tournament = {
   createdAt: Date
 }
 
+// Generate a stable ID for seed tournaments based on their content
+function generateSeedTournamentId(
+  tournament: Omit<Tournament, "_id" | "id" | "createdAt">,
+): string {
+  // Create a simple hash from name and start date
+  const str = `${tournament.name}-${tournament.startDate.toISOString()}`
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i)
+    hash = (hash << 5) - hash + char
+    hash = hash & hash // Convert to 32-bit integer
+  }
+  return `seed-${Math.abs(hash).toString(36)}`
+}
+
 export async function getTournaments(): Promise<Tournament[]> {
   const now = new Date()
 
@@ -148,6 +164,7 @@ export async function getTournaments(): Promise<Tournament[]> {
     (t) => t.startDate >= now,
   ).map((t) => ({
     ...t,
+    id: generateSeedTournamentId(t),
     createdAt: new Date("2026-04-30"), // Date from the FECADE calendar document
   }))
 
@@ -167,6 +184,7 @@ export async function getTournaments(): Promise<Tournament[]> {
       dbTournaments = docs.map((t) => ({
         ...t,
         _id: t._id ? String(t._id) : undefined,
+        id: t._id ? String(t._id) : generateSeedTournamentId(t),
       }))
     }
   }
@@ -176,6 +194,13 @@ export async function getTournaments(): Promise<Tournament[]> {
   allTournaments.sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
 
   return allTournaments
+}
+
+export async function getTournamentById(
+  id: string,
+): Promise<Tournament | null> {
+  const tournaments = await getTournaments()
+  return tournaments.find((t) => t.id === id) || null
 }
 
 export async function getTournamentByIndex(
@@ -189,7 +214,7 @@ export async function getTournamentByIndex(
 export type SaveTournamentResult = "ok" | "unconfigured" | "invalid"
 
 export async function saveTournament(
-  tournament: Omit<Tournament, "_id" | "createdAt">,
+  tournament: Omit<Tournament, "_id" | "id" | "createdAt">,
 ): Promise<SaveTournamentResult> {
   if (!tournament.name || !tournament.startDate) return "invalid"
   if (!isMongoConfigured()) return "unconfigured"

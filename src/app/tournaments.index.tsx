@@ -20,7 +20,7 @@ function getDaysUntil(date: Date): number {
   return Math.ceil(diff / (1000 * 60 * 60 * 24))
 }
 
-export const Route = createFileRoute("/tournaments")({
+export const Route = createFileRoute("/tournaments/")({
   head: () =>
     pageHead({
       title: "Chess Tournaments in Cameroon | mboachess",
@@ -69,13 +69,13 @@ function TournamentsPage() {
             <div className="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Upcoming Tournaments ({tournaments.length})
             </div>
-            {tournaments.map((tournament, index) => {
+            {tournaments.map((tournament) => {
               const daysUntil = getDaysUntil(tournament.startDate)
               return (
                 <Link
-                  key={index}
+                  key={tournament.id}
                   to="/tournaments/$id"
-                  params={{ id: String(index) }}
+                  params={{ id: tournament.id }}
                   className="block rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900/50 sm:p-6"
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

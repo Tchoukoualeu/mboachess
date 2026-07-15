@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router"
-import { loadTournamentByIndex } from "@/server/tournaments"
+import { loadTournamentById } from "@/server/tournaments"
 import { pageHead } from "@/lib/seo"
 import type { Tournament } from "@/lib/tournaments"
 
@@ -28,10 +28,7 @@ export const Route = createFileRoute("/tournaments/$id")({
       path: `/tournaments/${params.id}`,
     }),
   loader: async ({ params }): Promise<Tournament> => {
-    const id = parseInt(params.id, 10)
-    if (isNaN(id)) throw notFound()
-
-    const tournament = await loadTournamentByIndex({ data: id })
+    const tournament = await loadTournamentById({ data: params.id })
     if (!tournament) throw notFound()
 
     return tournament
