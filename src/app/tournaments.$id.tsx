@@ -42,7 +42,7 @@ function TournamentDetailPage() {
 
   return (
     <div className="min-h-dvh flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <div className="mx-auto w-full max-w-4xl flex-1 px-4 py-5 sm:px-6 sm:py-8">
+      <div className="mx-auto w-full max-w-4xl flex-1 px-3 py-4 sm:px-6 sm:py-8">
         <header className="mb-4 sm:mb-6">
           <div className="mb-3 flex items-center justify-between">
             <Link
@@ -54,7 +54,7 @@ function TournamentDetailPage() {
           </div>
         </header>
 
-        <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-md dark:border-zinc-800 dark:bg-zinc-900/50 sm:p-8">
+        <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-md dark:border-zinc-800 dark:bg-zinc-900/50 sm:p-8">
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0 flex-1">
               <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -96,7 +96,7 @@ function TournamentDetailPage() {
               <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-700 dark:text-zinc-300">
                 Description
               </h2>
-              <p className="whitespace-pre-line break-words text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+              <p className="whitespace-pre-line wrap-break-word text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                 {tournament.description}
               </p>
             </div>
