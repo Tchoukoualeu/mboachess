@@ -12,6 +12,7 @@ function formatDate(date: Date): string {
     hour: "2-digit",
     minute: "2-digit",
     timeZone: "UTC",
+    hour12: false,
   })
 }
 
