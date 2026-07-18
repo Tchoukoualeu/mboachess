@@ -1,5 +1,10 @@
 import { useRouter } from "@tanstack/react-router"
-import { useState } from "react"
+import { useState, useEffect, useMemo } from "react"
+import {
+  getUserTimezone,
+  getTimezoneName,
+  previewGermanTime,
+} from "@/lib/utils"
 
 export function AddTournamentForm() {
   const router = useRouter()
@@ -19,6 +24,23 @@ export function AddTournamentForm() {
     text: string
   } | null>(null)
   const [loading, setLoading] = useState(false)
+  const [userTimezone, setUserTimezone] = useState<string>("UTC")
+
+  // Detect user's timezone on component mount
+  useEffect(() => {
+    setUserTimezone(getUserTimezone())
+  }, [])
+
+  // Preview German time for start and end dates
+  const startDateGermanPreview = useMemo(
+    () => previewGermanTime(formData.startDate, userTimezone),
+    [formData.startDate, userTimezone],
+  )
+
+  const endDateGermanPreview = useMemo(
+    () => previewGermanTime(formData.endDate, userTimezone),
+    [formData.endDate, userTimezone],
+  )
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -39,7 +61,10 @@ export function AddTournamentForm() {
       const res = await fetch("/api/submit-tournament", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          userTimezone, // Include user's timezone for server-side conversion
+        }),
       })
       const data = (await res.json().catch(() => ({}))) as {
         error?: string
@@ -130,13 +155,24 @@ export function AddTournamentForm() {
             />
           </div>
 
+          <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-800/50">
+            <p className="text-xs text-zinc-600 dark:text-zinc-400">
+              <strong>Your timezone:</strong> {getTimezoneName(userTimezone)} (
+              {userTimezone})
+            </p>
+            <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+              Enter times in your local time. They will be stored in UTC and
+              displayed in your timezone when viewing.
+            </p>
+          </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label
                 htmlFor="startDate"
                 className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
               >
-                Start Date *
+                Start Date * (Your Time)
               </label>
               <input
                 id="startDate"
@@ -149,6 +185,11 @@ export function AddTournamentForm() {
                 disabled={loading}
                 className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-500 dark:focus:ring-zinc-600"
               />
+              {startDateGermanPreview && (
+                <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400">
+                  → German time: {startDateGermanPreview}
+                </p>
+              )}
             </div>
 
             <div>
@@ -156,7 +197,7 @@ export function AddTournamentForm() {
                 htmlFor="endDate"
                 className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
               >
-                End Date
+                End Date (Your Time)
               </label>
               <input
                 id="endDate"
@@ -169,6 +210,11 @@ export function AddTournamentForm() {
                 disabled={loading}
                 className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-500 dark:focus:ring-zinc-600"
               />
+              {endDateGermanPreview && (
+                <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400">
+                  → German time: {endDateGermanPreview}
+                </p>
+              )}
             </div>
           </div>
 

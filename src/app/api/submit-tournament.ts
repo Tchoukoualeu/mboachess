@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { saveTournament } from "@/lib/tournaments"
+import { datetimeLocalToUTC } from "@/lib/utils"
+import { TOURNAMENT_TIMEZONE } from "@/lib/constants"
 
 export const Route = createFileRoute("/api/submit-tournament")({
   server: {
@@ -26,13 +28,17 @@ export const Route = createFileRoute("/api/submit-tournament")({
         }
 
         if (!data.startDate || typeof data.startDate !== "string") {
-          return Response.json(
-            { error: "Missing start date" },
-            { status: 400 },
-          )
+          return Response.json({ error: "Missing start date" }, { status: 400 })
         }
 
-        const startDate = new Date(data.startDate)
+        // Extract user's timezone (fallback to German timezone if not provided)
+        const userTimezone =
+          data.userTimezone && typeof data.userTimezone === "string"
+            ? data.userTimezone
+            : TOURNAMENT_TIMEZONE
+
+        // Convert datetime-local input from user's timezone to UTC for storage
+        const startDate = datetimeLocalToUTC(data.startDate, userTimezone)
         if (isNaN(startDate.getTime())) {
           return Response.json({ error: "Invalid start date" }, { status: 400 })
         }
@@ -49,7 +55,7 @@ export const Route = createFileRoute("/api/submit-tournament")({
           startDate,
           endDate:
             data.endDate && typeof data.endDate === "string"
-              ? new Date(data.endDate)
+              ? datetimeLocalToUTC(data.endDate, userTimezone) // Convert end date from user's timezone to UTC
               : undefined,
           location:
             data.location && typeof data.location === "string"

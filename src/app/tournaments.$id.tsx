@@ -2,7 +2,11 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router"
 import { loadTournamentById } from "@/server/tournaments"
 import { pageHead } from "@/lib/seo"
 import type { Tournament } from "@/lib/tournaments"
-import { formatDate } from "@/lib/utils"
+import {
+  formatDate,
+  getUserTimezone,
+  formatDateInGermanTime,
+} from "@/lib/utils"
 import { useEffect, useState } from "react"
 
 function getDaysUntil(date: Date): number {
@@ -28,7 +32,7 @@ function getTimeRemaining(startDate: Date) {
 
 function CountdownTimer({ startDate }: { startDate: Date }) {
   const [timeRemaining, setTimeRemaining] = useState(() =>
-    getTimeRemaining(startDate)
+    getTimeRemaining(startDate),
   )
 
   useEffect(() => {
@@ -49,25 +53,29 @@ function CountdownTimer({ startDate }: { startDate: Date }) {
       <div className="flex items-center gap-2">
         <div className="flex flex-col items-center">
           <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">
-            {hours.toString().padStart(2, '0')}
+            {hours.toString().padStart(2, "0")}
           </div>
           <div className="text-xs font-medium text-amber-600 dark:text-amber-500">
             hrs
           </div>
         </div>
-        <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">:</div>
+        <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">
+          :
+        </div>
         <div className="flex flex-col items-center">
           <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">
-            {minutes.toString().padStart(2, '0')}
+            {minutes.toString().padStart(2, "0")}
           </div>
           <div className="text-xs font-medium text-amber-600 dark:text-amber-500">
             min
           </div>
         </div>
-        <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">:</div>
+        <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">
+          :
+        </div>
         <div className="flex flex-col items-center">
           <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">
-            {seconds.toString().padStart(2, '0')}
+            {seconds.toString().padStart(2, "0")}
           </div>
           <div className="text-xs font-medium text-amber-600 dark:text-amber-500">
             sec
@@ -97,10 +105,17 @@ export const Route = createFileRoute("/tournaments/$id")({
 function TournamentDetailPage() {
   const tournament = Route.useLoaderData() as Tournament
   const daysUntil = getDaysUntil(tournament.startDate)
+  const [userTimezone, setUserTimezone] = useState<string>("UTC")
+
+  // Detect user's timezone on mount
+  useEffect(() => {
+    setUserTimezone(getUserTimezone())
+  }, [])
 
   // Calculate time remaining in milliseconds
   const now = new Date()
-  const timeRemainingMs = new Date(tournament.startDate).getTime() - now.getTime()
+  const timeRemainingMs =
+    new Date(tournament.startDate).getTime() - now.getTime()
   const fiveHoursInMs = 5 * 60 * 60 * 1000
   const showCountdown = timeRemainingMs > 0 && timeRemainingMs <= fiveHoursInMs
 
@@ -195,7 +210,10 @@ function TournamentDetailPage() {
                     Start Date
                   </div>
                   <div className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                    {formatDate(tournament.startDate)}
+                    {formatDate(tournament.startDate, userTimezone)}
+                  </div>
+                  <div className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    German time: {formatDateInGermanTime(tournament.startDate)}
                   </div>
                 </div>
               </div>
@@ -220,7 +238,10 @@ function TournamentDetailPage() {
                       End Date
                     </div>
                     <div className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                      {formatDate(tournament.endDate)}
+                      {formatDate(tournament.endDate, userTimezone)}
+                    </div>
+                    <div className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                      German time: {formatDateInGermanTime(tournament.endDate)}
                     </div>
                   </div>
                 </div>
