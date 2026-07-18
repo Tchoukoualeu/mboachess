@@ -4,7 +4,7 @@ import { pageHead } from "@/lib/seo"
 import type { Tournament } from "@/lib/tournaments"
 
 function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString("en-US", {
+  return new Date(date).toLocaleDateString("de-DE", {
     weekday: "short",
     year: "numeric",
     month: "short",
