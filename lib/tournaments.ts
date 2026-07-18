@@ -1,13 +1,63 @@
 import { getDb, isMongoConfigured } from "./mongodb"
+import { TOURNAMENT_TIMEZONE } from "./constants"
 
 const COLLECTION = "tournaments"
+
+/**
+ * Converts a German time string to UTC for database storage.
+ * FECADE tournament times are specified in German time (CET/CEST).
+ * Database stores all dates in UTC.
+ *
+ * @param dateString - ISO date string in German time (e.g., "2026-05-31T09:00:00")
+ * @returns Date object in UTC representing that German time
+ *
+ * @example
+ * germanDate("2026-05-31T09:00:00")
+ * // Input: 9:00 AM German time (May 2026 = CEST = UTC+2)
+ * // Returns: Date object for 2026-05-31T07:00:00.000Z (7:00 AM UTC)
+ */
+function germanDate(dateString: string): Date {
+  // Parse the date components
+  const [datePart, timePart] = dateString.split("T")
+  const [year, month, day] = datePart.split("-").map(Number)
+  const [hour, minute, second = 0] = timePart.split(":").map(Number)
+
+  // Create a formatter for German timezone
+  const germanFormatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: TOURNAMENT_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  })
+
+  // Create a reference date in UTC
+  const utcDate = new Date(Date.UTC(year, month - 1, day, hour, minute, second))
+
+  // Format it in German timezone to get the string representation
+  const germanDateString = germanFormatter.format(utcDate)
+
+  // Parse it back - this gives us the wrong date, but we can calculate the offset
+  const [datePartGerman, timePartGerman] = germanDateString.split(", ")
+  const [m, d, y] = datePartGerman.split("/").map(Number)
+  const [h, min, s] = timePartGerman.split(":").map(Number)
+  const parsedGermanDate = new Date(y, m - 1, d, h, min, s)
+
+  // Calculate the offset and apply it to get the correct UTC representation
+  // This converts German local time to UTC for storage
+  const offset = utcDate.getTime() - parsedGermanDate.getTime()
+  return new Date(Date.UTC(year, month - 1, day, hour, minute, second) - offset)
+}
 
 // Seed tournaments from FECADE 2026 calendar
 const SEED_TOURNAMENTS: Omit<Tournament, "_id" | "id" | "createdAt">[] = [
   // May
   {
     name: "Tournoi de l'Unité - Blitz",
-    startDate: new Date("2026-05-31T09:00:00"),
+    startDate: germanDate("2026-05-31T09:00:00"),
     location: "Cameroon",
     description: "PARTIES BLITZ - 5min + 3s/coup",
     link: "https://www.fecade.cm/",
@@ -16,8 +66,8 @@ const SEED_TOURNAMENTS: Omit<Tournament, "_id" | "id" | "createdAt">[] = [
   // June
   {
     name: "Championnats Régionaux par Équipe",
-    startDate: new Date("2026-06-07T09:00:00"),
-    endDate: new Date("2026-06-28T18:00:00"),
+    startDate: germanDate("2026-06-07T09:00:00"),
+    endDate: germanDate("2026-06-28T18:00:00"),
     location: "Cameroon",
     description: "PARTIES LENTES - 30min + 30s/coup (7, 14, 21, 28 Juin)",
     link: "https://www.fecade.cm/",
@@ -25,8 +75,8 @@ const SEED_TOURNAMENTS: Omit<Tournament, "_id" | "id" | "createdAt">[] = [
   },
   {
     name: "Championnat Africain Individuel",
-    startDate: new Date("2026-06-18T09:00:00"),
-    endDate: new Date("2026-06-29T18:00:00"),
+    startDate: germanDate("2026-06-18T09:00:00"),
+    endDate: germanDate("2026-06-29T18:00:00"),
     location: "Africa",
     description: "PARTIE LENTE - 90min/40+30min + 30s/coup",
     link: "https://www.fecade.cm/",
@@ -35,8 +85,8 @@ const SEED_TOURNAMENTS: Omit<Tournament, "_id" | "id" | "createdAt">[] = [
   // July
   {
     name: "Championnats Régionaux par Équipe",
-    startDate: new Date("2026-07-05T09:00:00"),
-    endDate: new Date("2026-07-26T18:00:00"),
+    startDate: germanDate("2026-07-05T09:00:00"),
+    endDate: germanDate("2026-07-26T18:00:00"),
     location: "Cameroon",
     description: "PARTIES LENTES - 30min + 30s/coup (5, 12, 19, 26 Juillet)",
     link: "https://www.fecade.cm/",
@@ -44,8 +94,8 @@ const SEED_TOURNAMENTS: Omit<Tournament, "_id" | "id" | "createdAt">[] = [
   },
   {
     name: "Championnats Régionaux Individuel Junior",
-    startDate: new Date("2026-07-18T09:00:00"),
-    endDate: new Date("2026-07-25T18:00:00"),
+    startDate: germanDate("2026-07-18T09:00:00"),
+    endDate: germanDate("2026-07-25T18:00:00"),
     location: "Cameroon",
     description: "PARTIES RAPIDES - 30min + 15s/coup",
     link: "https://www.fecade.cm/",
@@ -54,8 +104,8 @@ const SEED_TOURNAMENTS: Omit<Tournament, "_id" | "id" | "createdAt">[] = [
   // August
   {
     name: "Championnats Régionaux Individuels Dames",
-    startDate: new Date("2026-08-01T09:00:00"),
-    endDate: new Date("2026-08-29T18:00:00"),
+    startDate: germanDate("2026-08-01T09:00:00"),
+    endDate: germanDate("2026-08-29T18:00:00"),
     location: "Cameroon",
     description: "PARTIES LENTES - 30min + 30s/coup (1, 8, 29 Août)",
     link: "https://www.fecade.cm/",
@@ -63,8 +113,8 @@ const SEED_TOURNAMENTS: Omit<Tournament, "_id" | "id" | "createdAt">[] = [
   },
   {
     name: "Championnats Régionaux Individuels Opens",
-    startDate: new Date("2026-08-02T09:00:00"),
-    endDate: new Date("2026-08-30T18:00:00"),
+    startDate: germanDate("2026-08-02T09:00:00"),
+    endDate: germanDate("2026-08-30T18:00:00"),
     location: "Cameroon",
     description: "PARTIES LENTES - 45min + 30s/coup (2, 9, 16, 30 Août)",
     link: "https://www.fecade.cm/",
@@ -72,7 +122,7 @@ const SEED_TOURNAMENTS: Omit<Tournament, "_id" | "id" | "createdAt">[] = [
   },
   {
     name: "Finale de la Coupe du Cameroun des Clubs",
-    startDate: new Date("2026-08-27T09:00:00"),
+    startDate: germanDate("2026-08-27T09:00:00"),
     location: "Cameroon",
     description: "PARTIES RAPIDES - EQUIPE - 20min + 15s/coup",
     link: "https://www.fecade.cm/",
@@ -81,8 +131,8 @@ const SEED_TOURNAMENTS: Omit<Tournament, "_id" | "id" | "createdAt">[] = [
   // September
   {
     name: "Olympiades Mondiales des Échecs",
-    startDate: new Date("2026-09-15T09:00:00"),
-    endDate: new Date("2026-09-27T18:00:00"),
+    startDate: germanDate("2026-09-15T09:00:00"),
+    endDate: germanDate("2026-09-27T18:00:00"),
     location: "Uzbekistan",
     description: "LENTES 90min/40 + 30min + 30s/coup",
     link: "https://www.fecade.cm/",
@@ -91,8 +141,8 @@ const SEED_TOURNAMENTS: Omit<Tournament, "_id" | "id" | "createdAt">[] = [
   // October
   {
     name: "Championnat National Individuel Dames",
-    startDate: new Date("2026-10-17T09:00:00"),
-    endDate: new Date("2026-10-18T18:00:00"),
+    startDate: germanDate("2026-10-17T09:00:00"),
+    endDate: germanDate("2026-10-18T18:00:00"),
     location: "Cameroon",
     description: "PARTIES LENTES - 30min + 30s/coup",
     link: "https://www.fecade.cm/",
@@ -100,8 +150,8 @@ const SEED_TOURNAMENTS: Omit<Tournament, "_id" | "id" | "createdAt">[] = [
   },
   {
     name: "Championnat National Individuel Open",
-    startDate: new Date("2026-10-30T09:00:00"),
-    endDate: new Date("2026-10-31T18:00:00"),
+    startDate: germanDate("2026-10-30T09:00:00"),
+    endDate: germanDate("2026-10-31T18:00:00"),
     location: "Cameroon",
     description: "PARTIES LENTES - 45min + 30s/coup",
     link: "https://www.fecade.cm/",
@@ -110,7 +160,7 @@ const SEED_TOURNAMENTS: Omit<Tournament, "_id" | "id" | "createdAt">[] = [
   // November
   {
     name: "Championnat National Individuel Open",
-    startDate: new Date("2026-11-01T09:00:00"),
+    startDate: germanDate("2026-11-01T09:00:00"),
     location: "Cameroon",
     description: "PARTIES LENTES - 45min + 30s/coup",
     link: "https://www.fecade.cm/",
@@ -118,8 +168,8 @@ const SEED_TOURNAMENTS: Omit<Tournament, "_id" | "id" | "createdAt">[] = [
   },
   {
     name: "Memorial Nguele Viang Michel",
-    startDate: new Date("2026-11-21T09:00:00"),
-    endDate: new Date("2026-11-22T18:00:00"),
+    startDate: germanDate("2026-11-21T09:00:00"),
+    endDate: germanDate("2026-11-22T18:00:00"),
     location: "Cameroon",
     description: "PARTIES LENTES - 30min + 30s/coup",
     link: "https://www.fecade.cm/",
@@ -127,18 +177,26 @@ const SEED_TOURNAMENTS: Omit<Tournament, "_id" | "id" | "createdAt">[] = [
   },
 ]
 
+/**
+ * Tournament type definition.
+ *
+ * IMPORTANT: All Date fields (startDate, endDate, createdAt) are stored in UTC.
+ * Dates are displayed in the user's local timezone for better UX.
+ * German time (CET/CEST) is shown as a reference since tournaments are German-based.
+ * See TIMEZONE.md for details.
+ */
 export type Tournament = {
   _id?: string
   id: string // Unique stable identifier for all tournaments
   name: string
-  startDate: Date
-  endDate?: Date
+  startDate: Date // Stored in UTC, displayed in user's timezone
+  endDate?: Date // Stored in UTC, displayed in user's timezone
   location?: string
   description?: string
   link?: string
   phone?: string
   isOnline?: boolean
-  createdAt: Date
+  createdAt: Date // Stored in UTC
 }
 
 // Generate a stable ID for seed tournaments based on their content
@@ -165,7 +223,7 @@ export async function getTournaments(): Promise<Tournament[]> {
   ).map((t) => ({
     ...t,
     id: generateSeedTournamentId(t),
-    createdAt: new Date("2026-04-30"), // Date from the FECADE calendar document
+    createdAt: new Date("2026-04-30T00:00:00Z"), // Date from the FECADE calendar document (UTC)
   }))
 
   // Get tournaments from database if configured

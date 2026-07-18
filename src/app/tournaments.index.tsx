@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
+import { useState, useEffect } from "react"
 import { AddTournamentForm } from "@/components/AddTournamentForm"
 import { loadTournaments } from "@/server/tournaments"
 import { pageHead } from "@/lib/seo"
-import { formatDate } from "@/lib/utils"
+import { formatDate, getUserTimezone } from "@/lib/utils"
 
 function getDaysUntil(date: Date): number {
   const now = new Date()
@@ -24,6 +25,12 @@ export const Route = createFileRoute("/tournaments/")({
 
 function TournamentsPage() {
   const tournaments = Route.useLoaderData()
+  const [userTimezone, setUserTimezone] = useState<string>("UTC")
+
+  // Detect user's timezone on mount
+  useEffect(() => {
+    setUserTimezone(getUserTimezone())
+  }, [])
 
   return (
     <div className="min-h-dvh flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
@@ -116,7 +123,7 @@ function TournamentsPage() {
                           <span>
                             Starts:{" "}
                             <span className="font-medium">
-                              {formatDate(tournament.startDate)}
+                              {formatDate(tournament.startDate, userTimezone)}
                             </span>
                           </span>
                         </div>
@@ -138,7 +145,7 @@ function TournamentsPage() {
                             <span>
                               Ends:{" "}
                               <span className="font-medium">
-                                {formatDate(tournament.endDate)}
+                                {formatDate(tournament.endDate, userTimezone)}
                               </span>
                             </span>
                           </div>
