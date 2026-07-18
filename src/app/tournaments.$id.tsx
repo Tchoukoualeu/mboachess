@@ -4,13 +4,14 @@ import { pageHead } from "@/lib/seo"
 import type { Tournament } from "@/lib/tournaments"
 
 function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString("de-DE", {
+  return new Date(date).toLocaleDateString("en-US", {
     weekday: "short",
     year: "numeric",
     month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "UTC",
   })
 }
 
