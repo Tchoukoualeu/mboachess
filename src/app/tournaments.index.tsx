@@ -2,17 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { AddTournamentForm } from "@/components/AddTournamentForm"
 import { loadTournaments } from "@/server/tournaments"
 import { pageHead } from "@/lib/seo"
-
-function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString("en-US", {
-    weekday: "short",
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
-}
+import { formatDate } from "@/lib/utils"
 
 function getDaysUntil(date: Date): number {
   const now = new Date()
