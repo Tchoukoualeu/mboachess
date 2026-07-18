@@ -3,11 +3,79 @@ import { loadTournamentById } from "@/server/tournaments"
 import { pageHead } from "@/lib/seo"
 import type { Tournament } from "@/lib/tournaments"
 import { formatDate } from "@/lib/utils"
+import { useEffect, useState } from "react"
 
 function getDaysUntil(date: Date): number {
   const now = new Date()
   const diff = new Date(date).getTime() - now.getTime()
   return Math.ceil(diff / (1000 * 60 * 60 * 24))
+}
+
+function getTimeRemaining(startDate: Date) {
+  const now = new Date()
+  const diff = new Date(startDate).getTime() - now.getTime()
+
+  if (diff <= 0) {
+    return { hours: 0, minutes: 0, seconds: 0, totalMs: 0 }
+  }
+
+  const hours = Math.floor(diff / (1000 * 60 * 60))
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+
+  return { hours, minutes, seconds, totalMs: diff }
+}
+
+function CountdownTimer({ startDate }: { startDate: Date }) {
+  const [timeRemaining, setTimeRemaining] = useState(() =>
+    getTimeRemaining(startDate)
+  )
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeRemaining(getTimeRemaining(startDate))
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [startDate])
+
+  const { hours, minutes, seconds } = timeRemaining
+
+  return (
+    <div className="flex shrink-0 flex-col items-start gap-2 rounded-lg bg-amber-50 px-4 py-3 dark:bg-amber-900/20 sm:items-end">
+      <div className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">
+        Starts In
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="flex flex-col items-center">
+          <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">
+            {hours.toString().padStart(2, '0')}
+          </div>
+          <div className="text-xs font-medium text-amber-600 dark:text-amber-500">
+            hrs
+          </div>
+        </div>
+        <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">:</div>
+        <div className="flex flex-col items-center">
+          <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">
+            {minutes.toString().padStart(2, '0')}
+          </div>
+          <div className="text-xs font-medium text-amber-600 dark:text-amber-500">
+            min
+          </div>
+        </div>
+        <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">:</div>
+        <div className="flex flex-col items-center">
+          <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">
+            {seconds.toString().padStart(2, '0')}
+          </div>
+          <div className="text-xs font-medium text-amber-600 dark:text-amber-500">
+            sec
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export const Route = createFileRoute("/tournaments/$id")({
@@ -29,6 +97,12 @@ export const Route = createFileRoute("/tournaments/$id")({
 function TournamentDetailPage() {
   const tournament = Route.useLoaderData() as Tournament
   const daysUntil = getDaysUntil(tournament.startDate)
+
+  // Calculate time remaining in milliseconds
+  const now = new Date()
+  const timeRemainingMs = new Date(tournament.startDate).getTime() - now.getTime()
+  const fiveHoursInMs = 5 * 60 * 60 * 1000
+  const showCountdown = timeRemainingMs > 0 && timeRemainingMs <= fiveHoursInMs
 
   return (
     <div className="min-h-dvh flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
@@ -71,14 +145,18 @@ function TournamentDetailPage() {
                 )}
               </div>
             </div>
-            <div className="flex shrink-0 flex-col items-start gap-1 rounded-lg bg-emerald-50 px-4 py-3 dark:bg-emerald-900/20 sm:items-end">
-              <div className="text-3xl font-bold text-emerald-700 dark:text-emerald-400">
-                {daysUntil}
+            {showCountdown ? (
+              <CountdownTimer startDate={tournament.startDate} />
+            ) : (
+              <div className="flex shrink-0 flex-col items-start gap-1 rounded-lg bg-emerald-50 px-4 py-3 dark:bg-emerald-900/20 sm:items-end">
+                <div className="text-3xl font-bold text-emerald-700 dark:text-emerald-400">
+                  {daysUntil}
+                </div>
+                <div className="text-sm font-medium uppercase text-emerald-700 dark:text-emerald-400">
+                  {daysUntil === 1 ? "day left" : "days left"}
+                </div>
               </div>
-              <div className="text-sm font-medium uppercase text-emerald-700 dark:text-emerald-400">
-                {daysUntil === 1 ? "day left" : "days left"}
-              </div>
-            </div>
+            )}
           </div>
 
           {tournament.description && (
