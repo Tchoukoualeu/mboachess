@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router"
 import { loadTournamentById } from "@/server/tournaments"
 import { pageHead } from "@/lib/seo"
-import type { Tournament } from "@/lib/tournaments"
+import type { TournamentWithWinners } from "@/lib/tournaments"
 import {
   formatDate,
   getUserTimezone,
@@ -93,7 +93,7 @@ export const Route = createFileRoute("/tournaments/$id")({
       description: "View tournament information and details",
       path: `/tournaments/${params.id}`,
     }),
-  loader: async ({ params }): Promise<Tournament> => {
+  loader: async ({ params }): Promise<TournamentWithWinners> => {
     const tournament = await loadTournamentById({ data: params.id })
     if (!tournament) throw notFound()
 
@@ -103,7 +103,7 @@ export const Route = createFileRoute("/tournaments/$id")({
 })
 
 function TournamentDetailPage() {
-  const tournament = Route.useLoaderData() as Tournament
+  const tournament = Route.useLoaderData() as TournamentWithWinners
   const daysUntil = getDaysUntil(tournament.startDate)
   const [userTimezone, setUserTimezone] = useState<string>("UTC")
 
@@ -181,6 +181,34 @@ function TournamentDetailPage() {
               </h2>
               <p className="whitespace-pre-line wrap-break-word text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                 {tournament.description}
+              </p>
+            </div>
+          )}
+
+          {tournament.winners.length > 0 && (
+            <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-900/20">
+              <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-amber-800 dark:text-amber-300">
+                {tournament.winners.length === 1 ? "Winner" : "Winners"}
+              </h2>
+              <p className="text-sm text-amber-900 dark:text-amber-100">
+                {tournament.winners.map((username, index) => (
+                  <span key={username}>
+                    {index > 0 ? ", " : null}
+                    <a
+                      href={`https://www.chess.com/member/${encodeURIComponent(username)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold underline decoration-amber-700/30 underline-offset-2 hover:decoration-amber-600 dark:decoration-amber-400/40"
+                    >
+                      {username}
+                    </a>
+                  </span>
+                ))}
+                {tournament.winnersSource === "chesscom" ? (
+                  <span className="ml-2 text-xs text-amber-700/80 dark:text-amber-400/80">
+                    via Chess.com
+                  </span>
+                ) : null}
               </p>
             </div>
           )}

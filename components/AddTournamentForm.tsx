@@ -270,7 +270,7 @@ export function AddTournamentForm() {
               id="link"
               name="link"
               type="url"
-              placeholder="e.g. https://chess.com/tournament/..."
+              placeholder="e.g. https://www.chess.com/tournament/..."
               value={formData.link}
               onChange={(e) =>
                 setFormData({ ...formData, link: e.target.value })
@@ -278,6 +278,12 @@ export function AddTournamentForm() {
               disabled={loading}
               className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-zinc-500 dark:focus:ring-zinc-600"
             />
+            {formData.isOnline && (
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                Use a Chess.com tournament URL so winners can be fetched
+                automatically for past online events.
+              </p>
+            )}
           </div>
 
           <div>

@@ -43,7 +43,10 @@ export const Route = createFileRoute("/api/submit-tournament")({
           return Response.json({ error: "Invalid start date" }, { status: 400 })
         }
 
-        if (startDate < new Date()) {
+        const isOnline = data.isOnline === true
+
+        // Past dates are only allowed for online tournaments (to record results).
+        if (startDate < new Date() && !isOnline) {
           return Response.json(
             { error: "Tournament must start in the future" },
             { status: 400 },
@@ -71,7 +74,11 @@ export const Route = createFileRoute("/api/submit-tournament")({
             data.phone && typeof data.phone === "string"
               ? data.phone
               : undefined,
-          isOnline: data.isOnline === true ? true : undefined,
+          isOnline: isOnline ? true : undefined,
+          winner:
+            data.winner && typeof data.winner === "string" && data.winner.trim()
+              ? data.winner.trim()
+              : undefined,
         }
 
         const result = await saveTournament(tournament)
