@@ -8,7 +8,12 @@ type PageSeo = {
   type?: "website" | "article"
 }
 
-export function pageHead({ title, description, path, type = "website" }: PageSeo) {
+export function pageHead({
+  title,
+  description,
+  path,
+  type = "website",
+}: PageSeo) {
   const url = `${SITE_URL}${path}`
 
   return {
@@ -32,6 +37,7 @@ export const PUBLIC_ROUTES = [
   { path: "/", changefreq: "daily", priority: "1" },
   { path: "/chess-cameroon", changefreq: "weekly", priority: "0.8" },
   { path: "/tournaments", changefreq: "daily", priority: "0.7" },
+  { path: "/tournaments/past-online", changefreq: "weekly", priority: "0.6" },
   { path: "/clubs", changefreq: "weekly", priority: "0.7" },
   { path: "/content-creators", changefreq: "weekly", priority: "0.7" },
 ] as const

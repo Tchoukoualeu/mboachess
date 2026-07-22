@@ -79,7 +79,6 @@ function getCountryName(code: string | null): string {
   return COUNTRY_NAMES[code.toUpperCase()] || code.toUpperCase()
 }
 
-
 function formatLastSeen(unix: number | null): string {
   if (unix == null) return "—"
   const s = Date.now() / 1000 - unix
@@ -143,6 +142,16 @@ function Home() {
                 {" • "}
               </p>
               <p>
+                Browse{" "}
+                <Link
+                  to="/tournaments/past-online"
+                  className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
+                >
+                  Past Online Tournaments
+                </Link>
+                {" • "}
+              </p>
+              <p>
                 Find{" "}
                 <Link
                   to="/clubs"
@@ -187,6 +196,35 @@ function Home() {
               </div>
               <svg
                 className="h-5 w-5 shrink-0 text-emerald-700 dark:text-emerald-300"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </div>
+          </Link>
+
+          <Link
+            to="/tournaments/past-online"
+            className="block rounded-xl border border-sky-200 bg-sky-50 p-4 transition hover:border-sky-300 hover:bg-sky-100 dark:border-sky-900/50 dark:bg-sky-900/20 dark:hover:border-sky-800 dark:hover:bg-sky-900/30 sm:p-6"
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-sky-900 dark:text-sky-100">
+                  Past Online
+                </h2>
+                <p className="mt-1 text-sm text-sky-700 dark:text-sky-300">
+                  Browse past online chess tournaments
+                </p>
+              </div>
+              <svg
+                className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

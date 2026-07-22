@@ -16,6 +16,7 @@ import { Route as ClubsRouteImport } from './app/clubs'
 import { Route as ChessCameroonRouteImport } from './app/chess-cameroon'
 import { Route as IndexRouteImport } from './app/index'
 import { Route as TournamentsIndexRouteImport } from './app/tournaments.index'
+import { Route as TournamentsPastOnlineRouteImport } from './app/tournaments.past-online'
 import { Route as TournamentsIdRouteImport } from './app/tournaments.$id'
 import { Route as ApiSubmitUsernameRouteImport } from './app/api/submit-username'
 import { Route as ApiSubmitTournamentRouteImport } from './app/api/submit-tournament'
@@ -57,6 +58,11 @@ const TournamentsIndexRoute = TournamentsIndexRouteImport.update({
   path: '/tournaments/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TournamentsPastOnlineRoute = TournamentsPastOnlineRouteImport.update({
+  id: '/tournaments/past-online',
+  path: '/tournaments/past-online',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TournamentsIdRoute = TournamentsIdRouteImport.update({
   id: '/tournaments/$id',
   path: '/tournaments/$id',
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/api/submit-tournament': typeof ApiSubmitTournamentRoute
   '/api/submit-username': typeof ApiSubmitUsernameRoute
   '/tournaments/$id': typeof TournamentsIdRoute
+  '/tournaments/past-online': typeof TournamentsPastOnlineRoute
   '/tournaments/': typeof TournamentsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/api/submit-tournament': typeof ApiSubmitTournamentRoute
   '/api/submit-username': typeof ApiSubmitUsernameRoute
   '/tournaments/$id': typeof TournamentsIdRoute
+  '/tournaments/past-online': typeof TournamentsPastOnlineRoute
   '/tournaments': typeof TournamentsIndexRoute
 }
 export interface FileRoutesById {
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/api/submit-tournament': typeof ApiSubmitTournamentRoute
   '/api/submit-username': typeof ApiSubmitUsernameRoute
   '/tournaments/$id': typeof TournamentsIdRoute
+  '/tournaments/past-online': typeof TournamentsPastOnlineRoute
   '/tournaments/': typeof TournamentsIndexRoute
 }
 export interface FileRouteTypes {
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/api/submit-tournament'
     | '/api/submit-username'
     | '/tournaments/$id'
+    | '/tournaments/past-online'
     | '/tournaments/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
     | '/api/submit-tournament'
     | '/api/submit-username'
     | '/tournaments/$id'
+    | '/tournaments/past-online'
     | '/tournaments'
   id:
     | '__root__'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/api/submit-tournament'
     | '/api/submit-username'
     | '/tournaments/$id'
+    | '/tournaments/past-online'
     | '/tournaments/'
   fileRoutesById: FileRoutesById
 }
@@ -183,6 +195,7 @@ export interface RootRouteChildren {
   ApiSubmitTournamentRoute: typeof ApiSubmitTournamentRoute
   ApiSubmitUsernameRoute: typeof ApiSubmitUsernameRoute
   TournamentsIdRoute: typeof TournamentsIdRoute
+  TournamentsPastOnlineRoute: typeof TournamentsPastOnlineRoute
   TournamentsIndexRoute: typeof TournamentsIndexRoute
 }
 
@@ -237,6 +250,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TournamentsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tournaments/past-online': {
+      id: '/tournaments/past-online'
+      path: '/tournaments/past-online'
+      fullPath: '/tournaments/past-online'
+      preLoaderRoute: typeof TournamentsPastOnlineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tournaments/$id': {
       id: '/tournaments/$id'
       path: '/tournaments/$id'
@@ -287,6 +307,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiSubmitTournamentRoute: ApiSubmitTournamentRoute,
   ApiSubmitUsernameRoute: ApiSubmitUsernameRoute,
   TournamentsIdRoute: TournamentsIdRoute,
+  TournamentsPastOnlineRoute: TournamentsPastOnlineRoute,
   TournamentsIndexRoute: TournamentsIndexRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,5 +1,9 @@
 import { getDb, isMongoConfigured } from "./mongodb"
 import { TOURNAMENT_TIMEZONE } from "./constants"
+import {
+  fetchChessComTournamentWinners,
+  parseChessComTournamentId,
+} from "./chesscom"
 
 const COLLECTION = "tournaments"
 
@@ -196,7 +200,69 @@ export type Tournament = {
   link?: string
   phone?: string
   isOnline?: boolean
+  /**
+   * Optional manually stored winner (fallback when Chess.com lookup is not possible).
+   * Prefer Chess.com Pub API winners via `withChessComWinners`.
+   */
+  winner?: string
   createdAt: Date // Stored in UTC
+}
+
+export type TournamentWithWinners = Tournament & {
+  /** Winner usernames resolved from Chess.com (or stored fallback). */
+  winners: string[]
+  winnersSource: "chesscom" | "stored" | null
+}
+
+async function mapWithConcurrency<T, R>(
+  items: readonly T[],
+  limit: number,
+  fn: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results = new Array<R>(items.length)
+  let next = 0
+  async function worker() {
+    while (next < items.length) {
+      const index = next++
+      results[index] = await fn(items[index])
+    }
+  }
+  await Promise.all(
+    Array.from({ length: Math.min(limit, items.length) }, worker),
+  )
+  return results
+}
+
+/** Attach Chess.com winners (or stored fallback) to each tournament. */
+export async function withChessComWinners(
+  tournaments: Tournament[],
+): Promise<TournamentWithWinners[]> {
+  return mapWithConcurrency(tournaments, 4, async (tournament) => {
+    if (tournament.link && parseChessComTournamentId(tournament.link)) {
+      const result = await fetchChessComTournamentWinners(tournament.link)
+      if (result.winners.length > 0) {
+        return {
+          ...tournament,
+          winners: result.winners,
+          winnersSource: "chesscom" as const,
+        }
+      }
+    }
+
+    if (tournament.winner?.trim()) {
+      return {
+        ...tournament,
+        winners: [tournament.winner.trim()],
+        winnersSource: "stored" as const,
+      }
+    }
+
+    return {
+      ...tournament,
+      winners: [],
+      winnersSource: null,
+    }
+  })
 }
 
 // Generate a stable ID for seed tournaments based on their content
@@ -212,6 +278,14 @@ function generateSeedTournamentId(
     hash = hash & hash // Convert to 32-bit integer
   }
   return `seed-${Math.abs(hash).toString(36)}`
+}
+
+function normalizeTournament(t: Tournament): Tournament {
+  return {
+    ...t,
+    _id: t._id ? String(t._id) : undefined,
+    id: t._id ? String(t._id) : generateSeedTournamentId(t),
+  }
 }
 
 export async function getTournaments(): Promise<Tournament[]> {
@@ -239,11 +313,7 @@ export async function getTournaments(): Promise<Tournament[]> {
         .sort({ startDate: 1 })
         .toArray()
       // Normalize BSON values (e.g. ObjectId) so loader data is serializable.
-      dbTournaments = docs.map((t) => ({
-        ...t,
-        _id: t._id ? String(t._id) : undefined,
-        id: t._id ? String(t._id) : generateSeedTournamentId(t),
-      }))
+      dbTournaments = docs.map(normalizeTournament)
     }
   }
 
@@ -254,11 +324,49 @@ export async function getTournaments(): Promise<Tournament[]> {
   return allTournaments
 }
 
+/** Past tournaments that were held online (start date before now, isOnline). */
+export async function getPastOnlineTournaments(): Promise<Tournament[]> {
+  const now = new Date()
+
+  const pastOnlineSeeds = SEED_TOURNAMENTS.filter(
+    (t) => t.startDate < now && t.isOnline === true,
+  ).map((t) => ({
+    ...t,
+    id: generateSeedTournamentId(t),
+    createdAt: new Date("2026-04-30T00:00:00Z"),
+  }))
+
+  let dbTournaments: Tournament[] = []
+  if (isMongoConfigured()) {
+    const db = await getDb()
+    if (db) {
+      const docs = await db
+        .collection(COLLECTION)
+        .find<Tournament>({
+          startDate: { $lt: now },
+          isOnline: true,
+        })
+        .sort({ startDate: -1 })
+        .toArray()
+      dbTournaments = docs.map(normalizeTournament)
+    }
+  }
+
+  const allTournaments = [...pastOnlineSeeds, ...dbTournaments]
+  allTournaments.sort((a, b) => b.startDate.getTime() - a.startDate.getTime())
+
+  return allTournaments
+}
+
 export async function getTournamentById(
   id: string,
 ): Promise<Tournament | null> {
   const tournaments = await getTournaments()
-  return tournaments.find((t) => t.id === id) || null
+  const upcoming = tournaments.find((t) => t.id === id)
+  if (upcoming) return upcoming
+
+  const pastOnline = await getPastOnlineTournaments()
+  return pastOnline.find((t) => t.id === id) || null
 }
 
 export async function getTournamentByIndex(

@@ -49,7 +49,14 @@ function TournamentsPage() {
           </div>
           <p className="max-w-2xl text-xs leading-5 text-zinc-600 sm:text-sm sm:leading-6 dark:text-zinc-400">
             Upcoming chess tournaments. Add your tournament to share it with the
-            community.
+            community.{" "}
+            <Link
+              to="/tournaments/past-online"
+              className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
+            >
+              View past online tournaments
+            </Link>
+            .
           </p>
         </header>
 
