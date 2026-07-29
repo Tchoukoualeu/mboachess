@@ -15,10 +15,13 @@ export type PlayerLookupResult = {
   rapid: number | null
   online: boolean
   lastOnline: number | null
+  bullet: number | null
   /** Chess.com `avatar` URL; null if not set or on error. */
   avatarUrl: string | null
   /** ISO country code (e.g., "CM", "US"); null if not available. */
   countryCode: string | null
+  /** Chess.com profile created/joined timestamp in Unix seconds. */
+  joined: number | null
   error?: string
 }
 
@@ -27,6 +30,7 @@ type ProfilePayload = {
   last_online?: number
   avatar?: string
   country?: string
+  joined?: number
   code?: number
   message?: string
 }
@@ -97,10 +101,12 @@ export async function fetchPlayerSnapshot(
       username,
       blitz: null,
       rapid: null,
+      bullet: null,
       online: false,
       lastOnline: null,
       avatarUrl: null,
       countryCode: null,
+      joined: null,
       error: msg,
     }
   }
@@ -121,10 +127,12 @@ export async function fetchPlayerSnapshot(
       username: profile.username || username,
       blitz: null,
       rapid: null,
+      bullet: null,
       online,
       lastOnline: lastActivity,
       avatarUrl,
       countryCode,
+      joined: profile.joined ?? null,
       error: "Stats unavailable",
     }
   }
@@ -138,10 +146,12 @@ export async function fetchPlayerSnapshot(
       username: profile.username || username,
       blitz: null,
       rapid: null,
+      bullet: null,
       online,
       lastOnline: lastActivity,
       avatarUrl,
       countryCode,
+      joined: profile.joined ?? null,
       error: stats.message,
     }
   }
@@ -150,15 +160,18 @@ export async function fetchPlayerSnapshot(
   const online = lastActivity != null && now - lastActivity < ONLINE_WITHIN_SEC
   const blitz = stats.chess_blitz?.last?.rating ?? null
   const rapid = stats.chess_rapid?.last?.rating ?? null
+  const bullet = stats.chess_bullet?.last?.rating ?? null
 
   return {
     username: profile.username || username,
     blitz,
     rapid,
+    bullet,
     online,
     lastOnline: lastActivity,
     avatarUrl,
     countryCode,
+    joined: profile.joined ?? null,
   }
 }
 

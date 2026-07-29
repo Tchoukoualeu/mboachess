@@ -152,6 +152,16 @@ function Home() {
                 {" • "}
               </p>
               <p>
+                Run a{" "}
+                <Link
+                  to="/rating-speed-run"
+                  className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
+                >
+                  Rating Speed Run
+                </Link>
+                {" • "}
+              </p>
+              <p>
                 Find{" "}
                 <Link
                   to="/clubs"
@@ -180,7 +190,7 @@ function Home() {
 
         <RatingLeaders blitzLeader={blitzLeader} rapidLeader={rapidLeader} />
 
-        <div className="mb-4 grid gap-4 sm:mb-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mb-4 grid gap-4 sm:mb-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           <Link
             to="/tournaments"
             className="block rounded-xl border border-emerald-200 bg-emerald-50 p-4 transition hover:border-emerald-300 hover:bg-emerald-100 dark:border-emerald-900/50 dark:bg-emerald-900/20 dark:hover:border-emerald-800 dark:hover:bg-emerald-900/30 sm:p-6"
@@ -225,6 +235,35 @@ function Home() {
               </div>
               <svg
                 className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </div>
+          </Link>
+
+          <Link
+            to="/rating-speed-run"
+            className="block rounded-xl border border-amber-200 bg-amber-50 p-4 transition hover:border-amber-300 hover:bg-amber-100 dark:border-amber-900/50 dark:bg-amber-900/20 dark:hover:border-amber-800 dark:hover:bg-amber-900/30 sm:p-6"
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-amber-900 dark:text-amber-100">
+                  Rating Speed Run
+                </h2>
+                <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
+                  Run timed rating gain competitions
+                </p>
+              </div>
+              <svg
+                className="h-5 w-5 shrink-0 text-amber-700 dark:text-amber-300"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
