@@ -155,6 +155,7 @@ function Home() {
                 Run a{" "}
                 <Link
                   to="/rating-speed-run"
+                  search={{}}
                   className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
                 >
                   Rating Speed Run
@@ -251,6 +252,7 @@ function Home() {
 
           <Link
             to="/rating-speed-run"
+            search={{}}
             className="block rounded-xl border border-amber-200 bg-amber-50 p-4 transition hover:border-amber-300 hover:bg-amber-100 dark:border-amber-900/50 dark:bg-amber-900/20 dark:hover:border-amber-800 dark:hover:bg-amber-900/30 sm:p-6"
           >
             <div className="flex items-start justify-between">

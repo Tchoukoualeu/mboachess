@@ -133,7 +133,7 @@ function JoinCompetitionForm({ competitionId }: { competitionId: string }) {
       <button
         type="submit"
         disabled={submitting}
-        className="mt-auto inline-flex items-center justify-center rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-600 dark:hover:bg-emerald-500"
+        className="mt-auto inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
       >
         {submitting ? "Joining..." : "Join competition"}
       </button>
@@ -170,6 +170,7 @@ export function RatingSpeedRunCompetitionView({
               <div className="mb-3">
                 <Link
                   to="/rating-speed-run"
+                  search={{}}
                   className="text-sm text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
                 >
                   Back to all speed runs

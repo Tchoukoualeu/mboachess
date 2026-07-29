@@ -135,7 +135,7 @@ function CreateCompetitionForm() {
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex w-full items-center justify-center rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-600 dark:hover:bg-emerald-500"
+            className="inline-flex w-full items-center justify-center rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
             {submitting ? "Creating..." : "Create competition"}
           </button>
@@ -161,12 +161,20 @@ export const Route = createFileRoute("/rating-speed-run/")({
         "Create and track rating speed run competitions using Chess.com accounts.",
       path: "/rating-speed-run",
     }),
+  validateSearch: (search: Record<string, unknown>): { admin?: boolean } => {
+    if (search.admin === "true" || search.admin === true) {
+      return { admin: true }
+    }
+    return {}
+  },
   loader: () => loadRatingSpeedRuns(),
   component: RatingSpeedRunIndexPage,
 })
 
 function RatingSpeedRunIndexPage() {
   const competitions = Route.useLoaderData()
+  const { admin } = Route.useSearch()
+  const isAdmin = admin === true
 
   return (
     <div className="min-h-dvh flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
@@ -198,11 +206,13 @@ function RatingSpeedRunIndexPage() {
           </div>
         </header>
 
-        <CreateCompetitionForm />
+        {isAdmin ? <CreateCompetitionForm /> : null}
 
         {competitions.length === 0 ? (
           <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-8 text-center text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900/40 dark:text-zinc-400">
-            No competition yet. Create one above to open registration.
+            {isAdmin
+              ? "No competition yet. Create one above to open registration."
+              : "No competition yet. Check back soon."}
           </div>
         ) : (
           <div className="space-y-4">
