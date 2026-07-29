@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { GitHubLink } from "@/components/GitHubLink"
 import { WhatsAppLink } from "@/components/WhatsAppLink"
+import { EloByParticipantChart } from "@/components/EloByParticipantChart"
 import { RatingLeaders } from "@/components/RatingLeaders"
 import { SubmitUsernameForm } from "@/components/SubmitUsernameForm"
 import { ONLINE_WITHIN_SEC } from "@/lib/chesscom"
@@ -194,148 +195,133 @@ function Home() {
         <div className="mb-4 grid gap-4 sm:mb-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           <Link
             to="/tournaments"
-            className="block rounded-xl border border-emerald-200 bg-emerald-50 p-4 transition hover:border-emerald-300 hover:bg-emerald-100 dark:border-emerald-900/50 dark:bg-emerald-900/20 dark:hover:border-emerald-800 dark:hover:bg-emerald-900/30 sm:p-6"
+            className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-emerald-200 bg-emerald-50 p-3 transition hover:border-emerald-300 hover:bg-emerald-100 dark:border-emerald-900/50 dark:bg-emerald-900/20 dark:hover:border-emerald-800 dark:hover:bg-emerald-900/30 sm:p-4"
           >
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-emerald-900 dark:text-emerald-100">
-                  Tournaments
-                </h2>
-                <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">
-                  View and add upcoming chess tournaments
-                </p>
-              </div>
-              <svg
-                className="h-5 w-5 shrink-0 text-emerald-700 dark:text-emerald-300"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </div>
+            <svg
+              className="absolute top-3 right-3 h-4 w-4 text-emerald-700 dark:text-emerald-300 sm:top-4 sm:right-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+            <h2 className="pr-6 text-base font-semibold leading-snug text-emerald-900 dark:text-emerald-100">
+              Tournaments
+            </h2>
+            <p className="mt-1 text-sm leading-5 text-emerald-700 dark:text-emerald-300">
+              View and add upcoming chess tournaments
+            </p>
           </Link>
 
           <Link
             to="/tournaments/past-online"
-            className="block rounded-xl border border-sky-200 bg-sky-50 p-4 transition hover:border-sky-300 hover:bg-sky-100 dark:border-sky-900/50 dark:bg-sky-900/20 dark:hover:border-sky-800 dark:hover:bg-sky-900/30 sm:p-6"
+            className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-sky-200 bg-sky-50 p-3 transition hover:border-sky-300 hover:bg-sky-100 dark:border-sky-900/50 dark:bg-sky-900/20 dark:hover:border-sky-800 dark:hover:bg-sky-900/30 sm:p-4"
           >
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-sky-900 dark:text-sky-100">
-                  Past Online
-                </h2>
-                <p className="mt-1 text-sm text-sky-700 dark:text-sky-300">
-                  Browse past online chess tournaments
-                </p>
-              </div>
-              <svg
-                className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </div>
+            <svg
+              className="absolute top-3 right-3 h-4 w-4 text-sky-700 dark:text-sky-300 sm:top-4 sm:right-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+            <h2 className="pr-6 text-base font-semibold leading-snug text-sky-900 dark:text-sky-100">
+              Past Online
+            </h2>
+            <p className="mt-1 text-sm leading-5 text-sky-700 dark:text-sky-300">
+              Browse past online chess tournaments
+            </p>
           </Link>
 
           <Link
             to="/rating-speed-run"
             search={{}}
-            className="block rounded-xl border border-amber-200 bg-amber-50 p-4 transition hover:border-amber-300 hover:bg-amber-100 dark:border-amber-900/50 dark:bg-amber-900/20 dark:hover:border-amber-800 dark:hover:bg-amber-900/30 sm:p-6"
+            className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-amber-200 bg-amber-50 p-3 transition hover:border-amber-300 hover:bg-amber-100 dark:border-amber-900/50 dark:bg-amber-900/20 dark:hover:border-amber-800 dark:hover:bg-amber-900/30 sm:p-4"
           >
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-amber-900 dark:text-amber-100">
-                  Rating Speed Run
-                </h2>
-                <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
-                  Run timed rating gain competitions
-                </p>
-              </div>
-              <svg
-                className="h-5 w-5 shrink-0 text-amber-700 dark:text-amber-300"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </div>
+            <svg
+              className="absolute top-3 right-3 h-4 w-4 text-amber-700 dark:text-amber-300 sm:top-4 sm:right-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+            <h2 className="pr-6 text-base font-semibold leading-snug text-amber-900 dark:text-amber-100">
+              Rating Speed Run
+            </h2>
+            <p className="mt-1 text-sm leading-5 text-amber-700 dark:text-amber-300">
+              Run timed rating gain competitions
+            </p>
           </Link>
 
           <Link
             to="/clubs"
-            className="block rounded-xl border border-blue-200 bg-blue-50 p-4 transition hover:border-blue-300 hover:bg-blue-100 dark:border-blue-900/50 dark:bg-blue-900/20 dark:hover:border-blue-800 dark:hover:bg-blue-900/30 sm:p-6"
+            className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-blue-200 bg-blue-50 p-3 transition hover:border-blue-300 hover:bg-blue-100 dark:border-blue-900/50 dark:bg-blue-900/20 dark:hover:border-blue-800 dark:hover:bg-blue-900/30 sm:p-4"
           >
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-100">
-                  Chess Clubs
-                </h2>
-                <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
-                  Find and join local chess clubs
-                </p>
-              </div>
-              <svg
-                className="h-5 w-5 shrink-0 text-blue-700 dark:text-blue-300"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </div>
+            <svg
+              className="absolute top-3 right-3 h-4 w-4 text-blue-700 dark:text-blue-300 sm:top-4 sm:right-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+            <h2 className="pr-6 text-base font-semibold leading-snug text-blue-900 dark:text-blue-100">
+              Chess Clubs
+            </h2>
+            <p className="mt-1 text-sm leading-5 text-blue-700 dark:text-blue-300">
+              Find and join local chess clubs
+            </p>
           </Link>
 
           <Link
             to="/content-creators"
-            className="block rounded-xl border border-purple-200 bg-purple-50 p-4 transition hover:border-purple-300 hover:bg-purple-100 dark:border-purple-900/50 dark:bg-purple-900/20 dark:hover:border-purple-800 dark:hover:bg-purple-900/30 sm:p-6"
+            className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-purple-200 bg-purple-50 p-3 transition hover:border-purple-300 hover:bg-purple-100 dark:border-purple-900/50 dark:bg-purple-900/20 dark:hover:border-purple-800 dark:hover:bg-purple-900/30 sm:p-4"
           >
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-purple-900 dark:text-purple-100">
-                  Content Creators
-                </h2>
-                <p className="mt-1 text-sm text-purple-700 dark:text-purple-300">
-                  Discover chess content creators
-                </p>
-              </div>
-              <svg
-                className="h-5 w-5 shrink-0 text-purple-700 dark:text-purple-300"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </div>
+            <svg
+              className="absolute top-3 right-3 h-4 w-4 text-purple-700 dark:text-purple-300 sm:top-4 sm:right-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+            <h2 className="pr-6 text-base font-semibold leading-snug text-purple-900 dark:text-purple-100">
+              Content Creators
+            </h2>
+            <p className="mt-1 text-sm leading-5 text-purple-700 dark:text-purple-300">
+              Discover chess content creators
+            </p>
           </Link>
         </div>
 
@@ -433,6 +419,8 @@ function Home() {
             </p>
           ) : null}
         </div>
+
+        <EloByParticipantChart rows={rows} />
       </div>
     </div>
   )
