@@ -46,7 +46,7 @@ function RatingSpeedRunDetailPage() {
           <div className="rounded-xl bg-zinc-100 px-4 py-3 text-sm text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
             <div className="font-medium">Eligibility</div>
             <div>
-              Chess.com account must be at least 3 months old at start time.
+              Chess.com account must be at least 90 days old at start time.
             </div>
           </div>
         </header>

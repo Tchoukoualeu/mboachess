@@ -58,14 +58,15 @@ function getRatingValue(
   return snapshot[ratingType]
 }
 
-function isOlderThanThreeMonths(
+const MIN_ACCOUNT_AGE_MS = 90 * 24 * 60 * 60 * 1000
+
+function isOlderThanNinetyDays(
   chessJoinedSeconds: number | null,
   startDate: Date,
 ): boolean {
   if (chessJoinedSeconds == null) return false
   const joinedAt = new Date(chessJoinedSeconds * 1000)
-  const threshold = new Date(startDate)
-  threshold.setMonth(threshold.getMonth() - 3)
+  const threshold = new Date(startDate.getTime() - MIN_ACCOUNT_AGE_MS)
   return joinedAt <= threshold
 }
 
@@ -173,7 +174,7 @@ export async function joinRatingSpeedRun(
     return { ok: false, error: "Chess.com profile not found.", status: 404 }
   }
 
-  const eligible = isOlderThanThreeMonths(
+  const eligible = isOlderThanNinetyDays(
     snapshot.joined,
     normalizedCompetition.startDate,
   )
@@ -181,7 +182,7 @@ export async function joinRatingSpeedRun(
     return {
       ok: false,
       error:
-        "Chess.com account must be at least 3 months old at competition start.",
+        "Chess.com account must be at least 90 days old at competition start.",
       status: 400,
     }
   }
