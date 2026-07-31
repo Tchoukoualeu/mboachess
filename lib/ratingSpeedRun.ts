@@ -4,6 +4,7 @@ import { getDb, isMongoConfigured } from "./mongodb"
 import { normalizeChesscomUsername } from "./chesscomUsernames"
 import {
   getCompetitionStatus,
+  sortParticipantsByStanding,
   type RatingSpeedRunCompetition,
   type RatingSpeedRunParticipant,
   type RatingType,
@@ -219,12 +220,7 @@ export async function joinRatingSpeedRun(
 function sortParticipants(
   participants: RatingSpeedRunParticipant[],
 ): RatingSpeedRunParticipant[] {
-  return [...participants].sort((a, b) => {
-    if (b.netPoints !== a.netPoints) return b.netPoints - a.netPoints
-    if (b.gainedPoints !== a.gainedPoints)
-      return b.gainedPoints - a.gainedPoints
-    return a.username.localeCompare(b.username)
-  })
+  return sortParticipantsByStanding(participants)
 }
 
 async function syncCompetitionRatings(
@@ -238,6 +234,25 @@ async function syncCompetitionRatings(
     }
   }
 
+  // Finished competitions with complete scores stay frozen — only re-rank.
+  if (
+    status === "finished" &&
+    competition.participants.every(
+      (participant) =>
+        participant.startRating != null && participant.currentRating != null,
+    )
+  ) {
+    const rankedParticipants = sortParticipants(competition.participants)
+    const col = await getCompetitionCollection()
+    if (col) {
+      await col.updateOne(
+        { _id: new ObjectId(competition.id) },
+        { $set: { participants: rankedParticipants } },
+      )
+    }
+    return { ...competition, participants: rankedParticipants }
+  }
+
   const col = await getCompetitionCollection()
   if (!col)
     return {
@@ -246,30 +261,39 @@ async function syncCompetitionRatings(
     }
 
   const now = new Date()
-  const shouldRefreshCurrent = status === "running"
-  const shouldFreeze = status === "finished"
+  const isRunning = status === "running"
+  const isFinished = status === "finished"
 
   const syncedParticipants = await Promise.all(
     competition.participants.map(async (participant) => {
       const snapshot = await fetchPlayerSnapshot(participant.username)
       const rating = getRatingValue(competition.ratingType, snapshot)
 
-      const startRating =
-        participant.startRating == null ? rating : participant.startRating
-      const currentRating =
-        shouldRefreshCurrent || shouldFreeze
-          ? rating
-          : participant.currentRating
+      let startRating = participant.startRating
+      let currentRating = participant.currentRating
+
+      if (isRunning) {
+        // Lock the baseline on first sync after the competition starts.
+        if (startRating == null) startRating = rating
+        currentRating = rating
+      } else if (isFinished) {
+        // Never invent a start rating after the run ends — that would force net 0.
+        // Only fill a missing final rating when we already have a baseline.
+        if (startRating != null && currentRating == null) {
+          currentRating = rating
+        }
+      }
 
       const baseline = startRating ?? 0
       const latest = currentRating ?? baseline
-      const delta = latest - baseline
+      const delta =
+        startRating == null || currentRating == null ? 0 : latest - baseline
 
       return {
         ...participant,
         eligible: participant.eligible,
-        avatarUrl: snapshot.avatarUrl,
-        countryCode: snapshot.countryCode,
+        avatarUrl: snapshot.avatarUrl ?? participant.avatarUrl,
+        countryCode: snapshot.countryCode ?? participant.countryCode,
         error: snapshot.error,
         startRating,
         currentRating,
@@ -281,12 +305,14 @@ async function syncCompetitionRatings(
     }),
   )
 
+  const rankedParticipants = sortParticipants(syncedParticipants)
+
   await col.updateOne(
     { _id: new ObjectId(competition.id) },
-    { $set: { participants: syncedParticipants } },
+    { $set: { participants: rankedParticipants } },
   )
 
-  return { ...competition, participants: sortParticipants(syncedParticipants) }
+  return { ...competition, participants: rankedParticipants }
 }
 
 export async function getRatingSpeedRuns(): Promise<
@@ -296,7 +322,13 @@ export async function getRatingSpeedRuns(): Promise<
   if (!col) return []
 
   const docs = await col.find({}).sort({ createdAt: -1 }).toArray()
-  return docs.map((doc) => toCompetition(doc))
+  return docs.map((doc) => {
+    const competition = toCompetition(doc)
+    return {
+      ...competition,
+      participants: sortParticipants(competition.participants),
+    }
+  })
 }
 
 export async function getRatingSpeedRunById(

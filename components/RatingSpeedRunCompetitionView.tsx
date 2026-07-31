@@ -1,9 +1,12 @@
 import { Link, useRouter } from "@tanstack/react-router"
 import { useMemo, useState, type FormEvent } from "react"
+import { CrownIcon } from "@/components/CrownIcon"
 import {
   getCompetitionStatus,
+  getCompetitionWinner,
   type CompetitionStatus,
   type RatingSpeedRunCompetition,
+  type RatingSpeedRunParticipant,
   type RatingType,
 } from "@/lib/ratingSpeedRunShared"
 
@@ -64,8 +67,87 @@ function ratingTypeLabel(ratingType: RatingType): string {
 }
 
 function getWinner(competition: RatingSpeedRunCompetition | null) {
-  if (!competition || competition.participants.length === 0) return null
-  return competition.participants[0]
+  return getCompetitionWinner(competition)
+}
+
+function WinnerBanner({
+  winner,
+  prize,
+  ratingType,
+}: {
+  winner: RatingSpeedRunParticipant
+  prize?: string
+  ratingType: RatingType
+}) {
+  const initial = winner.username.slice(0, 1).toUpperCase()
+  const netLabel = `${winner.netPoints > 0 ? "+" : ""}${winner.netPoints}`
+
+  return (
+    <section
+      aria-label={`Winner: ${winner.username}`}
+      className="overflow-hidden rounded-2xl border-2 border-amber-300 bg-linear-to-br from-amber-50 via-white to-amber-100/80 shadow-md dark:border-amber-600/50 dark:from-amber-950/40 dark:via-zinc-900 dark:to-amber-950/20"
+    >
+      <div className="flex flex-col items-center gap-5 px-5 py-8 text-center sm:px-8 sm:py-10">
+        <div className="inline-flex items-center gap-2 rounded-full bg-amber-200/80 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-amber-900 dark:bg-amber-500/20 dark:text-amber-200">
+          <CrownIcon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+          Winner
+        </div>
+
+        <div className="relative">
+          <div
+            className="pointer-events-none absolute top-0 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
+            aria-hidden
+          >
+            <CrownIcon className="h-8 w-8 text-amber-500 drop-shadow dark:text-amber-400 sm:h-10 sm:w-10" />
+          </div>
+          <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-amber-300 bg-zinc-100 shadow-sm dark:border-amber-500/60 dark:bg-zinc-800 sm:h-28 sm:w-28">
+            {winner.avatarUrl ? (
+              <img
+                src={winner.avatarUrl}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="flex h-full w-full items-center justify-center text-3xl font-bold text-zinc-500 sm:text-4xl">
+                {initial}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="min-w-0 space-y-2">
+          <a
+            href={`https://www.chess.com/member/${encodeURIComponent(winner.username)}`}
+            target="_blank"
+            rel="noreferrer"
+            className="block truncate font-mono text-3xl font-bold tracking-tight text-zinc-900 underline decoration-amber-400/50 underline-offset-4 hover:decoration-amber-500 dark:text-zinc-50 dark:decoration-amber-500/40 sm:text-4xl"
+          >
+            {winner.username}
+          </a>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400 sm:text-base">
+            Top {ratingTypeLabel(ratingType)} net gain
+          </p>
+        </div>
+
+        <div className="flex flex-col items-center gap-1">
+          <div
+            className={`text-5xl font-bold tabular-nums tracking-tight sm:text-6xl ${statColor(winner.netPoints)}`}
+          >
+            {netLabel}
+          </div>
+          <div className="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            net rating points
+          </div>
+        </div>
+
+        {prize ? (
+          <div className="mt-1 rounded-xl bg-amber-100/90 px-5 py-3 text-sm font-semibold text-amber-950 dark:bg-amber-500/15 dark:text-amber-100 sm:text-base">
+            Prize: {prize}
+          </div>
+        ) : null}
+      </div>
+    </section>
+  )
 }
 
 function JoinCompetitionForm({ competitionId }: { competitionId: string }) {
@@ -262,15 +344,15 @@ export function RatingSpeedRunCompetitionView({
             <JoinCompetitionForm competitionId={competition.id} />
           </div>
         ) : null}
-
-        {status === "finished" && winner ? (
-          <div className="mt-6 rounded-xl bg-amber-50 px-4 py-4 text-sm text-amber-900 dark:bg-amber-900/20 dark:text-amber-200">
-            Winner: <span className="font-semibold">{winner.username}</span>{" "}
-            with <span className="font-semibold">+{winner.netPoints}</span>{" "}
-            points.
-          </div>
-        ) : null}
       </section>
+
+      {status === "finished" && winner ? (
+        <WinnerBanner
+          winner={winner}
+          prize={competition.prize}
+          ratingType={competition.ratingType}
+        />
+      ) : null}
 
       <section className="rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
         <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-4 dark:border-zinc-800 sm:px-6">
@@ -292,84 +374,99 @@ export function RatingSpeedRunCompetitionView({
         ) : (
           <>
             <div className="space-y-3 p-4 sm:hidden">
-              {competition.participants.map((participant, index) => (
-                <article
-                  key={participant.username}
-                  className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950/40"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                        Rank #{index + 1}
+              {competition.participants.map((participant, index) => {
+                const isWinner = status === "finished" && index === 0
+                return (
+                  <article
+                    key={participant.username}
+                    className={`rounded-xl border p-4 ${
+                      isWinner
+                        ? "border-amber-300 bg-amber-50 dark:border-amber-600/50 dark:bg-amber-950/30"
+                        : "border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950/40"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                          {isWinner ? (
+                            <CrownIcon className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400" />
+                          ) : null}
+                          Rank #{index + 1}
+                          {isWinner ? (
+                            <span className="rounded-full bg-amber-200/80 px-2 py-0.5 text-[10px] font-bold text-amber-900 dark:bg-amber-500/20 dark:text-amber-200">
+                              Winner
+                            </span>
+                          ) : null}
+                        </div>
+                        <a
+                          href={`https://www.chess.com/member/${encodeURIComponent(
+                            participant.username,
+                          )}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-1 block font-mono text-sm text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
+                        >
+                          {participant.username}
+                        </a>
                       </div>
-                      <a
-                        href={`https://www.chess.com/member/${encodeURIComponent(
-                          participant.username,
-                        )}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="mt-1 block font-mono text-sm text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
+                      <div
+                        className={`text-lg font-semibold ${statColor(participant.netPoints)}`}
                       >
-                        {participant.username}
-                      </a>
+                        {participant.netPoints > 0 ? "+" : ""}
+                        {participant.netPoints}
+                      </div>
                     </div>
-                    <div
-                      className={`text-lg font-semibold ${statColor(participant.netPoints)}`}
-                    >
-                      {participant.netPoints > 0 ? "+" : ""}
-                      {participant.netPoints}
-                    </div>
-                  </div>
 
-                  <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                    <div className="rounded-lg bg-white px-3 py-2 dark:bg-zinc-900">
-                      <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                        Start
+                    <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                      <div className="rounded-lg bg-white px-3 py-2 dark:bg-zinc-900">
+                        <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                          Start
+                        </div>
+                        <div className="mt-1 font-semibold tabular-nums">
+                          {formatRatingValue(participant.startRating)}
+                        </div>
                       </div>
-                      <div className="mt-1 font-semibold tabular-nums">
-                        {formatRatingValue(participant.startRating)}
+                      <div className="rounded-lg bg-white px-3 py-2 dark:bg-zinc-900">
+                        <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                          Current
+                        </div>
+                        <div className="mt-1 font-semibold tabular-nums">
+                          {formatRatingValue(participant.currentRating)}
+                        </div>
+                      </div>
+                      <div className="rounded-lg bg-white px-3 py-2 dark:bg-zinc-900">
+                        <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                          Gained
+                        </div>
+                        <div className="mt-1 font-semibold tabular-nums text-emerald-700 dark:text-emerald-400">
+                          +{participant.gainedPoints}
+                        </div>
+                      </div>
+                      <div className="rounded-lg bg-white px-3 py-2 dark:bg-zinc-900">
+                        <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                          Lost
+                        </div>
+                        <div className="mt-1 font-semibold tabular-nums text-rose-700 dark:text-rose-400">
+                          -{participant.lostPoints}
+                        </div>
                       </div>
                     </div>
-                    <div className="rounded-lg bg-white px-3 py-2 dark:bg-zinc-900">
-                      <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                        Current
-                      </div>
-                      <div className="mt-1 font-semibold tabular-nums">
-                        {formatRatingValue(participant.currentRating)}
-                      </div>
-                    </div>
-                    <div className="rounded-lg bg-white px-3 py-2 dark:bg-zinc-900">
-                      <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                        Gained
-                      </div>
-                      <div className="mt-1 font-semibold tabular-nums text-emerald-700 dark:text-emerald-400">
-                        +{participant.gainedPoints}
-                      </div>
-                    </div>
-                    <div className="rounded-lg bg-white px-3 py-2 dark:bg-zinc-900">
-                      <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                        Lost
-                      </div>
-                      <div className="mt-1 font-semibold tabular-nums text-rose-700 dark:text-rose-400">
-                        -{participant.lostPoints}
-                      </div>
-                    </div>
-                  </div>
 
-                  <div className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">
-                    Last sync:{" "}
-                    {participant.lastSyncedAt
-                      ? formatDateTime(participant.lastSyncedAt)
-                      : "Waiting for start"}
-                  </div>
-
-                  {participant.error ? (
-                    <div className="mt-2 text-xs text-amber-700 dark:text-amber-400">
-                      {participant.error}
+                    <div className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">
+                      Last sync:{" "}
+                      {participant.lastSyncedAt
+                        ? formatDateTime(participant.lastSyncedAt)
+                        : "Waiting for start"}
                     </div>
-                  ) : null}
-                </article>
-              ))}
+
+                    {participant.error ? (
+                      <div className="mt-2 text-xs text-amber-700 dark:text-amber-400">
+                        {participant.error}
+                      </div>
+                    ) : null}
+                  </article>
+                )
+              })}
             </div>
 
             <div className="hidden overflow-x-auto sm:block">
@@ -390,55 +487,70 @@ export function RatingSpeedRunCompetitionView({
                   </tr>
                 </thead>
                 <tbody>
-                  {competition.participants.map((participant) => (
-                    <tr
-                      key={participant.username}
-                      className="border-b border-zinc-100 last:border-0 dark:border-zinc-800/80"
-                    >
-                      <td className="px-4 py-3 sm:px-6">
-                        <div className="font-mono text-xs sm:text-sm">
-                          <a
-                            href={`https://www.chess.com/member/${encodeURIComponent(
-                              participant.username,
-                            )}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
-                          >
-                            {participant.username}
-                          </a>
-                        </div>
-                        {participant.error ? (
-                          <div className="mt-1 text-xs text-amber-700 dark:text-amber-400">
-                            {participant.error}
-                          </div>
-                        ) : null}
-                      </td>
-                      <td className="px-4 py-3 tabular-nums">
-                        {formatRatingValue(participant.startRating)}
-                      </td>
-                      <td className="px-4 py-3 tabular-nums">
-                        {formatRatingValue(participant.currentRating)}
-                      </td>
-                      <td className="px-4 py-3 tabular-nums text-emerald-700 dark:text-emerald-400">
-                        +{participant.gainedPoints}
-                      </td>
-                      <td className="px-4 py-3 tabular-nums text-rose-700 dark:text-rose-400">
-                        -{participant.lostPoints}
-                      </td>
-                      <td
-                        className={`px-4 py-3 tabular-nums font-semibold ${statColor(participant.netPoints)}`}
+                  {competition.participants.map((participant, index) => {
+                    const isWinner = status === "finished" && index === 0
+                    return (
+                      <tr
+                        key={participant.username}
+                        className={`border-b last:border-0 ${
+                          isWinner
+                            ? "border-amber-200 bg-amber-50 dark:border-amber-800/60 dark:bg-amber-950/30"
+                            : "border-zinc-100 dark:border-zinc-800/80"
+                        }`}
                       >
-                        {participant.netPoints > 0 ? "+" : ""}
-                        {participant.netPoints}
-                      </td>
-                      <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
-                        {participant.lastSyncedAt
-                          ? formatDateTime(participant.lastSyncedAt)
-                          : "Waiting for start"}
-                      </td>
-                    </tr>
-                  ))}
+                        <td className="px-4 py-3 sm:px-6">
+                          <div className="flex items-center gap-2 font-mono text-xs sm:text-sm">
+                            {isWinner ? (
+                              <CrownIcon className="h-4 w-4 shrink-0 text-amber-500 dark:text-amber-400" />
+                            ) : null}
+                            <a
+                              href={`https://www.chess.com/member/${encodeURIComponent(
+                                participant.username,
+                              )}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
+                            >
+                              {participant.username}
+                            </a>
+                            {isWinner ? (
+                              <span className="rounded-full bg-amber-200/80 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-900 dark:bg-amber-500/20 dark:text-amber-200">
+                                Winner
+                              </span>
+                            ) : null}
+                          </div>
+                          {participant.error ? (
+                            <div className="mt-1 text-xs text-amber-700 dark:text-amber-400">
+                              {participant.error}
+                            </div>
+                          ) : null}
+                        </td>
+                        <td className="px-4 py-3 tabular-nums">
+                          {formatRatingValue(participant.startRating)}
+                        </td>
+                        <td className="px-4 py-3 tabular-nums">
+                          {formatRatingValue(participant.currentRating)}
+                        </td>
+                        <td className="px-4 py-3 tabular-nums text-emerald-700 dark:text-emerald-400">
+                          +{participant.gainedPoints}
+                        </td>
+                        <td className="px-4 py-3 tabular-nums text-rose-700 dark:text-rose-400">
+                          -{participant.lostPoints}
+                        </td>
+                        <td
+                          className={`px-4 py-3 tabular-nums font-semibold ${statColor(participant.netPoints)}`}
+                        >
+                          {participant.netPoints > 0 ? "+" : ""}
+                          {participant.netPoints}
+                        </td>
+                        <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
+                          {participant.lastSyncedAt
+                            ? formatDateTime(participant.lastSyncedAt)
+                            : "Waiting for start"}
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>

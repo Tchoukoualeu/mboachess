@@ -47,3 +47,21 @@ export function getCompetitionStatus(
   if (now <= competition.endDate) return "running"
   return "finished"
 }
+
+export function sortParticipantsByStanding(
+  participants: RatingSpeedRunParticipant[],
+): RatingSpeedRunParticipant[] {
+  return [...participants].sort((a, b) => {
+    if (b.netPoints !== a.netPoints) return b.netPoints - a.netPoints
+    if (b.gainedPoints !== a.gainedPoints)
+      return b.gainedPoints - a.gainedPoints
+    return a.username.localeCompare(b.username)
+  })
+}
+
+export function getCompetitionWinner(
+  competition: Pick<RatingSpeedRunCompetition, "participants"> | null,
+): RatingSpeedRunParticipant | null {
+  if (!competition || competition.participants.length === 0) return null
+  return sortParticipantsByStanding(competition.participants)[0] ?? null
+}

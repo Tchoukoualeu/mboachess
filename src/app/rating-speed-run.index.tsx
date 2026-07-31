@@ -1,8 +1,11 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 import { useState, type FormEvent } from "react"
+import { CrownIcon } from "@/components/CrownIcon"
 import { pageHead } from "@/lib/seo"
 import {
   getCompetitionStatus,
+  getCompetitionWinner,
+  type CompetitionStatus,
   type RatingType,
 } from "@/lib/ratingSpeedRunShared"
 import { loadRatingSpeedRuns } from "@/server/ratingSpeedRun"
@@ -16,6 +19,32 @@ function formatDateTime(date: Date): string {
 
 function ratingTypeLabel(ratingType: RatingType): string {
   return ratingType.charAt(0).toUpperCase() + ratingType.slice(1)
+}
+
+function statusLabel(status: CompetitionStatus): string {
+  switch (status) {
+    case "registration-open":
+      return "Registration open"
+    case "upcoming":
+      return "Starting soon"
+    case "running":
+      return "Running"
+    case "finished":
+      return "Finished"
+  }
+}
+
+function statusClasses(status: CompetitionStatus): string {
+  switch (status) {
+    case "registration-open":
+      return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+    case "upcoming":
+      return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+    case "running":
+      return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+    case "finished":
+      return "bg-zinc-700 text-white dark:bg-zinc-200 dark:text-zinc-900"
+  }
 }
 
 function CreateCompetitionForm() {
@@ -221,12 +250,22 @@ function RatingSpeedRunIndexPage() {
             </div>
             {competitions.map((competition) => {
               const status = getCompetitionStatus(competition)
+              const isFinished = status === "finished"
+              const winner = getCompetitionWinner(competition)
+              const netLabel = winner
+                ? `${winner.netPoints > 0 ? "+" : ""}${winner.netPoints}`
+                : null
+
               return (
                 <Link
                   key={competition.id}
                   to="/rating-speed-run/$id"
                   params={{ id: competition.id }}
-                  className="block rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900/50 sm:p-6"
+                  className={`block rounded-xl border p-4 shadow-sm transition hover:shadow-md sm:p-6 ${
+                    isFinished
+                      ? "border-amber-300 bg-linear-to-br from-amber-50 via-white to-amber-50/80 dark:border-amber-700/50 dark:from-amber-950/30 dark:via-zinc-900/50 dark:to-amber-950/20"
+                      : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50"
+                  }`}
                 >
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0 flex-1">
@@ -234,8 +273,10 @@ function RatingSpeedRunIndexPage() {
                         <h2 className="text-lg font-semibold">
                           {competition.title}
                         </h2>
-                        <span className="inline-flex rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                          {status.replace("-", " ")}
+                        <span
+                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${statusClasses(status)}`}
+                        >
+                          {statusLabel(status)}
                         </span>
                       </div>
                       <p className="text-sm text-zinc-600 dark:text-zinc-400">
@@ -246,6 +287,49 @@ function RatingSpeedRunIndexPage() {
                           {competition.description}
                         </p>
                       ) : null}
+
+                      {isFinished && winner ? (
+                        <div className="mt-4 flex items-center gap-3 rounded-xl border border-amber-300/80 bg-amber-100/70 px-3 py-3 dark:border-amber-600/40 dark:bg-amber-950/40">
+                          <div className="relative h-11 w-11 shrink-0">
+                            <div
+                              className="pointer-events-none absolute top-0 left-1/2 z-10 -translate-x-1/2 translate-y-[-35%]"
+                              aria-hidden
+                            >
+                              <CrownIcon className="h-4 w-4 text-amber-500 dark:text-amber-400" />
+                            </div>
+                            <div className="h-full w-full overflow-hidden rounded-full border-2 border-amber-300 bg-zinc-100 dark:border-amber-500/50 dark:bg-zinc-800">
+                              {winner.avatarUrl ? (
+                                <img
+                                  src={winner.avatarUrl}
+                                  alt=""
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : (
+                                <span className="flex h-full w-full items-center justify-center text-sm font-bold text-zinc-500">
+                                  {winner.username.slice(0, 1).toUpperCase()}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-amber-800 dark:text-amber-300">
+                              Winner
+                            </div>
+                            <div className="truncate font-mono text-base font-semibold text-zinc-900 dark:text-zinc-50">
+                              {winner.username}
+                            </div>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <div className="text-xl font-bold tabular-nums text-emerald-700 dark:text-emerald-400">
+                              {netLabel}
+                            </div>
+                            <div className="text-[11px] font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                              net
+                            </div>
+                          </div>
+                        </div>
+                      ) : null}
+
                       <div className="mt-3 grid gap-2 text-sm text-zinc-700 dark:text-zinc-300 sm:grid-cols-2">
                         <div>
                           <span className="font-medium">Starts:</span>{" "}
@@ -267,8 +351,14 @@ function RatingSpeedRunIndexPage() {
                         ) : null}
                       </div>
                     </div>
-                    <div className="shrink-0 text-sm font-medium text-emerald-700 dark:text-emerald-400">
-                      Open competition →
+                    <div
+                      className={`shrink-0 text-sm font-medium ${
+                        isFinished
+                          ? "text-amber-800 dark:text-amber-300"
+                          : "text-emerald-700 dark:text-emerald-400"
+                      }`}
+                    >
+                      {isFinished ? "See results →" : "Open competition →"}
                     </div>
                   </div>
                 </Link>
