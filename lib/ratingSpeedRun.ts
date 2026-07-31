@@ -58,9 +58,9 @@ function getRatingValue(
   return snapshot[ratingType]
 }
 
-const MIN_ACCOUNT_AGE_MS = 90 * 24 * 60 * 60 * 1000
+const MIN_ACCOUNT_AGE_MS = 60 * 24 * 60 * 60 * 1000
 
-function isOlderThanNinetyDays(
+function isOlderThanSixtyDays(
   chessJoinedSeconds: number | null,
   startDate: Date,
 ): boolean {
@@ -174,7 +174,7 @@ export async function joinRatingSpeedRun(
     return { ok: false, error: "Chess.com profile not found.", status: 404 }
   }
 
-  const eligible = isOlderThanNinetyDays(
+  const eligible = isOlderThanSixtyDays(
     snapshot.joined,
     normalizedCompetition.startDate,
   )
@@ -182,7 +182,7 @@ export async function joinRatingSpeedRun(
     return {
       ok: false,
       error:
-        "Chess.com account must be at least 90 days old at competition start.",
+        "Chess.com account must be at least 60 days old at competition start.",
       status: 400,
     }
   }
