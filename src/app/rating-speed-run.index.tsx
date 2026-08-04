@@ -97,7 +97,7 @@ function CreateCompetitionForm() {
         <h2 className="text-lg font-semibold">Create a new speed run</h2>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
           Registration opens immediately and closes after 24 hours. The
-          competition then runs for exactly 3 days.
+          competition then runs for exactly 2 days.
         </p>
       </div>
 
@@ -157,7 +157,7 @@ function CreateCompetitionForm() {
 
         <div className="sm:col-span-2 rounded-lg bg-zinc-100 px-4 py-3 text-sm text-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-300">
           Every speed run follows the same schedule: 24 hours to register, then
-          3 days of rating competition.
+          2 days of rating competition.
         </div>
 
         <div className="sm:col-span-2 flex flex-col gap-2">
@@ -223,14 +223,15 @@ function RatingSpeedRunIndexPage() {
             </h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">
               Contestants register with a Chess.com account during a 24-hour
-              signup window. Once registration closes, the speed run lasts 3
+              signup window. Once registration closes, the speed run lasts 2
               days and the player with the highest net rating gain wins.
             </p>
           </div>
           <div className="rounded-xl bg-zinc-100 px-4 py-3 text-sm text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
             <div className="font-medium">Eligibility</div>
             <div>
-              Chess.com account must be at least 60 days old at start time.
+              Chess.com account must be at least 60 days old at start time, and
+              rated at least 400 in the competition category.
             </div>
           </div>
         </header>

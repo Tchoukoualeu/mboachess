@@ -48,7 +48,7 @@ function getStartDateFromCreatedAt(createdAt: Date): Date {
 }
 
 function getEndDateFromStartDate(startDate: Date): Date {
-  return new Date(startDate.getTime() + 3 * 24 * 60 * 60 * 1000)
+  return new Date(startDate.getTime() + 2 * 24 * 60 * 60 * 1000)
 }
 
 function getRatingValue(
@@ -59,6 +59,7 @@ function getRatingValue(
 }
 
 const MIN_ACCOUNT_AGE_MS = 60 * 24 * 60 * 60 * 1000
+const MIN_ENTRY_RATING = 400
 
 function isOlderThanSixtyDays(
   chessJoinedSeconds: number | null,
@@ -68,6 +69,10 @@ function isOlderThanSixtyDays(
   const joinedAt = new Date(chessJoinedSeconds * 1000)
   const threshold = new Date(startDate.getTime() - MIN_ACCOUNT_AGE_MS)
   return joinedAt <= threshold
+}
+
+function meetsMinimumRating(rating: number | null): boolean {
+  return rating != null && rating >= MIN_ENTRY_RATING
 }
 
 async function getCompetitionCollection() {
@@ -183,6 +188,15 @@ export async function joinRatingSpeedRun(
       ok: false,
       error:
         "Chess.com account must be at least 60 days old at competition start.",
+      status: 400,
+    }
+  }
+
+  const entryRating = getRatingValue(normalizedCompetition.ratingType, snapshot)
+  if (!meetsMinimumRating(entryRating)) {
+    return {
+      ok: false,
+      error: `Minimum ${normalizedCompetition.ratingType} rating is ${MIN_ENTRY_RATING}.`,
       status: 400,
     }
   }
