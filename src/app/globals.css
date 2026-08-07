@@ -1,26 +1,183 @@
 @import "tailwindcss" source("../../");
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f3f5f3;
+  --foreground: #141816;
+  --brand: #14532d;
+  --brand-soft: #1a6b3c;
+  --brand-muted: #d8ebe0;
+  --wood: #8a6a3d;
+  --wood-soft: #c4a574;
+  --surface: #ffffff;
+  --surface-muted: #e8ece8;
+  --ink-muted: #4a554e;
+  --border: #d4ddd6;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-muted: var(--brand-muted);
+  --color-wood: var(--wood);
+  --color-wood-soft: var(--wood-soft);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-ink-muted: var(--ink-muted);
+  --color-border: var(--border);
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
   --font-mono: ui-monospace, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0c110e;
+    --foreground: #e8efe9;
+    --brand: #3d9b63;
+    --brand-soft: #2f7a4d;
+    --brand-muted: #1a3324;
+    --wood: #c4a574;
+    --wood-soft: #8a6a3d;
+    --surface: #141a16;
+    --surface-muted: #1c2420;
+    --ink-muted: #9aaba0;
+    --border: #2a3530;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Atmospheric board-grid + soft green wash */
+.site-atmosphere {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(
+      ellipse 120% 80% at 50% -20%,
+      color-mix(in srgb, var(--brand) 14%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 60% 40% at 100% 0%,
+      color-mix(in srgb, var(--wood) 8%, transparent),
+      transparent 50%
+    ),
+    var(--background);
+}
+
+.site-atmosphere::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.018;
+  background-image:
+    linear-gradient(45deg, var(--foreground) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--foreground) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--foreground) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--foreground) 75%);
+  background-size: 32px 32px;
+  background-position:
+    0 0,
+    0 16px,
+    16px -16px,
+    -16px 0;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes board-drift {
+  from {
+    background-position:
+      0 0,
+      0 14px,
+      14px -14px,
+      -14px 0;
+  }
+  to {
+    background-position:
+      28px 28px,
+      28px 42px,
+      42px 14px,
+      14px 28px;
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.7s ease-out both;
+}
+
+.animate-fade-up-delay {
+  animation: fade-up 0.7s ease-out 0.12s both;
+}
+
+.animate-fade-in {
+  animation: fade-in 1s ease-out both;
+}
+
+.hero-board {
+  background-image:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--brand) 88%, #000) 0%,
+      color-mix(in srgb, var(--brand-soft) 70%, #0a1f14) 55%,
+      color-mix(in srgb, var(--wood) 35%, #0f1a12) 100%
+    );
+}
+
+.hero-board::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.015;
+  background-image:
+    linear-gradient(45deg, #fff 25%, transparent 25%),
+    linear-gradient(-45deg, #fff 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #fff 75%),
+    linear-gradient(-45deg, transparent 75%, #fff 75%);
+  background-size: 48px 48px;
+  background-position:
+    0 0,
+    0 24px,
+    24px -24px,
+    -24px 0;
+  animation: board-drift 48s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-fade-up-delay,
+  .animate-fade-in,
+  .hero-board::after {
+    animation: none;
+  }
 }

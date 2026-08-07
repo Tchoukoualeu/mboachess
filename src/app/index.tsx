@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { GitHubLink } from "@/components/GitHubLink"
-import { WhatsAppLink } from "@/components/WhatsAppLink"
 import { EloByParticipantChart } from "@/components/EloByParticipantChart"
+import { PageShell } from "@/components/PageShell"
 import { RatingLeaders } from "@/components/RatingLeaders"
 import { SubmitUsernameForm } from "@/components/SubmitUsernameForm"
 import { ONLINE_WITHIN_SEC } from "@/lib/chesscom"
+import { pageHead, webPageJsonLd } from "@/lib/seo"
 import { loadHomeData } from "@/server/home"
 
 /** Convert ISO country code to flag emoji (e.g., "CM" -> "🇨🇲"). */
@@ -99,7 +99,23 @@ function formatRating(
   return "Unrated"
 }
 
+const HOME_TITLE =
+  "Mboachess - Chess in Cameroon | Players, Clubs & Tournaments"
+const HOME_DESCRIPTION =
+  "The hub for chess in Cameroon. Track Cameroonian chess players' ratings, discover local chess clubs, view upcoming tournaments, and connect with the chess community across Cameroon."
+
 export const Route = createFileRoute("/")({
+  head: () =>
+    pageHead({
+      title: HOME_TITLE,
+      description: HOME_DESCRIPTION,
+      path: "/",
+      jsonLd: webPageJsonLd({
+        title: HOME_TITLE,
+        description: HOME_DESCRIPTION,
+        path: "/",
+      }),
+    }),
   loader: () => loadHomeData(),
   component: Home,
 })
@@ -108,320 +124,275 @@ function Home() {
   const { rows, blitzLeader, rapidLeader } = Route.useLoaderData()
 
   return (
-    <div className="min-h-dvh flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <div className="mx-auto w-full max-w-4xl flex-1 px-4 py-5 sm:px-6 sm:py-8">
-        <header className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-          <div className="min-w-0">
-            <h1 className="text-xl font-semibold tracking-tight sm:text-2xl md:text-3xl">
-              Mboachess.com
+    <>
+      <section className="hero-board relative overflow-hidden text-white">
+        <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col justify-center px-4 py-10 sm:px-6 sm:py-12">
+          <div className="animate-fade-up relative z-10 max-w-xl rounded-xl bg-black/35 px-4 py-4 backdrop-blur-[2px] sm:px-5 sm:py-5">
+            <h1 className="font-display text-3xl font-semibold tracking-tight drop-shadow-sm sm:text-4xl md:text-5xl">
+              Mboachess
             </h1>
-            <p className="mt-1.5 max-w-2xl text-xs leading-5 text-zinc-600 sm:mt-2 sm:text-sm sm:leading-6 dark:text-zinc-400">
-              Blitz and rapid ratings and activity from the Chess.com public
-              API. Online (green dot) uses recent profile and game times within{" "}
-              {ONLINE_WITHIN_SEC / 60} minutes.
+            <p className="animate-fade-up-delay mt-2 max-w-md text-sm leading-6 text-white sm:text-base sm:leading-7">
+              Follow Cameroonian players on Chess.com—ratings, activity, and the
+              community in one place.
             </p>
-            <div className="mt-2 flex flex-wrap gap-x-1 text-xs leading-5 text-zinc-600 sm:text-sm sm:leading-6 dark:text-zinc-400">
-              <p>
-                Looking for <span className="font-medium">chess cameroon</span>?
-                See{" "}
-                <Link
-                  to="/chess-cameroon"
-                  className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
-                >
-                  Chess Cameroon
-                </Link>
-                {" • "}
-              </p>
-              <p>
-                View{" "}
-                <Link
-                  to="/tournaments"
-                  className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
-                >
-                  Upcoming Tournaments
-                </Link>
-                {" • "}
-              </p>
-              <p>
-                Browse{" "}
-                <Link
-                  to="/tournaments/past-online"
-                  className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
-                >
-                  Past Online Tournaments
-                </Link>
-                {" • "}
-              </p>
-              <p>
-                Run a{" "}
-                <Link
-                  to="/rating-speed-run"
-                  search={{}}
-                  className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
-                >
-                  Rating Speed Run
-                </Link>
-                {" • "}
-              </p>
-              <p>
-                Find{" "}
-                <Link
-                  to="/clubs"
-                  className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
-                >
-                  Chess Clubs
-                </Link>
-                {" • "}
-              </p>
-              <p>
-                Discover{" "}
-                <Link
-                  to="/content-creators"
-                  className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
-                >
-                  Content Creators
-                </Link>
-              </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <a
+                href="#ratings"
+                className="inline-flex items-center justify-center rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-brand transition hover:bg-brand-muted"
+              >
+                View ratings
+              </a>
+              <a
+                href="#submit"
+                className="inline-flex items-center justify-center rounded-lg border border-white/50 bg-white/15 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/25"
+              >
+                Add a player
+              </a>
             </div>
           </div>
-          <div className="flex shrink-0 items-center gap-2 sm:pt-1">
-            <GitHubLink />
-            <WhatsAppLink />
-          </div>
-        </header>
-
-        <RatingLeaders blitzLeader={blitzLeader} rapidLeader={rapidLeader} />
-
-        <div className="mb-4 grid gap-4 sm:mb-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          <Link
-            to="/tournaments"
-            className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-emerald-200 bg-emerald-50 p-3 transition hover:border-emerald-300 hover:bg-emerald-100 dark:border-emerald-900/50 dark:bg-emerald-900/20 dark:hover:border-emerald-800 dark:hover:bg-emerald-900/30 sm:p-4"
-          >
-            <svg
-              className="absolute top-3 right-3 h-4 w-4 text-emerald-700 dark:text-emerald-300 sm:top-4 sm:right-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-hidden
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-            <h2 className="pr-6 text-base font-semibold leading-snug text-emerald-900 dark:text-emerald-100">
-              Tournaments
-            </h2>
-            <p className="mt-1 text-sm leading-5 text-emerald-700 dark:text-emerald-300">
-              View and add upcoming chess tournaments
-            </p>
-          </Link>
-
-          <Link
-            to="/tournaments/past-online"
-            className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-sky-200 bg-sky-50 p-3 transition hover:border-sky-300 hover:bg-sky-100 dark:border-sky-900/50 dark:bg-sky-900/20 dark:hover:border-sky-800 dark:hover:bg-sky-900/30 sm:p-4"
-          >
-            <svg
-              className="absolute top-3 right-3 h-4 w-4 text-sky-700 dark:text-sky-300 sm:top-4 sm:right-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-hidden
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-            <h2 className="pr-6 text-base font-semibold leading-snug text-sky-900 dark:text-sky-100">
-              Past Online
-            </h2>
-            <p className="mt-1 text-sm leading-5 text-sky-700 dark:text-sky-300">
-              Browse past online chess tournaments
-            </p>
-          </Link>
-
-          <Link
-            to="/rating-speed-run"
-            search={{}}
-            className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-amber-200 bg-amber-50 p-3 transition hover:border-amber-300 hover:bg-amber-100 dark:border-amber-900/50 dark:bg-amber-900/20 dark:hover:border-amber-800 dark:hover:bg-amber-900/30 sm:p-4"
-          >
-            <svg
-              className="absolute top-3 right-3 h-4 w-4 text-amber-700 dark:text-amber-300 sm:top-4 sm:right-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-hidden
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-            <h2 className="pr-6 text-base font-semibold leading-snug text-amber-900 dark:text-amber-100">
-              Rating Speed Run
-            </h2>
-            <p className="mt-1 text-sm leading-5 text-amber-700 dark:text-amber-300">
-              Run timed rating gain competitions
-            </p>
-          </Link>
-
-          <Link
-            to="/clubs"
-            className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-blue-200 bg-blue-50 p-3 transition hover:border-blue-300 hover:bg-blue-100 dark:border-blue-900/50 dark:bg-blue-900/20 dark:hover:border-blue-800 dark:hover:bg-blue-900/30 sm:p-4"
-          >
-            <svg
-              className="absolute top-3 right-3 h-4 w-4 text-blue-700 dark:text-blue-300 sm:top-4 sm:right-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-hidden
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-            <h2 className="pr-6 text-base font-semibold leading-snug text-blue-900 dark:text-blue-100">
-              Chess Clubs
-            </h2>
-            <p className="mt-1 text-sm leading-5 text-blue-700 dark:text-blue-300">
-              Find and join local chess clubs
-            </p>
-          </Link>
-
-          <Link
-            to="/content-creators"
-            className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-purple-200 bg-purple-50 p-3 transition hover:border-purple-300 hover:bg-purple-100 dark:border-purple-900/50 dark:bg-purple-900/20 dark:hover:border-purple-800 dark:hover:bg-purple-900/30 sm:p-4"
-          >
-            <svg
-              className="absolute top-3 right-3 h-4 w-4 text-purple-700 dark:text-purple-300 sm:top-4 sm:right-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-hidden
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-            <h2 className="pr-6 text-base font-semibold leading-snug text-purple-900 dark:text-purple-100">
-              Content Creators
-            </h2>
-            <p className="mt-1 text-sm leading-5 text-purple-700 dark:text-purple-300">
-              Discover chess content creators
-            </p>
-          </Link>
+          <img
+            src="/queen.png"
+            alt=""
+            width={180}
+            height={180}
+            className="animate-fade-in pointer-events-none absolute right-2 top-1/2 h-28 w-28 -translate-y-1/2 object-contain opacity-15 sm:right-6 sm:h-36 sm:w-36"
+          />
         </div>
+      </section>
 
-        <SubmitUsernameForm />
-
-        <div className="mb-4 flex items-center justify-between rounded-lg bg-zinc-100 px-4 py-3 dark:bg-zinc-800/50">
-          <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Total players:{" "}
-            <span className="text-emerald-700 dark:text-emerald-400">
-              {rows.length}
-            </span>
+      <PageShell className="pt-8 sm:pt-10">
+        <section aria-labelledby="leaders-heading" className="mb-8">
+          <h2
+            id="leaders-heading"
+            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
+          >
+            Leaders
+          </h2>
+          <p className="mt-1 text-sm text-ink-muted">
+            Top blitz and rapid ratings among tracked players.
           </p>
-        </div>
+          <div className="mt-4">
+            <RatingLeaders
+              blitzLeader={blitzLeader}
+              rapidLeader={rapidLeader}
+            />
+          </div>
+        </section>
 
-        <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
-          <table className="w-full min-w-xl text-left text-sm">
-            <thead>
-              <tr className="border-b border-zinc-200 dark:border-zinc-800">
-                <th className="px-4 py-3 font-medium">Username</th>
-                <th className="px-4 py-3 font-medium">Blitz</th>
-                <th className="px-4 py-3 font-medium">Rapid</th>
-                <th className="px-4 py-3 font-medium" scope="col">
-                  Online
-                </th>
-                <th className="px-4 py-3 font-medium text-zinc-500 dark:text-zinc-400">
-                  Last seen
-                </th>
-                <th className="px-4 py-3 font-medium">Country</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr
-                  key={r.username}
-                  className="border-b border-zinc-100 last:border-0 dark:border-zinc-800/80"
-                >
-                  <td className="px-4 py-3 font-mono text-xs sm:text-sm">
-                    <a
-                      href={`https://www.chess.com/member/${encodeURIComponent(
-                        r.username,
-                      )}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
-                    >
-                      {r.username}
-                    </a>
-                  </td>
-                  <td className="px-4 py-3 tabular-nums">
-                    {formatRating(r.blitz, r.error)}
-                  </td>
-                  <td className="px-4 py-3 tabular-nums">
-                    {formatRating(r.rapid, r.error)}
-                  </td>
-                  <td className="px-4 py-3">
+        <section aria-labelledby="explore-heading" className="mb-10">
+          <h2
+            id="explore-heading"
+            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
+          >
+            Explore
+          </h2>
+          <p className="mt-1 text-sm text-ink-muted">
+            Tournaments, clubs, creators, and more across Cameroon chess.
+          </p>
+          <ul className="mt-4 divide-y divide-border border-y border-border">
+            {(
+              [
+                {
+                  to: "/tournaments" as const,
+                  label: "Tournaments",
+                  blurb: "Upcoming events to play or follow",
+                },
+                {
+                  to: "/tournaments/past-online" as const,
+                  label: "Past online",
+                  blurb: "Previous online tournament results",
+                },
+                {
+                  to: "/rating-speed-run" as const,
+                  label: "Rating speed run",
+                  blurb: "Timed rating-gain competitions",
+                  search: {} as Record<string, never>,
+                },
+                {
+                  to: "/clubs" as const,
+                  label: "Chess clubs",
+                  blurb: "Local clubs and meetups",
+                },
+                {
+                  to: "/content-creators" as const,
+                  label: "Content creators",
+                  blurb: "Streams, channels, and socials",
+                },
+                {
+                  to: "/chess-cameroon" as const,
+                  label: "Chess Cameroon",
+                  blurb: "Start here if you searched for chess cameroon",
+                },
+              ] as const
+            ).map((item) => (
+              <li key={item.to}>
+                {"search" in item && item.search !== undefined ? (
+                  <Link
+                    to={item.to}
+                    search={item.search}
+                    className="group flex items-baseline justify-between gap-4 py-3.5 transition hover:bg-brand-muted/40"
+                  >
+                    <span>
+                      <span className="font-medium text-foreground group-hover:text-brand">
+                        {item.label}
+                      </span>
+                      <span className="mt-0.5 block text-sm text-ink-muted">
+                        {item.blurb}
+                      </span>
+                    </span>
                     <span
-                      role="img"
-                      aria-label={r.online ? "Online" : "Offline"}
-                      title={r.online ? "Online" : "Offline"}
-                      className={
-                        r.online
-                          ? "inline-block h-3 w-3 rounded-full bg-emerald-500 dark:bg-emerald-400"
-                          : "inline-block h-3 w-3 rounded-full bg-zinc-300 dark:bg-zinc-500"
-                      }
-                    />
-                  </td>
-                  <td className="px-4 py-3 text-zinc-600 tabular-nums dark:text-zinc-400">
-                    {formatLastSeen(r.lastOnline)}
-                  </td>
-                  <td className="px-4 py-3">
-                    {r.countryCode ? (
-                      <div className="group relative inline-block cursor-help">
-                        <span className="text-2xl">
-                          {countryCodeToFlag(r.countryCode)}
-                        </span>
-                        <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-zinc-100 dark:text-zinc-900">
-                          {getCountryName(r.countryCode)}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-zinc-400">—</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {rows.some((r) => r.error) ? (
-            <p className="border-t border-zinc-200 px-4 py-3 text-xs text-amber-800 dark:border-zinc-800 dark:text-amber-200/90">
-              Some rows may be missing ratings:{" "}
-              {rows
-                .filter((r) => r.error)
-                .map((r) => `${r.username} (${r.error})`)
-                .join("; ")}
-            </p>
-          ) : null}
-        </div>
+                      aria-hidden
+                      className="shrink-0 text-brand opacity-60 transition group-hover:translate-x-0.5 group-hover:opacity-100"
+                    >
+                      →
+                    </span>
+                  </Link>
+                ) : (
+                  <Link
+                    to={item.to}
+                    className="group flex items-baseline justify-between gap-4 py-3.5 transition hover:bg-brand-muted/40"
+                  >
+                    <span>
+                      <span className="font-medium text-foreground group-hover:text-brand">
+                        {item.label}
+                      </span>
+                      <span className="mt-0.5 block text-sm text-ink-muted">
+                        {item.blurb}
+                      </span>
+                    </span>
+                    <span
+                      aria-hidden
+                      className="shrink-0 text-brand opacity-60 transition group-hover:translate-x-0.5 group-hover:opacity-100"
+                    >
+                      →
+                    </span>
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
 
-        <EloByParticipantChart rows={rows} />
-      </div>
-    </div>
+        <section id="submit" aria-labelledby="submit-heading" className="mb-8">
+          <h2
+            id="submit-heading"
+            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
+          >
+            Add a player
+          </h2>
+          <p className="mt-1 mb-4 text-sm text-ink-muted">
+            Submit a Chess.com username to include them in the ratings table.
+          </p>
+          <SubmitUsernameForm />
+        </section>
+
+        <section id="ratings" aria-labelledby="ratings-heading">
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <h2
+                id="ratings-heading"
+                className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
+              >
+                Player ratings
+              </h2>
+              <p className="mt-1 text-sm text-ink-muted">
+                Blitz and rapid from the Chess.com public API. Online (green
+                dot) uses recent profile and game times within{" "}
+                {ONLINE_WITHIN_SEC / 60} minutes.
+              </p>
+            </div>
+            <p className="text-sm font-medium text-ink-muted">
+              {rows.length} players
+            </p>
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border border-border bg-surface shadow-sm">
+            <table className="w-full min-w-xl text-left text-sm">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="px-4 py-3 font-medium">Username</th>
+                  <th className="px-4 py-3 font-medium">Blitz</th>
+                  <th className="px-4 py-3 font-medium">Rapid</th>
+                  <th className="px-4 py-3 font-medium" scope="col">
+                    Online
+                  </th>
+                  <th className="px-4 py-3 font-medium text-ink-muted">
+                    Last seen
+                  </th>
+                  <th className="px-4 py-3 font-medium">Country</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r) => (
+                  <tr
+                    key={r.username}
+                    className="border-b border-border/70 last:border-0"
+                  >
+                    <td className="px-4 py-3 font-mono text-xs sm:text-sm">
+                      <a
+                        href={`https://www.chess.com/member/${encodeURIComponent(
+                          r.username,
+                        )}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
+                      >
+                        {r.username}
+                      </a>
+                    </td>
+                    <td className="px-4 py-3 tabular-nums">
+                      {formatRating(r.blitz, r.error)}
+                    </td>
+                    <td className="px-4 py-3 tabular-nums">
+                      {formatRating(r.rapid, r.error)}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        role="img"
+                        aria-label={r.online ? "Online" : "Offline"}
+                        title={r.online ? "Online" : "Offline"}
+                        className={
+                          r.online
+                            ? "inline-block h-3 w-3 rounded-full bg-brand"
+                            : "inline-block h-3 w-3 rounded-full bg-border"
+                        }
+                      />
+                    </td>
+                    <td className="px-4 py-3 tabular-nums text-ink-muted">
+                      {formatLastSeen(r.lastOnline)}
+                    </td>
+                    <td className="px-4 py-3">
+                      {r.countryCode ? (
+                        <div className="group relative inline-block cursor-help">
+                          <span className="text-2xl">
+                            {countryCodeToFlag(r.countryCode)}
+                          </span>
+                          <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-foreground px-3 py-1.5 text-xs font-medium text-background opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
+                            {getCountryName(r.countryCode)}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-ink-muted">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {rows.some((r) => r.error) ? (
+              <p className="border-t border-border px-4 py-3 text-xs text-wood">
+                Some rows may be missing ratings:{" "}
+                {rows
+                  .filter((r) => r.error)
+                  .map((r) => `${r.username} (${r.error})`)
+                  .join("; ")}
+              </p>
+            ) : null}
+          </div>
+
+          <EloByParticipantChart rows={rows} />
+        </section>
+      </PageShell>
+    </>
   )
 }
