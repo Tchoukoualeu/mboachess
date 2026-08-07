@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router"
+import { PageShell } from "@/components/PageShell"
 import { loadTournamentById } from "@/server/tournaments"
 import { pageHead } from "@/lib/seo"
 import type { TournamentWithWinners } from "@/lib/tournaments"
@@ -46,40 +47,30 @@ function CountdownTimer({ startDate }: { startDate: Date }) {
   const { hours, minutes, seconds } = timeRemaining
 
   return (
-    <div className="flex shrink-0 flex-col items-start gap-2 rounded-lg bg-amber-50 px-4 py-3 dark:bg-amber-900/20 sm:items-end">
-      <div className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">
-        Starts In
+    <div className="flex shrink-0 flex-col items-start gap-2 rounded-lg bg-wood/15 px-4 py-3 sm:items-end">
+      <div className="text-xs font-semibold uppercase tracking-wide text-wood">
+        Starts in
       </div>
       <div className="flex items-center gap-2">
         <div className="flex flex-col items-center">
-          <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">
+          <div className="text-2xl font-bold text-wood">
             {hours.toString().padStart(2, "0")}
           </div>
-          <div className="text-xs font-medium text-amber-600 dark:text-amber-500">
-            hrs
-          </div>
+          <div className="text-xs font-medium text-wood/80">hrs</div>
         </div>
-        <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">
-          :
-        </div>
+        <div className="text-2xl font-bold text-wood">:</div>
         <div className="flex flex-col items-center">
-          <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">
+          <div className="text-2xl font-bold text-wood">
             {minutes.toString().padStart(2, "0")}
           </div>
-          <div className="text-xs font-medium text-amber-600 dark:text-amber-500">
-            min
-          </div>
+          <div className="text-xs font-medium text-wood/80">min</div>
         </div>
-        <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">
-          :
-        </div>
+        <div className="text-2xl font-bold text-wood">:</div>
         <div className="flex flex-col items-center">
-          <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">
+          <div className="text-2xl font-bold text-wood">
             {seconds.toString().padStart(2, "0")}
           </div>
-          <div className="text-xs font-medium text-amber-600 dark:text-amber-500">
-            sec
-          </div>
+          <div className="text-xs font-medium text-wood/80">sec</div>
         </div>
       </div>
     </div>
@@ -87,12 +78,21 @@ function CountdownTimer({ startDate }: { startDate: Date }) {
 }
 
 export const Route = createFileRoute("/tournaments/$id")({
-  head: ({ params }) =>
-    pageHead({
-      title: "Tournament Details | mboachess",
-      description: "View tournament information and details",
+  head: ({ loaderData, params }) => {
+    const tournament = loaderData as TournamentWithWinners | undefined
+    const name = tournament?.name
+    const title = name
+      ? `${name} | Chess tournament | mboachess`
+      : "Tournament Details | mboachess"
+    const description = name
+      ? `Details for ${name} on mboachess — dates, location, and how to join.`
+      : "View tournament information and details"
+    return pageHead({
+      title,
+      description,
       path: `/tournaments/${params.id}`,
-    }),
+    })
+  },
   loader: async ({ params }): Promise<TournamentWithWinners> => {
     const tournament = await loadTournamentById({ data: params.id })
     if (!tournament) throw notFound()
@@ -107,12 +107,10 @@ function TournamentDetailPage() {
   const daysUntil = getDaysUntil(tournament.startDate)
   const [userTimezone, setUserTimezone] = useState<string>("UTC")
 
-  // Detect user's timezone on mount
   useEffect(() => {
     setUserTimezone(getUserTimezone())
   }, [])
 
-  // Calculate time remaining in milliseconds
   const now = new Date()
   const timeRemainingMs =
     new Date(tournament.startDate).getTime() - now.getTime()
@@ -120,253 +118,163 @@ function TournamentDetailPage() {
   const showCountdown = timeRemainingMs > 0 && timeRemainingMs <= fiveHoursInMs
 
   return (
-    <div className="min-h-dvh flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <div className="mx-auto w-full max-w-4xl flex-1 px-3 py-4 sm:px-6 sm:py-8">
-        <header className="mb-4 sm:mb-6">
-          <div className="mb-3 flex items-center justify-between">
-            <Link
-              to="/tournaments"
-              className="text-sm text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
-            >
-              ← Back to Tournaments
-            </Link>
-          </div>
-        </header>
+    <PageShell>
+      <p className="mb-4">
+        <Link
+          to="/tournaments"
+          className="text-sm text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
+        >
+          ← Tournaments
+        </Link>
+      </p>
 
-        <div className="sm:rounded-xl sm:border sm:border-zinc-200 sm:bg-white sm:p-8 sm:shadow-md sm:dark:border-zinc-800 sm:dark:bg-zinc-900/50">
-          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0 flex-1">
-              <div className="mb-2 flex flex-wrap items-center gap-2">
-                <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-3xl">
-                  {tournament.name}
-                </h1>
-                {tournament.isOnline && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                    <svg
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
-                      />
-                    </svg>
-                    Online
-                  </span>
-                )}
-              </div>
-            </div>
-            {showCountdown ? (
-              <CountdownTimer startDate={tournament.startDate} />
-            ) : (
-              <div className="flex shrink-0 flex-col items-start gap-1 rounded-lg bg-emerald-50 px-4 py-3 dark:bg-emerald-900/20 sm:items-end">
-                <div className="text-3xl font-bold text-emerald-700 dark:text-emerald-400">
-                  {daysUntil}
-                </div>
-                <div className="text-sm font-medium uppercase text-emerald-700 dark:text-emerald-400">
-                  {daysUntil === 1 ? "day left" : "days left"}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {tournament.description && (
-            <div className="mb-6 rounded-lg bg-zinc-50 p-4 dark:bg-zinc-800/50">
-              <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-700 dark:text-zinc-300">
-                Description
-              </h2>
-              <p className="whitespace-pre-line wrap-break-word text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-                {tournament.description}
-              </p>
-            </div>
-          )}
-
-          {tournament.winners.length > 0 && (
-            <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-900/20">
-              <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-amber-800 dark:text-amber-300">
-                {tournament.winners.length === 1 ? "Winner" : "Winners"}
-              </h2>
-              <p className="text-sm text-amber-900 dark:text-amber-100">
-                {tournament.winners.map((username, index) => (
-                  <span key={username}>
-                    {index > 0 ? ", " : null}
-                    <a
-                      href={`https://www.chess.com/member/${encodeURIComponent(username)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-semibold underline decoration-amber-700/30 underline-offset-2 hover:decoration-amber-600 dark:decoration-amber-400/40"
-                    >
-                      {username}
-                    </a>
-                  </span>
-                ))}
-                {tournament.winnersSource === "chesscom" ? (
-                  <span className="ml-2 text-xs text-amber-700/80 dark:text-amber-400/80">
-                    via Chess.com
-                  </span>
-                ) : null}
-              </p>
-            </div>
-          )}
-
-          <div className="space-y-4">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-700 dark:text-zinc-300">
-              Tournament Details
-            </h2>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="flex items-start gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/50">
-                <svg
-                  className="h-5 w-5 shrink-0 text-zinc-500 dark:text-zinc-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                <div className="min-w-0 flex-1">
-                  <div className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                    Start Date
-                  </div>
-                  <div className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                    {formatDate(tournament.startDate, userTimezone)}
-                  </div>
-                  <div className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                    German time: {formatDateInGermanTime(tournament.startDate)}
-                  </div>
-                </div>
-              </div>
-
-              {tournament.endDate && (
-                <div className="flex items-start gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/50">
-                  <svg
-                    className="h-5 w-5 shrink-0 text-zinc-500 dark:text-zinc-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                      End Date
-                    </div>
-                    <div className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                      {formatDate(tournament.endDate, userTimezone)}
-                    </div>
-                    <div className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                      German time: {formatDateInGermanTime(tournament.endDate)}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {tournament.location && (
-                <div className="flex items-start gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/50">
-                  <svg
-                    className="h-5 w-5 shrink-0 text-zinc-500 dark:text-zinc-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                      Location
-                    </div>
-                    <div className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                      {tournament.location}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {tournament.phone && (
-                <div className="flex items-start gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/50">
-                  <svg
-                    className="h-5 w-5 shrink-0 text-zinc-500 dark:text-zinc-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                    />
-                  </svg>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                      Contact
-                    </div>
-                    <div className="mt-1">
-                      <a
-                        href={`tel:${tournament.phone.split("/")[0].trim()}`}
-                        className="text-sm font-semibold text-emerald-700 hover:underline dark:text-emerald-400"
-                      >
-                        {tournament.phone}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {tournament.link && (
-              <div className="mt-6">
-                <a
-                  href={tournament.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-zinc-800 active:bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 dark:active:bg-zinc-100 sm:w-auto"
-                >
-                  <svg
-                    className="h-5 w-5 shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                    />
-                  </svg>
-                  <span className="truncate">View Tournament Details</span>
-                </a>
-              </div>
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+              {tournament.name}
+            </h1>
+            {tournament.isOnline && (
+              <span className="inline-flex items-center rounded-md bg-brand-muted px-3 py-1 text-sm font-medium text-brand">
+                Online
+              </span>
             )}
           </div>
         </div>
+        {showCountdown ? (
+          <CountdownTimer startDate={tournament.startDate} />
+        ) : (
+          <div className="flex shrink-0 flex-col items-start gap-1 rounded-lg bg-brand-muted px-4 py-3 sm:items-end">
+            <div className="text-3xl font-bold text-brand">{daysUntil}</div>
+            <div className="text-sm font-medium uppercase text-brand">
+              {daysUntil === 1 ? "day left" : "days left"}
+            </div>
+          </div>
+        )}
       </div>
-    </div>
+
+      {tournament.description && (
+        <section className="mb-6" aria-labelledby="desc-heading">
+          <h2
+            id="desc-heading"
+            className="mb-2 text-sm font-semibold uppercase tracking-wide text-ink-muted"
+          >
+            Description
+          </h2>
+          <p className="whitespace-pre-line wrap-break-word text-sm leading-relaxed text-ink-muted">
+            {tournament.description}
+          </p>
+        </section>
+      )}
+
+      {tournament.winners.length > 0 && (
+        <section
+          className="mb-6 rounded-lg border border-wood/30 bg-wood/10 p-4"
+          aria-labelledby="winners-heading"
+        >
+          <h2
+            id="winners-heading"
+            className="mb-2 text-sm font-semibold uppercase tracking-wide text-wood"
+          >
+            {tournament.winners.length === 1 ? "Winner" : "Winners"}
+          </h2>
+          <p className="text-sm text-foreground">
+            {tournament.winners.map((username, index) => (
+              <span key={username}>
+                {index > 0 ? ", " : null}
+                <a
+                  href={`https://www.chess.com/member/${encodeURIComponent(username)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
+                >
+                  {username}
+                </a>
+              </span>
+            ))}
+            {tournament.winnersSource === "chesscom" ? (
+              <span className="ml-2 text-xs text-ink-muted">via Chess.com</span>
+            ) : null}
+          </p>
+        </section>
+      )}
+
+      <section aria-labelledby="details-heading">
+        <h2
+          id="details-heading"
+          className="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-muted"
+        >
+          Tournament details
+        </h2>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="rounded-lg border border-border bg-surface p-4">
+            <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">
+              Start date
+            </div>
+            <div className="mt-1 text-sm font-semibold text-foreground">
+              {formatDate(tournament.startDate, userTimezone)}
+            </div>
+            <div className="mt-1 text-xs text-ink-muted">
+              German time: {formatDateInGermanTime(tournament.startDate)}
+            </div>
+          </div>
+
+          {tournament.endDate && (
+            <div className="rounded-lg border border-border bg-surface p-4">
+              <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">
+                End date
+              </div>
+              <div className="mt-1 text-sm font-semibold text-foreground">
+                {formatDate(tournament.endDate, userTimezone)}
+              </div>
+              <div className="mt-1 text-xs text-ink-muted">
+                German time: {formatDateInGermanTime(tournament.endDate)}
+              </div>
+            </div>
+          )}
+
+          {tournament.location && (
+            <div className="rounded-lg border border-border bg-surface p-4">
+              <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">
+                Location
+              </div>
+              <div className="mt-1 text-sm font-semibold text-foreground">
+                {tournament.location}
+              </div>
+            </div>
+          )}
+
+          {tournament.phone && (
+            <div className="rounded-lg border border-border bg-surface p-4">
+              <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">
+                Contact
+              </div>
+              <div className="mt-1">
+                <a
+                  href={`tel:${tournament.phone.split("/")[0].trim()}`}
+                  className="text-sm font-semibold text-brand hover:underline"
+                >
+                  {tournament.phone}
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {tournament.link && (
+          <div className="mt-6">
+            <a
+              href={tournament.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-6 py-3 text-sm font-medium text-white transition hover:bg-brand-soft sm:w-auto"
+            >
+              View tournament details
+            </a>
+          </div>
+        )}
+      </section>
+    </PageShell>
   )
 }

@@ -19,7 +19,7 @@ export function WhatsAppLink() {
       href={WHATSAPP_URL}
       target="_blank"
       rel="noreferrer"
-      className="inline-flex shrink-0 items-center justify-center rounded-lg border border-zinc-200 p-2 text-zinc-600 transition hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-100"
+      className="inline-flex shrink-0 items-center justify-center rounded-lg border border-border p-2 text-ink-muted transition hover:border-brand/40 hover:text-brand"
     >
       <WhatsAppIcon className="h-5 w-5" />
       <span className="sr-only">Join WhatsApp community</span>
