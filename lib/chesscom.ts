@@ -72,7 +72,33 @@ function latestActivitySeconds(
   return Math.max(...times)
 }
 
-export async function fetchPlayerSnapshot(
+/** How long a cached player snapshot is considered fresh before background refresh. */
+const PLAYER_SNAPSHOT_TTL_MS = 60_000
+
+type PlayerCacheEntry = {
+  at: number
+  data: PlayerLookupResult
+  refreshing: boolean
+}
+
+const playerSnapshotCache = new Map<string, PlayerCacheEntry>()
+/** In-flight fetches keyed by lowercase username — coalesces concurrent lookups. */
+const playerSnapshotInflight = new Map<string, Promise<PlayerLookupResult>>()
+
+function cacheKeyForUsername(username: string): string {
+  return username.trim().toLowerCase()
+}
+
+/** Recompute online from lastOnline so stale cache entries stay accurate. */
+function withFreshOnline(data: PlayerLookupResult): PlayerLookupResult {
+  const now = Date.now() / 1000
+  const online =
+    data.lastOnline != null && now - data.lastOnline < ONLINE_WITHIN_SEC
+  if (data.online === online) return data
+  return { ...data, online }
+}
+
+async function fetchPlayerSnapshotUncached(
   username: string,
 ): Promise<PlayerLookupResult> {
   const base = "https://api.chess.com/pub/player"
@@ -173,6 +199,71 @@ export async function fetchPlayerSnapshot(
     countryCode,
     joined: profile.joined ?? null,
   }
+}
+
+/**
+ * Player snapshot via Chess.com Pub API with in-memory stale-while-revalidate
+ * cache (60s) and in-flight request coalescing. Shared by home, speed runs, etc.
+ */
+export async function fetchPlayerSnapshot(
+  username: string,
+): Promise<PlayerLookupResult> {
+  const key = cacheKeyForUsername(username)
+  if (!key) {
+    return {
+      username,
+      blitz: null,
+      rapid: null,
+      bullet: null,
+      online: false,
+      lastOnline: null,
+      avatarUrl: null,
+      countryCode: null,
+      joined: null,
+      error: "Invalid username",
+    }
+  }
+
+  const entry = playerSnapshotCache.get(key)
+  const now = Date.now()
+
+  if (entry) {
+    if (now - entry.at >= PLAYER_SNAPSHOT_TTL_MS && !entry.refreshing) {
+      // Stale: return immediately and refresh in the background.
+      entry.refreshing = true
+      void fetchPlayerSnapshotUncached(username)
+        .then((fresh) => {
+          playerSnapshotCache.set(key, {
+            at: Date.now(),
+            data: fresh,
+            refreshing: false,
+          })
+        })
+        .catch(() => {
+          entry.refreshing = false
+        })
+    }
+    return withFreshOnline(entry.data)
+  }
+
+  const inflight = playerSnapshotInflight.get(key)
+  if (inflight) return inflight.then(withFreshOnline)
+
+  const promise = fetchPlayerSnapshotUncached(username)
+    .then((data) => {
+      playerSnapshotCache.set(key, {
+        at: Date.now(),
+        data,
+        refreshing: false,
+      })
+      return data
+    })
+    .finally(() => {
+      playerSnapshotInflight.delete(key)
+    })
+
+  playerSnapshotInflight.set(key, promise)
+  return promise
 }
 
 type TournamentPlayer = {

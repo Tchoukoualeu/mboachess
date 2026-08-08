@@ -1,9 +1,6 @@
 import { createServerFn } from "@tanstack/react-start"
 import { getSubmittedUsernames } from "@/lib/chesscomUsernames"
-import {
-  type PlayerLookupResult,
-  fetchPlayerSnapshot,
-} from "@/lib/chesscom"
+import { type PlayerLookupResult, fetchPlayerSnapshot } from "@/lib/chesscom"
 import { topByRating } from "@/lib/ratingLeaders"
 
 const TRACKED_USERNAMES = [
@@ -48,10 +45,7 @@ async function mapWithConcurrency<T, R>(
       results[index] = await fn(items[index])
     }
   }
-  const workers = Array.from(
-    { length: Math.min(limit, items.length) },
-    worker,
-  )
+  const workers = Array.from({ length: Math.min(limit, items.length) }, worker)
   await Promise.all(workers)
   return results
 }
@@ -64,65 +58,17 @@ type HomeData = {
 
 /** How many Chess.com lookups run at once on a cold fetch. */
 const FETCH_CONCURRENCY = 8
-/** How long a cached snapshot is considered fresh before a background refresh. */
-const PLAYER_TTL_MS = 60_000
-
-type PlayerCacheEntry = {
-  at: number
-  data: PlayerLookupResult
-  refreshing: boolean
-}
-
-const playerCache = new Map<string, PlayerCacheEntry>()
-
-/**
- * Stale-while-revalidate snapshot for a single player.
- *
- * - No cache yet: fetch and block (only happens once per username).
- * - Cached and fresh: return immediately.
- * - Cached and stale: return the stale value now and refresh in the
- *   background so the next request is up to date. This keeps SSR instant
- *   while ratings stay reasonably current.
- */
-async function getCachedSnapshot(
-  username: string,
-): Promise<PlayerLookupResult> {
-  const entry = playerCache.get(username)
-  const now = Date.now()
-
-  if (!entry) {
-    const data = await fetchPlayerSnapshot(username)
-    playerCache.set(username, { at: Date.now(), data, refreshing: false })
-    return data
-  }
-
-  if (now - entry.at >= PLAYER_TTL_MS && !entry.refreshing) {
-    entry.refreshing = true
-    void fetchPlayerSnapshot(username)
-      .then((fresh) => {
-        playerCache.set(username, {
-          at: Date.now(),
-          data: fresh,
-          refreshing: false,
-        })
-      })
-      .catch(() => {
-        entry.refreshing = false
-      })
-  }
-
-  return entry.data
-}
 
 export const loadHomeData = createServerFn({ method: "GET" }).handler(
   async (): Promise<HomeData> => {
     const fromDb = await getSubmittedUsernames()
     const usernames = uniqueSortedUsernames(TRACKED_USERNAMES, fromDb)
 
+    // Caching (SWR + in-flight coalesce) lives in fetchPlayerSnapshot.
     const rows = await mapWithConcurrency(
       usernames,
       FETCH_CONCURRENCY,
-      getCachedSnapshot,
+      fetchPlayerSnapshot,
     )
     sortByRapidDesc(rows)
 
