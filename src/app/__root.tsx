@@ -48,7 +48,7 @@ function RootLayout() {
       <head>
         <HeadContent />
       </head>
-      <body className="site-atmosphere flex min-h-full flex-col font-sans text-foreground">
+      <body className="flex min-h-full flex-col font-sans text-foreground">
         <SiteHeader />
         <Outlet />
         <SiteFooter />

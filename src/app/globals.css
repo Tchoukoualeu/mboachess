@@ -57,44 +57,6 @@ body {
   font-family: var(--font-display);
 }
 
-/* Atmospheric board-grid + soft green wash */
-.site-atmosphere {
-  position: relative;
-  isolation: isolate;
-  background:
-    radial-gradient(
-      ellipse 120% 80% at 50% -20%,
-      color-mix(in srgb, var(--brand) 14%, transparent),
-      transparent 55%
-    ),
-    radial-gradient(
-      ellipse 60% 40% at 100% 0%,
-      color-mix(in srgb, var(--wood) 8%, transparent),
-      transparent 50%
-    ),
-    var(--background);
-}
-
-.site-atmosphere::before {
-  content: "";
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  opacity: 0.018;
-  background-image:
-    linear-gradient(45deg, var(--foreground) 25%, transparent 25%),
-    linear-gradient(-45deg, var(--foreground) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, var(--foreground) 75%),
-    linear-gradient(-45deg, transparent 75%, var(--foreground) 75%);
-  background-size: 32px 32px;
-  background-position:
-    0 0,
-    0 16px,
-    16px -16px,
-    -16px 0;
-}
-
 @keyframes fade-up {
   from {
     opacity: 0;
@@ -112,23 +74,6 @@ body {
   }
   to {
     opacity: 1;
-  }
-}
-
-@keyframes board-drift {
-  from {
-    background-position:
-      0 0,
-      0 14px,
-      14px -14px,
-      -14px 0;
-  }
-  to {
-    background-position:
-      28px 28px,
-      28px 42px,
-      42px 14px,
-      14px 28px;
   }
 }
 
@@ -154,30 +99,10 @@ body {
     );
 }
 
-.hero-board::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: 0.015;
-  background-image:
-    linear-gradient(45deg, #fff 25%, transparent 25%),
-    linear-gradient(-45deg, #fff 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #fff 75%),
-    linear-gradient(-45deg, transparent 75%, #fff 75%);
-  background-size: 48px 48px;
-  background-position:
-    0 0,
-    0 24px,
-    24px -24px,
-    -24px 0;
-  animation: board-drift 48s linear infinite;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up,
   .animate-fade-up-delay,
-  .animate-fade-in,
-  .hero-board::after {
+  .animate-fade-in {
     animation: none;
   }
 }
