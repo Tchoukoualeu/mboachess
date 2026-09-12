@@ -2,102 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { EloByParticipantChart } from "@/components/EloByParticipantChart"
 import { PageShell } from "@/components/PageShell"
 import { RatingLeaders } from "@/components/RatingLeaders"
+import { RatingsTable } from "@/components/RatingsTable"
 import { SubmitUsernameForm } from "@/components/SubmitUsernameForm"
 import { ONLINE_WITHIN_SEC } from "@/lib/chesscom"
 import { pageHead, webPageJsonLd } from "@/lib/seo"
 import { loadHomeData } from "@/server/home"
-
-/** Convert ISO country code to flag emoji (e.g., "CM" -> "🇨🇲"). */
-function countryCodeToFlag(code: string): string {
-  return code
-    .toUpperCase()
-    .split("")
-    .map((char) => String.fromCodePoint(127397 + char.charCodeAt(0)))
-    .join("")
-}
-
-/** Map common country codes to full country names. */
-const COUNTRY_NAMES: Record<string, string> = {
-  CM: "Cameroon",
-  US: "United States",
-  GB: "United Kingdom",
-  FR: "France",
-  DE: "Germany",
-  ES: "Spain",
-  IT: "Italy",
-  CA: "Canada",
-  AU: "Australia",
-  BR: "Brazil",
-  AR: "Argentina",
-  MX: "Mexico",
-  IN: "India",
-  CN: "China",
-  JP: "Japan",
-  KR: "South Korea",
-  RU: "Russia",
-  UA: "Ukraine",
-  PL: "Poland",
-  NL: "Netherlands",
-  BE: "Belgium",
-  CH: "Switzerland",
-  AT: "Austria",
-  SE: "Sweden",
-  NO: "Norway",
-  DK: "Denmark",
-  FI: "Finland",
-  PT: "Portugal",
-  GR: "Greece",
-  TR: "Turkey",
-  ZA: "South Africa",
-  EG: "Egypt",
-  NG: "Nigeria",
-  KE: "Kenya",
-  GH: "Ghana",
-  MA: "Morocco",
-  TN: "Tunisia",
-  DZ: "Algeria",
-  SN: "Senegal",
-  CI: "Ivory Coast",
-  UG: "Uganda",
-  TZ: "Tanzania",
-  ET: "Ethiopia",
-  ZW: "Zimbabwe",
-  BW: "Botswana",
-  RW: "Rwanda",
-  CD: "DR Congo",
-  CG: "Congo",
-  GA: "Gabon",
-  ML: "Mali",
-  BF: "Burkina Faso",
-  NE: "Niger",
-  TD: "Chad",
-  CF: "Central African Republic",
-  GQ: "Equatorial Guinea",
-}
-
-function getCountryName(code: string | null): string {
-  if (!code) return "Unknown"
-  return COUNTRY_NAMES[code.toUpperCase()] || code.toUpperCase()
-}
-
-function formatLastSeen(unix: number | null): string {
-  if (unix == null) return "—"
-  const s = Date.now() / 1000 - unix
-  if (s < 60) return "just now"
-  if (s < 3600) return `${Math.floor(s / 60)}m ago`
-  if (s < 86400) return `${Math.floor(s / 3600)}h ago`
-  return `${Math.floor(s / 86400)}d ago`
-}
-
-function formatRating(
-  value: number | null,
-  error: string | undefined,
-): string | number {
-  if (error && /not found/i.test(error)) return "—"
-  if (value != null) return value
-  if (error) return "—"
-  return "Unrated"
-}
 
 const HOME_TITLE =
   "Mboachess - Chess in Cameroon | Players, Clubs & Tournaments"
@@ -306,89 +215,7 @@ function Home() {
             </p>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-border bg-surface shadow-sm">
-            <table className="w-full min-w-xl text-left text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="px-4 py-3 font-medium">Username</th>
-                  <th className="px-4 py-3 font-medium">Blitz</th>
-                  <th className="px-4 py-3 font-medium">Rapid</th>
-                  <th className="px-4 py-3 font-medium" scope="col">
-                    Online
-                  </th>
-                  <th className="px-4 py-3 font-medium text-ink-muted">
-                    Last seen
-                  </th>
-                  <th className="px-4 py-3 font-medium">Country</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r) => (
-                  <tr
-                    key={r.username}
-                    className="border-b border-border/70 last:border-0"
-                  >
-                    <td className="px-4 py-3 font-mono text-xs sm:text-sm">
-                      <a
-                        href={`https://www.chess.com/member/${encodeURIComponent(
-                          r.username,
-                        )}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
-                      >
-                        {r.username}
-                      </a>
-                    </td>
-                    <td className="px-4 py-3 tabular-nums">
-                      {formatRating(r.blitz, r.error)}
-                    </td>
-                    <td className="px-4 py-3 tabular-nums">
-                      {formatRating(r.rapid, r.error)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        role="img"
-                        aria-label={r.online ? "Online" : "Offline"}
-                        title={r.online ? "Online" : "Offline"}
-                        className={
-                          r.online
-                            ? "inline-block h-3 w-3 rounded-full bg-brand"
-                            : "inline-block h-3 w-3 rounded-full bg-border"
-                        }
-                      />
-                    </td>
-                    <td className="px-4 py-3 tabular-nums text-ink-muted">
-                      {formatLastSeen(r.lastOnline)}
-                    </td>
-                    <td className="px-4 py-3">
-                      {r.countryCode ? (
-                        <div className="group relative inline-block cursor-help">
-                          <span className="text-2xl">
-                            {countryCodeToFlag(r.countryCode)}
-                          </span>
-                          <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-foreground px-3 py-1.5 text-xs font-medium text-background opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
-                            {getCountryName(r.countryCode)}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-ink-muted">—</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {rows.some((r) => r.error) ? (
-              <p className="border-t border-border px-4 py-3 text-xs text-wood">
-                Some rows may be missing ratings:{" "}
-                {rows
-                  .filter((r) => r.error)
-                  .map((r) => `${r.username} (${r.error})`)
-                  .join("; ")}
-              </p>
-            ) : null}
-          </div>
+          <RatingsTable rows={rows} />
 
           <EloByParticipantChart rows={rows} />
         </section>
