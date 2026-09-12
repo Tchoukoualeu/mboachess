@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { EloByParticipantChart } from "@/components/EloByParticipantChart"
+import { OnlineNowBox } from "@/components/OnlineNowBox"
 import { PageShell } from "@/components/PageShell"
 import { RatingLeaders } from "@/components/RatingLeaders"
 import { RatingsTable } from "@/components/RatingsTable"
@@ -35,7 +36,7 @@ function Home() {
   return (
     <>
       <section className="hero-board relative overflow-hidden text-white">
-        <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col justify-center px-4 py-10 sm:px-6 sm:py-12">
+        <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col justify-center px-4 py-10 pb-14 sm:px-6 sm:py-12 sm:pb-16">
           <div className="animate-fade-up relative z-10 max-w-xl rounded-xl bg-black/35 px-4 py-4 backdrop-blur-[2px] sm:px-5 sm:py-5">
             <h1 className="font-display text-3xl font-semibold tracking-tight drop-shadow-sm sm:text-4xl md:text-5xl">
               Mboachess
@@ -69,7 +70,11 @@ function Home() {
         </div>
       </section>
 
-      <PageShell className="pt-8 sm:pt-10">
+      <PageShell className="pt-0 sm:pt-0">
+        <div className="relative z-10 -mt-6 mb-8 sm:-mt-8">
+          <OnlineNowBox rows={rows} />
+        </div>
+
         <section aria-labelledby="leaders-heading" className="mb-8">
           <h2
             id="leaders-heading"
