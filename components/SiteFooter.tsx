@@ -34,7 +34,7 @@ export function SiteFooter() {
             </li>
             <li>
               <Link
-                to="/top-players"
+                to="/top-cameroon-chess-players"
                 className="text-ink-muted transition hover:text-brand"
               >
                 Top 100

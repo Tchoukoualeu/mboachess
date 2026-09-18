@@ -107,7 +107,7 @@ function Home() {
             {(
               [
                 {
-                  to: "/top-players" as const,
+                  to: "/top-cameroon-chess-players" as const,
                   label: "Top 100 players",
                   blurb: "Best Cameroon blitz and rapid on Chess.com",
                 },

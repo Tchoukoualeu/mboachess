@@ -81,7 +81,7 @@ export function SiteHeader() {
           <Link to="/" className={linkClass} activeOptions={{ exact: true }}>
             Players
           </Link>
-          <Link to="/top-players" className={linkClass}>
+          <Link to="/top-cameroon-chess-players" className={linkClass}>
             Top 100
           </Link>
           <Link to="/tournaments" className={linkClass}>
@@ -136,7 +136,7 @@ export function SiteHeader() {
             </li>
             <li>
               <Link
-                to="/top-players"
+                to="/top-cameroon-chess-players"
                 className={mobileLinkClass}
                 onClick={() => setOpen(false)}
               >

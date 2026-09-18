@@ -95,7 +95,7 @@ function ChessCameroonPage() {
           </p>
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
             <Link
-              to="/top-players"
+              to="/top-cameroon-chess-players"
               className="inline-block text-sm text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
             >
               Top 100 players →

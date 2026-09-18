@@ -9,7 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './app/__root'
-import { Route as TopPlayersRouteImport } from './app/top-players'
+import { Route as TopCameroonChessPlayersRouteImport } from './app/top-cameroon-chess-players'
 import { Route as SitemapDotxmlRouteImport } from './app/sitemap[.]xml'
 import { Route as RobotsDottxtRouteImport } from './app/robots[.]txt'
 import { Route as RatingSpeedRunRouteImport } from './app/rating-speed-run'
@@ -29,9 +29,9 @@ import { Route as ApiSubmitClubRouteImport } from './app/api/submit-club'
 import { Route as ApiRatingSpeedRunJoinRouteImport } from './app/api/rating-speed-run/join'
 import { Route as ApiRatingSpeedRunCreateRouteImport } from './app/api/rating-speed-run/create'
 
-const TopPlayersRoute = TopPlayersRouteImport.update({
-  id: '/top-players',
-  path: '/top-players',
+const TopCameroonChessPlayersRoute = TopCameroonChessPlayersRouteImport.update({
+  id: '/top-cameroon-chess-players',
+  path: '/top-cameroon-chess-players',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -133,7 +133,7 @@ export interface FileRoutesByFullPath {
   '/rating-speed-run': typeof RatingSpeedRunRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/top-players': typeof TopPlayersRoute
+  '/top-cameroon-chess-players': typeof TopCameroonChessPlayersRoute
   '/api/submit-club': typeof ApiSubmitClubRoute
   '/api/submit-creator': typeof ApiSubmitCreatorRoute
   '/api/submit-tournament': typeof ApiSubmitTournamentRoute
@@ -153,7 +153,7 @@ export interface FileRoutesByTo {
   '/content-creators': typeof ContentCreatorsRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/top-players': typeof TopPlayersRoute
+  '/top-cameroon-chess-players': typeof TopCameroonChessPlayersRoute
   '/api/submit-club': typeof ApiSubmitClubRoute
   '/api/submit-creator': typeof ApiSubmitCreatorRoute
   '/api/submit-tournament': typeof ApiSubmitTournamentRoute
@@ -175,7 +175,7 @@ export interface FileRoutesById {
   '/rating-speed-run': typeof RatingSpeedRunRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/top-players': typeof TopPlayersRoute
+  '/top-cameroon-chess-players': typeof TopCameroonChessPlayersRoute
   '/api/submit-club': typeof ApiSubmitClubRoute
   '/api/submit-creator': typeof ApiSubmitCreatorRoute
   '/api/submit-tournament': typeof ApiSubmitTournamentRoute
@@ -198,7 +198,7 @@ export interface FileRouteTypes {
     | '/rating-speed-run'
     | '/robots.txt'
     | '/sitemap.xml'
-    | '/top-players'
+    | '/top-cameroon-chess-players'
     | '/api/submit-club'
     | '/api/submit-creator'
     | '/api/submit-tournament'
@@ -218,7 +218,7 @@ export interface FileRouteTypes {
     | '/content-creators'
     | '/robots.txt'
     | '/sitemap.xml'
-    | '/top-players'
+    | '/top-cameroon-chess-players'
     | '/api/submit-club'
     | '/api/submit-creator'
     | '/api/submit-tournament'
@@ -239,7 +239,7 @@ export interface FileRouteTypes {
     | '/rating-speed-run'
     | '/robots.txt'
     | '/sitemap.xml'
-    | '/top-players'
+    | '/top-cameroon-chess-players'
     | '/api/submit-club'
     | '/api/submit-creator'
     | '/api/submit-tournament'
@@ -261,7 +261,7 @@ export interface RootRouteChildren {
   RatingSpeedRunRoute: typeof RatingSpeedRunRouteWithChildren
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  TopPlayersRoute: typeof TopPlayersRoute
+  TopCameroonChessPlayersRoute: typeof TopCameroonChessPlayersRoute
   ApiSubmitClubRoute: typeof ApiSubmitClubRoute
   ApiSubmitCreatorRoute: typeof ApiSubmitCreatorRoute
   ApiSubmitTournamentRoute: typeof ApiSubmitTournamentRoute
@@ -275,11 +275,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/top-players': {
-      id: '/top-players'
-      path: '/top-players'
-      fullPath: '/top-players'
-      preLoaderRoute: typeof TopPlayersRouteImport
+    '/top-cameroon-chess-players': {
+      id: '/top-cameroon-chess-players'
+      path: '/top-cameroon-chess-players'
+      fullPath: '/top-cameroon-chess-players'
+      preLoaderRoute: typeof TopCameroonChessPlayersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -433,7 +433,7 @@ const rootRouteChildren: RootRouteChildren = {
   RatingSpeedRunRoute: RatingSpeedRunRouteWithChildren,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  TopPlayersRoute: TopPlayersRoute,
+  TopCameroonChessPlayersRoute: TopCameroonChessPlayersRoute,
   ApiSubmitClubRoute: ApiSubmitClubRoute,
   ApiSubmitCreatorRoute: ApiSubmitCreatorRoute,
   ApiSubmitTournamentRoute: ApiSubmitTournamentRoute,

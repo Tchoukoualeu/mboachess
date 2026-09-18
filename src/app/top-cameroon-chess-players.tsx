@@ -8,16 +8,16 @@ const TITLE = "Top 100 Cameroon Chess.com Players | Blitz & Rapid"
 const DESCRIPTION =
   "See the 100 highest-rated Cameroonian Chess.com players in live blitz and rapid. Browse the leaderboard with load more."
 
-export const Route = createFileRoute("/top-players")({
+export const Route = createFileRoute("/top-cameroon-chess-players")({
   head: () =>
     pageHead({
       title: TITLE,
       description: DESCRIPTION,
-      path: "/top-players",
+      path: "/top-cameroon-chess-players",
       jsonLd: webPageJsonLd({
         title: TITLE,
         description: DESCRIPTION,
-        path: "/top-players",
+        path: "/top-cameroon-chess-players",
       }),
     }),
   loader: () => loadCameroonTopPlayers(),
