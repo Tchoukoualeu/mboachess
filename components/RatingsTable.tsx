@@ -253,7 +253,7 @@ export function RatingsTable({ rows }: Props) {
             <tr
               key={r.username}
               className={`border-b border-border/70 last:border-0 ${
-                closed ? "bg-wood/5" : ""
+                closed ? "bg-red-50/80 dark:bg-red-950/20" : ""
               }`}
             >
               <td className="px-4 py-3 font-mono text-xs sm:text-sm">
@@ -275,7 +275,7 @@ export function RatingsTable({ rows }: Props) {
                           ? "Chess.com closed this account for fair play violations"
                           : "Chess.com closed this account"
                       }
-                      className="rounded-md bg-wood/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-wood"
+                      className="rounded-md bg-red-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-red-700 dark:bg-red-950/50 dark:text-red-400"
                     >
                       {closedAccountLabel(r.accountStatus)}
                     </span>
