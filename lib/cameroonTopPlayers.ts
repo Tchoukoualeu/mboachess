@@ -52,10 +52,12 @@ type CacheEntry = {
 let cache: CacheEntry | null = null
 let inflight: Promise<CameroonTopPlayersData> | null = null
 
-function preferLargerAvatar(url: string | null | undefined): string | null {
+function normalizeAvatarUrl(url: string | null | undefined): string | null {
   if (!url || typeof url !== "string") return null
   if (!url.startsWith("http")) return null
-  return url.replace(/\.40x40o\./, ".200x200o.")
+  // Chess.com default placeholder — treat as missing so the CM flag shows.
+  if (/\/noavatar/i.test(url)) return null
+  return url
 }
 
 function toPlayer(entry: LeaderboardEntry, index: number): CameroonTopPlayer | null {
@@ -66,7 +68,7 @@ function toPlayer(entry: LeaderboardEntry, index: number): CameroonTopPlayer | n
     rank: typeof entry.rank === "number" ? entry.rank : index + 1,
     username,
     rating,
-    avatarUrl: preferLargerAvatar(entry.user?.avatar_url),
+    avatarUrl: normalizeAvatarUrl(entry.user?.avatar_url),
     winCount: entry.totalWinCount ?? 0,
     lossCount: entry.totalLossCount ?? 0,
     drawCount: entry.totalDrawCount ?? 0,

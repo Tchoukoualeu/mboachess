@@ -13,7 +13,6 @@ type Props = {
 
 function PlayerRow({ player }: { player: CameroonTopPlayer }) {
   const href = `https://www.chess.com/member/${encodeURIComponent(player.username)}`
-  const initial = player.username.slice(0, 1).toUpperCase()
 
   return (
     <li className="border-b border-border last:border-b-0">
@@ -36,8 +35,12 @@ function PlayerRow({ player }: { player: CameroonTopPlayer }) {
               className="h-full w-full object-cover"
             />
           ) : (
-            <span className="flex h-full w-full items-center justify-center text-sm font-semibold text-ink-muted">
-              {initial}
+            <span
+              className="flex h-full w-full items-center justify-center text-xl leading-none"
+              aria-label="Cameroon"
+              title="Cameroon"
+            >
+              🇨🇲
             </span>
           )}
         </div>
