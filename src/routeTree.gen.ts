@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './app/__root'
+import { Route as TopPlayersRouteImport } from './app/top-players'
 import { Route as SitemapDotxmlRouteImport } from './app/sitemap[.]xml'
 import { Route as RobotsDottxtRouteImport } from './app/robots[.]txt'
 import { Route as RatingSpeedRunRouteImport } from './app/rating-speed-run'
@@ -28,6 +29,11 @@ import { Route as ApiSubmitClubRouteImport } from './app/api/submit-club'
 import { Route as ApiRatingSpeedRunJoinRouteImport } from './app/api/rating-speed-run/join'
 import { Route as ApiRatingSpeedRunCreateRouteImport } from './app/api/rating-speed-run/create'
 
+const TopPlayersRoute = TopPlayersRouteImport.update({
+  id: '/top-players',
+  path: '/top-players',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/rating-speed-run': typeof RatingSpeedRunRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/top-players': typeof TopPlayersRoute
   '/api/submit-club': typeof ApiSubmitClubRoute
   '/api/submit-creator': typeof ApiSubmitCreatorRoute
   '/api/submit-tournament': typeof ApiSubmitTournamentRoute
@@ -146,6 +153,7 @@ export interface FileRoutesByTo {
   '/content-creators': typeof ContentCreatorsRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/top-players': typeof TopPlayersRoute
   '/api/submit-club': typeof ApiSubmitClubRoute
   '/api/submit-creator': typeof ApiSubmitCreatorRoute
   '/api/submit-tournament': typeof ApiSubmitTournamentRoute
@@ -167,6 +175,7 @@ export interface FileRoutesById {
   '/rating-speed-run': typeof RatingSpeedRunRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/top-players': typeof TopPlayersRoute
   '/api/submit-club': typeof ApiSubmitClubRoute
   '/api/submit-creator': typeof ApiSubmitCreatorRoute
   '/api/submit-tournament': typeof ApiSubmitTournamentRoute
@@ -189,6 +198,7 @@ export interface FileRouteTypes {
     | '/rating-speed-run'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/top-players'
     | '/api/submit-club'
     | '/api/submit-creator'
     | '/api/submit-tournament'
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/content-creators'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/top-players'
     | '/api/submit-club'
     | '/api/submit-creator'
     | '/api/submit-tournament'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/rating-speed-run'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/top-players'
     | '/api/submit-club'
     | '/api/submit-creator'
     | '/api/submit-tournament'
@@ -249,6 +261,7 @@ export interface RootRouteChildren {
   RatingSpeedRunRoute: typeof RatingSpeedRunRouteWithChildren
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TopPlayersRoute: typeof TopPlayersRoute
   ApiSubmitClubRoute: typeof ApiSubmitClubRoute
   ApiSubmitCreatorRoute: typeof ApiSubmitCreatorRoute
   ApiSubmitTournamentRoute: typeof ApiSubmitTournamentRoute
@@ -262,6 +275,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/top-players': {
+      id: '/top-players'
+      path: '/top-players'
+      fullPath: '/top-players'
+      preLoaderRoute: typeof TopPlayersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -413,6 +433,7 @@ const rootRouteChildren: RootRouteChildren = {
   RatingSpeedRunRoute: RatingSpeedRunRouteWithChildren,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TopPlayersRoute: TopPlayersRoute,
   ApiSubmitClubRoute: ApiSubmitClubRoute,
   ApiSubmitCreatorRoute: ApiSubmitCreatorRoute,
   ApiSubmitTournamentRoute: ApiSubmitTournamentRoute,

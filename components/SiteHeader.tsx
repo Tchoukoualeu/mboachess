@@ -81,6 +81,9 @@ export function SiteHeader() {
           <Link to="/" className={linkClass} activeOptions={{ exact: true }}>
             Players
           </Link>
+          <Link to="/top-players" className={linkClass}>
+            Top 100
+          </Link>
           <Link to="/tournaments" className={linkClass}>
             Tournaments
           </Link>
@@ -129,6 +132,15 @@ export function SiteHeader() {
                 onClick={() => setOpen(false)}
               >
                 Players
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/top-players"
+                className={mobileLinkClass}
+                onClick={() => setOpen(false)}
+              >
+                Top 100
               </Link>
             </li>
             <li>

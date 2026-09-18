@@ -86,19 +86,27 @@ function ChessCameroonPage() {
           </h2>
           <p className="mt-2 text-sm leading-6 text-ink-muted">
             Much of “chess cameroon” interest is about discovering players and
-            tracking ratings. On the homepage you can look up any Chess.com
-            username and see blitz/rapid ratings and recent activity.
+            tracking ratings. Browse the top 100 Cameroon Chess.com players by
+            blitz and rapid, or look up any username on the homepage.
           </p>
           <p className="mt-2 text-sm leading-6 text-ink-muted">
             Building a list of Cameroonian players? Submit usernames so they
             show up in the table.
           </p>
-          <Link
-            to="/"
-            className="mt-3 inline-block text-sm text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
-          >
-            Open player ratings →
-          </Link>
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+            <Link
+              to="/top-players"
+              className="inline-block text-sm text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
+            >
+              Top 100 players →
+            </Link>
+            <Link
+              to="/"
+              className="inline-block text-sm text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
+            >
+              Open player ratings →
+            </Link>
+          </div>
         </div>
       </section>
 

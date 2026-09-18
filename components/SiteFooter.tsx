@@ -34,6 +34,14 @@ export function SiteFooter() {
             </li>
             <li>
               <Link
+                to="/top-players"
+                className="text-ink-muted transition hover:text-brand"
+              >
+                Top 100
+              </Link>
+            </li>
+            <li>
+              <Link
                 to="/tournaments"
                 className="text-ink-muted transition hover:text-brand"
               >

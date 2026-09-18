@@ -107,6 +107,11 @@ function Home() {
             {(
               [
                 {
+                  to: "/top-players" as const,
+                  label: "Top 100 players",
+                  blurb: "Best Cameroon blitz and rapid on Chess.com",
+                },
+                {
                   to: "/tournaments" as const,
                   label: "Tournaments",
                   blurb: "Upcoming events to play or follow",
