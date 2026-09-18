@@ -22,7 +22,20 @@ export type PlayerLookupResult = {
   countryCode: string | null
   /** Chess.com profile created/joined timestamp in Unix seconds. */
   joined: number | null
+  /**
+   * Chess.com account status when known:
+   * basic, premium, mod, staff, closed, closed:fair_play_violations.
+   */
+  accountStatus: string | null
   error?: string
+}
+
+/** True when Chess.com has closed/banned the account. */
+export function isClosedChesscomAccount(
+  accountStatus: string | null | undefined,
+): boolean {
+  if (!accountStatus) return false
+  return accountStatus === "closed" || accountStatus.startsWith("closed:")
 }
 
 type ProfilePayload = {
@@ -31,6 +44,7 @@ type ProfilePayload = {
   avatar?: string
   country?: string
   joined?: number
+  status?: string
   code?: number
   message?: string
 }
@@ -133,6 +147,7 @@ async function fetchPlayerSnapshotUncached(
       avatarUrl: null,
       countryCode: null,
       joined: null,
+      accountStatus: null,
       error: msg,
     }
   }
@@ -143,6 +158,10 @@ async function fetchPlayerSnapshotUncached(
       ? profile.avatar
       : null
   const countryCode = extractCountryCode(profile.country)
+  const accountStatus =
+    typeof profile.status === "string" && profile.status.trim()
+      ? profile.status.trim()
+      : null
   const now = Date.now() / 1000
 
   if (!statsRes.ok) {
@@ -159,6 +178,7 @@ async function fetchPlayerSnapshotUncached(
       avatarUrl,
       countryCode,
       joined: profile.joined ?? null,
+      accountStatus,
       error: "Stats unavailable",
     }
   }
@@ -178,6 +198,7 @@ async function fetchPlayerSnapshotUncached(
       avatarUrl,
       countryCode,
       joined: profile.joined ?? null,
+      accountStatus,
       error: stats.message,
     }
   }
@@ -198,6 +219,7 @@ async function fetchPlayerSnapshotUncached(
     avatarUrl,
     countryCode,
     joined: profile.joined ?? null,
+    accountStatus,
   }
 }
 
@@ -220,6 +242,7 @@ export async function fetchPlayerSnapshot(
       avatarUrl: null,
       countryCode: null,
       joined: null,
+      accountStatus: null,
       error: "Invalid username",
     }
   }

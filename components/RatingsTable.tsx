@@ -1,5 +1,8 @@
 import { useMemo, useState } from "react"
-import type { PlayerLookupResult } from "@/lib/chesscom"
+import {
+  isClosedChesscomAccount,
+  type PlayerLookupResult,
+} from "@/lib/chesscom"
 
 /** Convert ISO country code to flag emoji (e.g., "CM" -> "🇨🇲"). */
 function countryCodeToFlag(code: string): string {
@@ -81,6 +84,13 @@ function formatLastSeen(unix: number | null): string {
   if (s < 3600) return `${Math.floor(s / 60)}m ago`
   if (s < 86400) return `${Math.floor(s / 3600)}h ago`
   return `${Math.floor(s / 86400)}d ago`
+}
+
+function closedAccountLabel(accountStatus: string | null): string {
+  if (accountStatus === "closed:fair_play_violations") {
+    return "Closed (fair play)"
+  }
+  return "Closed"
 }
 
 function formatRating(
@@ -237,22 +247,40 @@ export function RatingsTable({ rows }: Props) {
           </tr>
         </thead>
         <tbody>
-          {sortedRows.map((r) => (
+          {sortedRows.map((r) => {
+            const closed = isClosedChesscomAccount(r.accountStatus)
+            return (
             <tr
               key={r.username}
-              className="border-b border-border/70 last:border-0"
+              className={`border-b border-border/70 last:border-0 ${
+                closed ? "bg-wood/5" : ""
+              }`}
             >
               <td className="px-4 py-3 font-mono text-xs sm:text-sm">
-                <a
-                  href={`https://www.chess.com/member/${encodeURIComponent(
-                    r.username,
-                  )}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
-                >
-                  {r.username}
-                </a>
+                <div className="flex flex-wrap items-center gap-2">
+                  <a
+                    href={`https://www.chess.com/member/${encodeURIComponent(
+                      r.username,
+                    )}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
+                  >
+                    {r.username}
+                  </a>
+                  {closed ? (
+                    <span
+                      title={
+                        r.accountStatus === "closed:fair_play_violations"
+                          ? "Chess.com closed this account for fair play violations"
+                          : "Chess.com closed this account"
+                      }
+                      className="rounded-md bg-wood/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-wood"
+                    >
+                      {closedAccountLabel(r.accountStatus)}
+                    </span>
+                  ) : null}
+                </div>
               </td>
               <td className="px-4 py-3 tabular-nums">
                 {formatRating(r.blitz, r.error)}
@@ -290,7 +318,8 @@ export function RatingsTable({ rows }: Props) {
                 )}
               </td>
             </tr>
-          ))}
+            )
+          })}
         </tbody>
       </table>
       {rows.some((r) => r.error) ? (
