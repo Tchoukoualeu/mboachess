@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { EloByParticipantChart } from "@/components/EloByParticipantChart"
+import { EloDistributionChart } from "@/components/EloDistributionChart"
 import { OnlineNowBox } from "@/components/OnlineNowBox"
 import { PageShell } from "@/components/PageShell"
 import { RatingLeaders } from "@/components/RatingLeaders"
@@ -227,7 +227,7 @@ function Home() {
 
           <RatingsTable rows={rows} />
 
-          <EloByParticipantChart rows={rows} />
+          <EloDistributionChart rows={rows} />
         </section>
       </PageShell>
     </>
