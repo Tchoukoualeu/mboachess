@@ -9,66 +9,31 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './app/__root'
-import { Route as TopPlayersRouteImport } from './app/top-players'
-import { Route as TopCameroonChessPlayersRouteImport } from './app/top-cameroon-chess-players'
-import { Route as SitemapDotxmlRouteImport } from './app/sitemap[.]xml'
-import { Route as RobotsDottxtRouteImport } from './app/robots[.]txt'
-import { Route as RatingSpeedRunRouteImport } from './app/rating-speed-run'
-import { Route as ProdigeLeagueRouteImport } from './app/prodige-league'
-import { Route as ContentCreatorsRouteImport } from './app/content-creators'
-import { Route as ClubsRouteImport } from './app/clubs'
-import { Route as ChessCameroonRouteImport } from './app/chess-cameroon'
 import { Route as IndexRouteImport } from './app/index'
-import { Route as TournamentsIndexRouteImport } from './app/tournaments.index'
-import { Route as RatingSpeedRunIndexRouteImport } from './app/rating-speed-run.index'
-import { Route as TournamentsPastOnlineRouteImport } from './app/tournaments.past-online'
-import { Route as TournamentsIdRouteImport } from './app/tournaments.$id'
-import { Route as RatingSpeedRunIdRouteImport } from './app/rating-speed-run.$id'
-import { Route as ApiSubmitUsernameRouteImport } from './app/api/submit-username'
-import { Route as ApiSubmitTournamentRouteImport } from './app/api/submit-tournament'
-import { Route as ApiSubmitCreatorRouteImport } from './app/api/submit-creator'
+import { Route as ChessCameroonRouteImport } from './app/chess-cameroon'
+import { Route as ClubsRouteImport } from './app/clubs'
+import { Route as ContentCreatorsRouteImport } from './app/content-creators'
+import { Route as ProdigeLeagueRouteImport } from './app/prodige-league'
+import { Route as RatingSpeedRunRouteImport } from './app/rating-speed-run'
+import { Route as RobotsDottxtRouteImport } from './app/robots[.]txt'
+import { Route as SitemapDotxmlRouteImport } from './app/sitemap[.]xml'
+import { Route as TopCameroonChessPlayersRouteImport } from './app/top-cameroon-chess-players'
+import { Route as TopPlayersRouteImport } from './app/top-players'
 import { Route as ApiSubmitClubRouteImport } from './app/api/submit-club'
-import { Route as ApiRatingSpeedRunJoinRouteImport } from './app/api/rating-speed-run/join'
+import { Route as ApiSubmitCreatorRouteImport } from './app/api/submit-creator'
+import { Route as ApiSubmitTournamentRouteImport } from './app/api/submit-tournament'
+import { Route as ApiSubmitUsernameRouteImport } from './app/api/submit-username'
+import { Route as RatingSpeedRunIndexRouteImport } from './app/rating-speed-run.index'
+import { Route as RatingSpeedRunIdRouteImport } from './app/rating-speed-run.$id'
+import { Route as TournamentsIndexRouteImport } from './app/tournaments.index'
+import { Route as TournamentsIdRouteImport } from './app/tournaments.$id'
+import { Route as TournamentsPastOnlineRouteImport } from './app/tournaments.past-online'
 import { Route as ApiRatingSpeedRunCreateRouteImport } from './app/api/rating-speed-run/create'
+import { Route as ApiRatingSpeedRunJoinRouteImport } from './app/api/rating-speed-run/join'
 
-const TopPlayersRoute = TopPlayersRouteImport.update({
-  id: '/top-players',
-  path: '/top-players',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TopCameroonChessPlayersRoute = TopCameroonChessPlayersRouteImport.update({
-  id: '/top-cameroon-chess-players',
-  path: '/top-cameroon-chess-players',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
-  id: '/robots.txt',
-  path: '/robots.txt',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RatingSpeedRunRoute = RatingSpeedRunRouteImport.update({
-  id: '/rating-speed-run',
-  path: '/rating-speed-run',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProdigeLeagueRoute = ProdigeLeagueRouteImport.update({
-  id: '/prodige-league',
-  path: '/prodige-league',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContentCreatorsRoute = ContentCreatorsRouteImport.update({
-  id: '/content-creators',
-  path: '/content-creators',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClubsRoute = ClubsRouteImport.update({
-  id: '/clubs',
-  path: '/clubs',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChessCameroonRoute = ChessCameroonRouteImport.update({
@@ -76,49 +41,44 @@ const ChessCameroonRoute = ChessCameroonRouteImport.update({
   path: '/chess-cameroon',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ClubsRoute = ClubsRouteImport.update({
+  id: '/clubs',
+  path: '/clubs',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TournamentsIndexRoute = TournamentsIndexRouteImport.update({
-  id: '/tournaments/',
-  path: '/tournaments/',
+const ContentCreatorsRoute = ContentCreatorsRouteImport.update({
+  id: '/content-creators',
+  path: '/content-creators',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RatingSpeedRunIndexRoute = RatingSpeedRunIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => RatingSpeedRunRoute,
-} as any)
-const TournamentsPastOnlineRoute = TournamentsPastOnlineRouteImport.update({
-  id: '/tournaments/past-online',
-  path: '/tournaments/past-online',
+const ProdigeLeagueRoute = ProdigeLeagueRouteImport.update({
+  id: '/prodige-league',
+  path: '/prodige-league',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TournamentsIdRoute = TournamentsIdRouteImport.update({
-  id: '/tournaments/$id',
-  path: '/tournaments/$id',
+const RatingSpeedRunRoute = RatingSpeedRunRouteImport.update({
+  id: '/rating-speed-run',
+  path: '/rating-speed-run',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RatingSpeedRunIdRoute = RatingSpeedRunIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => RatingSpeedRunRoute,
-} as any)
-const ApiSubmitUsernameRoute = ApiSubmitUsernameRouteImport.update({
-  id: '/api/submit-username',
-  path: '/api/submit-username',
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiSubmitTournamentRoute = ApiSubmitTournamentRouteImport.update({
-  id: '/api/submit-tournament',
-  path: '/api/submit-tournament',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiSubmitCreatorRoute = ApiSubmitCreatorRouteImport.update({
-  id: '/api/submit-creator',
-  path: '/api/submit-creator',
+const TopCameroonChessPlayersRoute = TopCameroonChessPlayersRouteImport.update({
+  id: '/top-cameroon-chess-players',
+  path: '/top-cameroon-chess-players',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TopPlayersRoute = TopPlayersRouteImport.update({
+  id: '/top-players',
+  path: '/top-players',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSubmitClubRoute = ApiSubmitClubRouteImport.update({
@@ -126,14 +86,54 @@ const ApiSubmitClubRoute = ApiSubmitClubRouteImport.update({
   path: '/api/submit-club',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiRatingSpeedRunJoinRoute = ApiRatingSpeedRunJoinRouteImport.update({
-  id: '/api/rating-speed-run/join',
-  path: '/api/rating-speed-run/join',
+const ApiSubmitCreatorRoute = ApiSubmitCreatorRouteImport.update({
+  id: '/api/submit-creator',
+  path: '/api/submit-creator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSubmitTournamentRoute = ApiSubmitTournamentRouteImport.update({
+  id: '/api/submit-tournament',
+  path: '/api/submit-tournament',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSubmitUsernameRoute = ApiSubmitUsernameRouteImport.update({
+  id: '/api/submit-username',
+  path: '/api/submit-username',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RatingSpeedRunIndexRoute = RatingSpeedRunIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => RatingSpeedRunRoute,
+} as any)
+const RatingSpeedRunIdRoute = RatingSpeedRunIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => RatingSpeedRunRoute,
+} as any)
+const TournamentsIndexRoute = TournamentsIndexRouteImport.update({
+  id: '/tournaments/',
+  path: '/tournaments/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TournamentsIdRoute = TournamentsIdRouteImport.update({
+  id: '/tournaments/$id',
+  path: '/tournaments/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TournamentsPastOnlineRoute = TournamentsPastOnlineRouteImport.update({
+  id: '/tournaments/past-online',
+  path: '/tournaments/past-online',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiRatingSpeedRunCreateRoute = ApiRatingSpeedRunCreateRouteImport.update({
   id: '/api/rating-speed-run/create',
   path: '/api/rating-speed-run/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRatingSpeedRunJoinRoute = ApiRatingSpeedRunJoinRouteImport.update({
+  id: '/api/rating-speed-run/join',
+  path: '/api/rating-speed-run/join',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -301,60 +301,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/top-players': {
-      id: '/top-players'
-      path: '/top-players'
-      fullPath: '/top-players'
-      preLoaderRoute: typeof TopPlayersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/top-cameroon-chess-players': {
-      id: '/top-cameroon-chess-players'
-      path: '/top-cameroon-chess-players'
-      fullPath: '/top-cameroon-chess-players'
-      preLoaderRoute: typeof TopCameroonChessPlayersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/robots.txt': {
-      id: '/robots.txt'
-      path: '/robots.txt'
-      fullPath: '/robots.txt'
-      preLoaderRoute: typeof RobotsDottxtRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rating-speed-run': {
-      id: '/rating-speed-run'
-      path: '/rating-speed-run'
-      fullPath: '/rating-speed-run'
-      preLoaderRoute: typeof RatingSpeedRunRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/prodige-league': {
-      id: '/prodige-league'
-      path: '/prodige-league'
-      fullPath: '/prodige-league'
-      preLoaderRoute: typeof ProdigeLeagueRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/content-creators': {
-      id: '/content-creators'
-      path: '/content-creators'
-      fullPath: '/content-creators'
-      preLoaderRoute: typeof ContentCreatorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/clubs': {
-      id: '/clubs'
-      path: '/clubs'
-      fullPath: '/clubs'
-      preLoaderRoute: typeof ClubsRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chess-cameroon': {
@@ -364,67 +315,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChessCameroonRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/clubs': {
+      id: '/clubs'
+      path: '/clubs'
+      fullPath: '/clubs'
+      preLoaderRoute: typeof ClubsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tournaments/': {
-      id: '/tournaments/'
-      path: '/tournaments'
-      fullPath: '/tournaments/'
-      preLoaderRoute: typeof TournamentsIndexRouteImport
+    '/content-creators': {
+      id: '/content-creators'
+      path: '/content-creators'
+      fullPath: '/content-creators'
+      preLoaderRoute: typeof ContentCreatorsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/rating-speed-run/': {
-      id: '/rating-speed-run/'
-      path: '/'
-      fullPath: '/rating-speed-run/'
-      preLoaderRoute: typeof RatingSpeedRunIndexRouteImport
-      parentRoute: typeof RatingSpeedRunRoute
-    }
-    '/tournaments/past-online': {
-      id: '/tournaments/past-online'
-      path: '/tournaments/past-online'
-      fullPath: '/tournaments/past-online'
-      preLoaderRoute: typeof TournamentsPastOnlineRouteImport
+    '/prodige-league': {
+      id: '/prodige-league'
+      path: '/prodige-league'
+      fullPath: '/prodige-league'
+      preLoaderRoute: typeof ProdigeLeagueRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tournaments/$id': {
-      id: '/tournaments/$id'
-      path: '/tournaments/$id'
-      fullPath: '/tournaments/$id'
-      preLoaderRoute: typeof TournamentsIdRouteImport
+    '/rating-speed-run': {
+      id: '/rating-speed-run'
+      path: '/rating-speed-run'
+      fullPath: '/rating-speed-run'
+      preLoaderRoute: typeof RatingSpeedRunRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/rating-speed-run/$id': {
-      id: '/rating-speed-run/$id'
-      path: '/$id'
-      fullPath: '/rating-speed-run/$id'
-      preLoaderRoute: typeof RatingSpeedRunIdRouteImport
-      parentRoute: typeof RatingSpeedRunRoute
-    }
-    '/api/submit-username': {
-      id: '/api/submit-username'
-      path: '/api/submit-username'
-      fullPath: '/api/submit-username'
-      preLoaderRoute: typeof ApiSubmitUsernameRouteImport
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/submit-tournament': {
-      id: '/api/submit-tournament'
-      path: '/api/submit-tournament'
-      fullPath: '/api/submit-tournament'
-      preLoaderRoute: typeof ApiSubmitTournamentRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/submit-creator': {
-      id: '/api/submit-creator'
-      path: '/api/submit-creator'
-      fullPath: '/api/submit-creator'
-      preLoaderRoute: typeof ApiSubmitCreatorRouteImport
+    '/top-cameroon-chess-players': {
+      id: '/top-cameroon-chess-players'
+      path: '/top-cameroon-chess-players'
+      fullPath: '/top-cameroon-chess-players'
+      preLoaderRoute: typeof TopCameroonChessPlayersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/top-players': {
+      id: '/top-players'
+      path: '/top-players'
+      fullPath: '/top-players'
+      preLoaderRoute: typeof TopPlayersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/submit-club': {
@@ -434,11 +378,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSubmitClubRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/rating-speed-run/join': {
-      id: '/api/rating-speed-run/join'
-      path: '/api/rating-speed-run/join'
-      fullPath: '/api/rating-speed-run/join'
-      preLoaderRoute: typeof ApiRatingSpeedRunJoinRouteImport
+    '/api/submit-creator': {
+      id: '/api/submit-creator'
+      path: '/api/submit-creator'
+      fullPath: '/api/submit-creator'
+      preLoaderRoute: typeof ApiSubmitCreatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/submit-tournament': {
+      id: '/api/submit-tournament'
+      path: '/api/submit-tournament'
+      fullPath: '/api/submit-tournament'
+      preLoaderRoute: typeof ApiSubmitTournamentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/submit-username': {
+      id: '/api/submit-username'
+      path: '/api/submit-username'
+      fullPath: '/api/submit-username'
+      preLoaderRoute: typeof ApiSubmitUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rating-speed-run/': {
+      id: '/rating-speed-run/'
+      path: '/'
+      fullPath: '/rating-speed-run/'
+      preLoaderRoute: typeof RatingSpeedRunIndexRouteImport
+      parentRoute: typeof RatingSpeedRunRoute
+    }
+    '/rating-speed-run/$id': {
+      id: '/rating-speed-run/$id'
+      path: '/$id'
+      fullPath: '/rating-speed-run/$id'
+      preLoaderRoute: typeof RatingSpeedRunIdRouteImport
+      parentRoute: typeof RatingSpeedRunRoute
+    }
+    '/tournaments/': {
+      id: '/tournaments/'
+      path: '/tournaments'
+      fullPath: '/tournaments/'
+      preLoaderRoute: typeof TournamentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tournaments/$id': {
+      id: '/tournaments/$id'
+      path: '/tournaments/$id'
+      fullPath: '/tournaments/$id'
+      preLoaderRoute: typeof TournamentsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tournaments/past-online': {
+      id: '/tournaments/past-online'
+      path: '/tournaments/past-online'
+      fullPath: '/tournaments/past-online'
+      preLoaderRoute: typeof TournamentsPastOnlineRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/rating-speed-run/create': {
@@ -446,6 +439,13 @@ declare module '@tanstack/react-router' {
       path: '/api/rating-speed-run/create'
       fullPath: '/api/rating-speed-run/create'
       preLoaderRoute: typeof ApiRatingSpeedRunCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/rating-speed-run/join': {
+      id: '/api/rating-speed-run/join'
+      path: '/api/rating-speed-run/join'
+      fullPath: '/api/rating-speed-run/join'
+      preLoaderRoute: typeof ApiRatingSpeedRunJoinRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
