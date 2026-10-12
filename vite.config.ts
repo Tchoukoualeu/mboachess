@@ -34,9 +34,10 @@ export default defineConfig({
     viteReact(),
     nitro({
       config: {
-        externals: {
-          external: ["mongodb"],
-        },
+        // Nitro 3 bundles dependencies unless they are traced. Bundling
+        // mongodb turns its runtime `require("crypto")` into a broken ESM
+        // call, which fails SCRAM-SHA-1 auth on the homepage loader.
+        traceDeps: ["mongodb*"],
       },
     }),
   ],
