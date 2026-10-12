@@ -2,8 +2,9 @@ import { createFileRoute } from "@tanstack/react-router"
 import { PageShell } from "@/components/PageShell"
 import { pageHead, SITE_URL } from "@/lib/seo"
 
-/** Set this to the Chess.com event URL when registration opens. */
-const REGISTRATION_URL: string | null = null
+/** Chess.com club invite for CENT Chess / Prodige League. */
+const REGISTRATION_URL: string | null =
+  "https://www.chess.com/club/cent-chess/join?utm_campaign=club_invite_link&utm_source=chesscom&utm_medium=copy"
 
 const TITLE =
   "Prodige League 2026 | Tournoi d'échecs en ligne au Cameroun"
