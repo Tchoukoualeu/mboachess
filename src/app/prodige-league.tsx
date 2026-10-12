@@ -76,8 +76,8 @@ export const Route = createFileRoute("/prodige-league")({
       path: PATH,
       image: SHARE_IMAGE,
       imageAlt: "Prodige League, saison officielle 2026",
-      imageWidth: 1200,
-      imageHeight: 630,
+      imageWidth: 1024,
+      imageHeight: 558,
       jsonLd: {
         "@context": "https://schema.org",
         "@type": "SportsEvent",
