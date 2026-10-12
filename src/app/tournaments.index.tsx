@@ -58,6 +58,21 @@ function TournamentsPage() {
         </p>
       </header>
 
+      <Link
+        to="/prodige-league"
+        className="mb-6 block rounded-xl border border-wood/40 bg-surface px-4 py-4 transition hover:border-wood sm:px-5"
+      >
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-wood">
+          Saison 2026
+        </p>
+        <p className="mt-1 font-display text-lg font-semibold tracking-tight text-foreground">
+          Prodige League
+        </p>
+        <p className="mt-1 text-sm text-ink-muted">
+          Online rapid on Chess.com, 15 Nov–31 Dec. See the season.
+        </p>
+      </Link>
+
       <AddTournamentForm />
 
       {tournaments.length === 0 ? (
