@@ -11,6 +11,7 @@ const TITLE =
 const DESCRIPTION =
   "Saison officielle 2026, 15 novembre–31 décembre : format individuel, rapide 10+0, 100 % en ligne sur Chess.com. Individual online rapid tournament in Cameroon, open entry."
 const PATH = "/prodige-league"
+const SHARE_IMAGE = "/prodige-league-og.jpg"
 
 const FACTS = [
   { label: "Format", value: "Individuel" },
@@ -73,6 +74,10 @@ export const Route = createFileRoute("/prodige-league")({
       title: TITLE,
       description: DESCRIPTION,
       path: PATH,
+      image: SHARE_IMAGE,
+      imageAlt: "Prodige League, saison officielle 2026",
+      imageWidth: 1200,
+      imageHeight: 630,
       jsonLd: {
         "@context": "https://schema.org",
         "@type": "SportsEvent",
@@ -83,6 +88,7 @@ export const Route = createFileRoute("/prodige-league")({
         eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
         eventStatus: "https://schema.org/EventScheduled",
         sport: "Chess",
+        image: `${SITE_URL}${SHARE_IMAGE}`,
         url: `${SITE_URL}${PATH}`,
         location: {
           "@type": "Place",

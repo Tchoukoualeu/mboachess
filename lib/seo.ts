@@ -7,6 +7,11 @@ type PageSeo = {
   description: string
   path: string
   type?: "website" | "article"
+  /** Site path (`/file.jpg`) or absolute URL. Defaults to the site share image. */
+  image?: string
+  imageAlt?: string
+  imageWidth?: number
+  imageHeight?: number
   jsonLd?: Record<string, unknown> | Record<string, unknown>[]
 }
 
@@ -15,9 +20,18 @@ export function pageHead({
   description,
   path,
   type = "website",
+  image,
+  imageAlt,
+  imageWidth,
+  imageHeight,
   jsonLd,
 }: PageSeo) {
   const url = `${SITE_URL}${path}`
+  const imageUrl = image
+    ? image.startsWith("http")
+      ? image
+      : `${SITE_URL}${image}`
+    : OG_IMAGE
 
   const scripts = jsonLd
     ? [
@@ -37,12 +51,24 @@ export function pageHead({
       { property: "og:url", content: url },
       { property: "og:site_name", content: SITE_NAME },
       { property: "og:type", content: type },
-      { property: "og:image", content: OG_IMAGE },
+      { property: "og:image", content: imageUrl },
+      ...(imageAlt
+        ? [{ property: "og:image:alt", content: imageAlt }]
+        : []),
+      ...(imageWidth
+        ? [{ property: "og:image:width", content: String(imageWidth) }]
+        : []),
+      ...(imageHeight
+        ? [{ property: "og:image:height", content: String(imageHeight) }]
+        : []),
       { property: "og:locale", content: "en_US" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: title },
       { name: "twitter:description", content: description },
-      { name: "twitter:image", content: OG_IMAGE },
+      { name: "twitter:image", content: imageUrl },
+      ...(imageAlt
+        ? [{ name: "twitter:image:alt", content: imageAlt }]
+        : []),
     ],
     links: [{ rel: "canonical", href: url }],
     scripts,
