@@ -14,6 +14,7 @@ import { Route as TopCameroonChessPlayersRouteImport } from './app/top-cameroon-
 import { Route as SitemapDotxmlRouteImport } from './app/sitemap[.]xml'
 import { Route as RobotsDottxtRouteImport } from './app/robots[.]txt'
 import { Route as RatingSpeedRunRouteImport } from './app/rating-speed-run'
+import { Route as ProdigeLeagueRouteImport } from './app/prodige-league'
 import { Route as ContentCreatorsRouteImport } from './app/content-creators'
 import { Route as ClubsRouteImport } from './app/clubs'
 import { Route as ChessCameroonRouteImport } from './app/chess-cameroon'
@@ -53,6 +54,11 @@ const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
 const RatingSpeedRunRoute = RatingSpeedRunRouteImport.update({
   id: '/rating-speed-run',
   path: '/rating-speed-run',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProdigeLeagueRoute = ProdigeLeagueRouteImport.update({
+  id: '/prodige-league',
+  path: '/prodige-league',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContentCreatorsRoute = ContentCreatorsRouteImport.update({
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/chess-cameroon': typeof ChessCameroonRoute
   '/clubs': typeof ClubsRoute
   '/content-creators': typeof ContentCreatorsRoute
+  '/prodige-league': typeof ProdigeLeagueRoute
   '/rating-speed-run': typeof RatingSpeedRunRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/chess-cameroon': typeof ChessCameroonRoute
   '/clubs': typeof ClubsRoute
   '/content-creators': typeof ContentCreatorsRoute
+  '/prodige-league': typeof ProdigeLeagueRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/top-cameroon-chess-players': typeof TopCameroonChessPlayersRoute
@@ -180,6 +188,7 @@ export interface FileRoutesById {
   '/chess-cameroon': typeof ChessCameroonRoute
   '/clubs': typeof ClubsRoute
   '/content-creators': typeof ContentCreatorsRoute
+  '/prodige-league': typeof ProdigeLeagueRoute
   '/rating-speed-run': typeof RatingSpeedRunRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/chess-cameroon'
     | '/clubs'
     | '/content-creators'
+    | '/prodige-league'
     | '/rating-speed-run'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
     | '/chess-cameroon'
     | '/clubs'
     | '/content-creators'
+    | '/prodige-league'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/top-cameroon-chess-players'
@@ -247,6 +258,7 @@ export interface FileRouteTypes {
     | '/chess-cameroon'
     | '/clubs'
     | '/content-creators'
+    | '/prodige-league'
     | '/rating-speed-run'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -270,6 +282,7 @@ export interface RootRouteChildren {
   ChessCameroonRoute: typeof ChessCameroonRoute
   ClubsRoute: typeof ClubsRoute
   ContentCreatorsRoute: typeof ContentCreatorsRoute
+  ProdigeLeagueRoute: typeof ProdigeLeagueRoute
   RatingSpeedRunRoute: typeof RatingSpeedRunRouteWithChildren
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -321,6 +334,13 @@ declare module '@tanstack/react-router' {
       path: '/rating-speed-run'
       fullPath: '/rating-speed-run'
       preLoaderRoute: typeof RatingSpeedRunRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prodige-league': {
+      id: '/prodige-league'
+      path: '/prodige-league'
+      fullPath: '/prodige-league'
+      preLoaderRoute: typeof ProdigeLeagueRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/content-creators': {
@@ -450,6 +470,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChessCameroonRoute: ChessCameroonRoute,
   ClubsRoute: ClubsRoute,
   ContentCreatorsRoute: ContentCreatorsRoute,
+  ProdigeLeagueRoute: ProdigeLeagueRoute,
   RatingSpeedRunRoute: RatingSpeedRunRouteWithChildren,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

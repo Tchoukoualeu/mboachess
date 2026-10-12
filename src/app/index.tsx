@@ -117,6 +117,11 @@ function Home() {
                   blurb: "Upcoming events to play or follow",
                 },
                 {
+                  to: "/prodige-league" as const,
+                  label: "Prodige League",
+                  blurb: "Online rapid season, 15 Nov–31 Dec 2026",
+                },
+                {
                   to: "/tournaments/past-online" as const,
                   label: "Past online",
                   blurb: "Previous online tournament results",
