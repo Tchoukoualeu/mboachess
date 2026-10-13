@@ -670,14 +670,6 @@ export function PuzzleTrainer() {
             ) : null}
             <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
               <a
-                href={`https://lichess.org/training/${puzzle.id}`}
-                target="_blank"
-                rel="noreferrer"
-                className="text-brand hover:underline"
-              >
-                Open on Lichess
-              </a>
-              <a
                 href={`https://lichess.org/${puzzle.gameId}`}
                 target="_blank"
                 rel="noreferrer"
