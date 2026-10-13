@@ -18,6 +18,7 @@ const UNICODE: Record<Color, Record<PieceSymbol, string>> = {
 }
 
 type LastMove = { from: Square; to: Square }
+type BoardMark = { from: Square; to: Square }
 
 type ChessBoardProps = {
   fen: string | null
@@ -65,7 +66,16 @@ export function ChessBoard({
     startY: number
     moved: boolean
   } | null>(null)
+  const drawRef = useRef<{
+    from: Square
+    pointerId: number
+    startX: number
+    startY: number
+    moved: boolean
+  } | null>(null)
   const suppressClick = useRef(false)
+  const [marks, setMarks] = useState<BoardMark[]>([])
+  const [draft, setDraft] = useState<BoardMark | null>(null)
   const [dragFrom, setDragFrom] = useState<Square | null>(null)
   const [ghost, setGhost] = useState<{
     x: number
@@ -94,6 +104,11 @@ export function ChessBoard({
   const ranks = orientation === "white" ? "87654321" : "12345678"
 
   useEffect(() => {
+    setMarks([])
+    setDraft(null)
+  }, [fen])
+
+  useEffect(() => {
     if (!promotion) return
     function onKey(event: KeyboardEvent) {
       if (event.key === "Escape") promotion?.onCancel()
@@ -117,8 +132,18 @@ export function ChessBoard({
 
   function endDrag() {
     dragRef.current = null
+    drawRef.current = null
     setDragFrom(null)
     setGhost(null)
+    setDraft(null)
+  }
+
+  function toggleMark(from: Square, to: Square) {
+    setMarks((current) => {
+      const exists = current.some((mark) => mark.from === from && mark.to === to)
+      if (exists) return current.filter((mark) => mark.from !== from || mark.to !== to)
+      return [...current, { from, to }]
+    })
   }
 
   return (
@@ -128,7 +153,39 @@ export function ChessBoard({
         role="grid"
         aria-label="Chess board"
         className="grid aspect-square w-full grid-cols-8 grid-rows-8 overflow-hidden rounded-md touch-none select-none"
+        onContextMenu={(event) => event.preventDefault()}
+        onAuxClick={(event) => event.preventDefault()}
+        onPointerDown={(event) => {
+          if (event.button === 0 && !event.ctrlKey) {
+            setMarks((current) => (current.length === 0 ? current : []))
+            return
+          }
+          if (event.button !== 2 && !(event.button === 0 && event.ctrlKey)) return
+          event.preventDefault()
+          const from = squareFromClient(event.clientX, event.clientY)
+          if (!from) return
+          drawRef.current = {
+            from,
+            pointerId: event.pointerId,
+            startX: event.clientX,
+            startY: event.clientY,
+            moved: false,
+          }
+          setDraft({ from, to: from })
+          event.currentTarget.setPointerCapture(event.pointerId)
+        }}
         onPointerMove={(event) => {
+          const draw = drawRef.current
+          if (draw && event.pointerId === draw.pointerId) {
+            const distance = Math.hypot(
+              event.clientX - draw.startX,
+              event.clientY - draw.startY,
+            )
+            if (distance >= 6) draw.moved = true
+            const to = squareFromClient(event.clientX, event.clientY) ?? draw.from
+            setDraft({ from: draw.from, to })
+            return
+          }
           const drag = dragRef.current
           if (!drag || event.pointerId !== drag.pointerId) return
           const distance = Math.hypot(
@@ -148,6 +205,17 @@ export function ChessBoard({
           })
         }}
         onPointerUp={(event) => {
+          const draw = drawRef.current
+          if (draw && event.pointerId === draw.pointerId) {
+            const from = draw.from
+            const moved = draw.moved
+            const to = squareFromClient(event.clientX, event.clientY)
+            drawRef.current = null
+            setDraft(null)
+            if (!moved || !to || to === from) toggleMark(from, from)
+            else toggleMark(from, to)
+            return
+          }
           const drag = dragRef.current
           if (!drag || event.pointerId !== drag.pointerId) return
           const from = drag.from
@@ -189,11 +257,10 @@ export function ChessBoard({
                 role="gridcell"
                 aria-label={squareLabel(square, piece)}
                 aria-pressed={isSelected}
-                disabled={!interactive && !piece}
                 className="relative flex items-center justify-center"
                 style={{ backgroundColor: isDark ? DARK : LIGHT }}
                 onPointerDown={(event) => {
-                  if (!interactive || event.button !== 0 || !piece) return
+                  if (!interactive || event.button !== 0 || event.ctrlKey || !piece) return
                   const turn = position?.turn()
                   if (!turn || piece.color !== turn) return
                   dragRef.current = {
@@ -257,6 +324,7 @@ export function ChessBoard({
             )
           }),
         )}
+        <BoardMarks marks={marks} draft={draft} files={files} ranks={ranks} />
       </div>
 
       {overlay ? (
@@ -305,6 +373,112 @@ export function ChessBoard({
     </div>
   )
 }
+
+function BoardMarks({
+  marks,
+  draft,
+  files,
+  ranks,
+}: {
+  marks: BoardMark[]
+  draft: BoardMark | null
+  files: string
+  ranks: string
+}) {
+  const shown = draft
+    ? [
+        ...marks.filter((mark) => mark.from !== draft.from || mark.to !== draft.to),
+        draft,
+      ]
+    : marks
+  if (shown.length === 0) return null
+  return (
+    <svg
+      className="pointer-events-none absolute inset-0 z-20 h-full w-full"
+      viewBox="0 0 8 8"
+      aria-hidden
+    >
+      {shown.map((mark) =>
+        mark.from === mark.to ? (
+          <circle
+            key={`${mark.from}${mark.to}`}
+            cx={squareCenter(mark.from, files, ranks).x}
+            cy={squareCenter(mark.from, files, ranks).y}
+            r={0.36}
+            fill="none"
+            stroke={ARROW}
+            strokeWidth={0.1}
+          />
+        ) : (
+          <ArrowShape
+            key={`${mark.from}${mark.to}`}
+            from={mark.from}
+            to={mark.to}
+            files={files}
+            ranks={ranks}
+          />
+        ),
+      )}
+    </svg>
+  )
+}
+
+function ArrowShape({
+  from,
+  to,
+  files,
+  ranks,
+}: {
+  from: Square
+  to: Square
+  files: string
+  ranks: string
+}) {
+  const start = squareCenter(from, files, ranks)
+  const end = squareCenter(to, files, ranks)
+  const dx = end.x - start.x
+  const dy = end.y - start.y
+  const length = Math.hypot(dx, dy)
+  if (length === 0) return null
+  const ux = dx / length
+  const uy = dy / length
+  const px = -uy
+  const py = ux
+  const x1 = start.x + ux * 0.2
+  const y1 = start.y + uy * 0.2
+  const tipX = end.x - ux * 0.18
+  const tipY = end.y - uy * 0.18
+  const head = 0.38
+  const baseX = tipX - ux * head
+  const baseY = tipY - uy * head
+  const wing = head * 0.48
+  return (
+    <g>
+      <line
+        x1={x1}
+        y1={y1}
+        x2={baseX}
+        y2={baseY}
+        stroke={ARROW}
+        strokeWidth={0.16}
+        strokeLinecap="round"
+      />
+      <polygon
+        points={`${tipX},${tipY} ${baseX + px * wing},${baseY + py * wing} ${baseX - px * wing},${baseY - py * wing}`}
+        fill={ARROW}
+      />
+    </g>
+  )
+}
+
+function squareCenter(square: Square, files: string, ranks: string) {
+  return {
+    x: files.indexOf(square[0]) + 0.5,
+    y: ranks.indexOf(square[1]) + 0.5,
+  }
+}
+
+const ARROW = "rgba(21, 120, 27, 0.9)"
 
 function PieceImage({ color, type }: { color: Color; type: PieceSymbol }) {
   const [failed, setFailed] = useState(false)
