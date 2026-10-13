@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { fetchPuzzle, PuzzleQueryError } from "@/server/puzzle"
 
 export const Route = createFileRoute("/api/puzzle")({
   server: {
     handlers: {
       GET: async ({ request }) => {
+        const { fetchPuzzle, PuzzleQueryError } = await import("@/server/puzzle")
         const url = new URL(request.url)
         try {
           const puzzle = await fetchPuzzle({

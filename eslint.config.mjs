@@ -5,5 +5,10 @@ import tseslint from "typescript-eslint"
 export default defineConfig([
   js.configs.recommended,
   ...tseslint.configs.recommended,
-  globalIgnores([".output/**", "node_modules/**", "src/routeTree.gen.ts"]),
+  globalIgnores([
+    ".output/**",
+    "node_modules/**",
+    "src/routeTree.gen.ts",
+    "scripts/**",
+  ]),
 ])

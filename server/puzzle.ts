@@ -1,15 +1,65 @@
 import {
   isPuzzleDifficulty,
   isPuzzleTheme,
-  parsePuzzleData,
-  type PuzzleColorId,
   type PuzzleData,
   type PuzzleDifficultyId,
-  type PuzzleThemeId,
 } from "@/lib/puzzle"
+import { puzzleRows } from "./puzzleData"
 
-const LICHESS_PUZZLE = "https://lichess.org/api/puzzle"
-const USER_AGENT = "mboachess.com (https://mboachess.com)"
+/**
+ * Compact rows extracted from the public Lichess puzzle database:
+ * [id, rating, plays, gameId, solver color, themes, fen, uci moves]
+ */
+type PuzzleRow = [
+  string,
+  number,
+  number,
+  string,
+  "w" | "b",
+  string,
+  string,
+  string,
+]
+
+type StoredPuzzle = {
+  id: string
+  rating: number
+  plays: number
+  gameId: string
+  color: "w" | "b"
+  themes: string[]
+  fen: string
+  moves: string[]
+}
+
+const RATING_DELTA: Record<PuzzleDifficultyId, number> = {
+  easiest: -600,
+  easier: -300,
+  normal: 0,
+  harder: 300,
+  hardest: 600,
+}
+
+const puzzles: StoredPuzzle[] = puzzleRows.map((row) => ({
+  id: row[0],
+  rating: row[1],
+  plays: row[2],
+  gameId: row[3],
+  color: row[4],
+  themes: row[5] ? row[5].split(" ") : [],
+  fen: row[6],
+  moves: row[7].split(" "),
+}))
+
+const byId = new Map(puzzles.map((puzzle) => [puzzle.id, puzzle]))
+const byTheme = new Map<string, StoredPuzzle[]>()
+for (const puzzle of puzzles) {
+  for (const theme of puzzle.themes) {
+    const list = byTheme.get(theme)
+    if (list) list.push(puzzle)
+    else byTheme.set(theme, [puzzle])
+  }
+}
 
 export class PuzzleQueryError extends Error {
   status: number
@@ -29,83 +79,96 @@ export type PuzzleRequest = {
   color?: string
 }
 
-export async function fetchPuzzle(request: PuzzleRequest): Promise<PuzzleData> {
-  const url = puzzleUrl(request)
-  let response: Response
-  try {
-    response = await fetch(url, {
-      headers: {
-        Accept: "application/json",
-        "User-Agent": USER_AGENT,
-      },
-    })
-  } catch {
-    throw new PuzzleQueryError(
-      "Could not reach Lichess. Check your connection and try again.",
-      502,
-    )
+export function fetchPuzzle(request: PuzzleRequest): PuzzleData {
+  if (puzzles.length === 0) {
+    throw new PuzzleQueryError("No puzzles are available.", 503)
   }
 
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new PuzzleQueryError(
-        "No puzzle matched that filter. Try another theme.",
-        404,
-      )
-    }
-    if (response.status === 429) {
-      throw new PuzzleQueryError(
-        "Lichess is rate-limiting puzzle requests. Wait a moment and try again.",
-        429,
-      )
-    }
-    throw new PuzzleQueryError("Lichess could not provide a puzzle.", 502)
-  }
-
-  let body: unknown
-  try {
-    body = await response.json()
-  } catch {
-    throw new PuzzleQueryError("Lichess returned an unreadable puzzle.", 502)
-  }
-
-  const puzzle = parsePuzzleData(body)
-  if (!puzzle) {
-    throw new PuzzleQueryError("Lichess returned an unexpected puzzle.", 502)
-  }
-  return puzzle
-}
-
-function puzzleUrl(request: PuzzleRequest) {
   if (request.id) {
     if (!/^[A-Za-z0-9]{4,8}$/.test(request.id)) {
       throw new PuzzleQueryError("Unknown puzzle.")
     }
-    return `${LICHESS_PUZZLE}/${request.id}`
+    const puzzle = byId.get(request.id)
+    if (!puzzle) throw new PuzzleQueryError("Unknown puzzle.", 404)
+    return toData(puzzle)
   }
 
-  if (request.daily) return `${LICHESS_PUZZLE}/daily`
+  if (request.daily) {
+    const dailyPool = puzzles.filter(
+      (puzzle) => puzzle.rating >= 1300 && puzzle.rating <= 1700,
+    )
+    const pool = dailyPool.length > 0 ? dailyPool : puzzles
+    return toData(pool[dailyIndex(pool.length)])
+  }
 
-  const params = new URLSearchParams()
-  if (request.angle && request.angle !== "mix") {
-    if (!isPuzzleTheme(request.angle)) {
-      throw new PuzzleQueryError("Unknown theme.")
-    }
-    params.set("angle", request.angle satisfies PuzzleThemeId)
+  const theme = request.angle && request.angle !== "mix" ? request.angle : undefined
+  if (theme && !isPuzzleTheme(theme)) {
+    throw new PuzzleQueryError("Unknown theme.")
   }
-  if (request.difficulty) {
-    if (!isPuzzleDifficulty(request.difficulty)) {
-      throw new PuzzleQueryError("Unknown difficulty.")
-    }
-    params.set("difficulty", request.difficulty satisfies PuzzleDifficultyId)
+  const difficulty = request.difficulty ?? "normal"
+  if (!isPuzzleDifficulty(difficulty)) {
+    throw new PuzzleQueryError("Unknown difficulty.")
   }
+  if (
+    request.color &&
+    request.color !== "white" &&
+    request.color !== "black"
+  ) {
+    throw new PuzzleQueryError("Unknown color.")
+  }
+
+  let pool = theme ? (byTheme.get(theme) ?? []) : puzzles
   if (request.color) {
-    if (request.color !== "white" && request.color !== "black") {
-      throw new PuzzleQueryError("Unknown color.")
-    }
-    params.set("color", request.color satisfies Exclude<PuzzleColorId, "">)
+    const color = request.color === "white" ? "w" : "b"
+    pool = pool.filter((puzzle) => puzzle.color === color)
+  }
+  if (pool.length === 0) {
+    throw new PuzzleQueryError(
+      "No puzzle matched that filter. Try another theme.",
+      404,
+    )
   }
 
-  const query = params.toString()
-  return query ? `${LICHESS_PUZZLE}/next?${query}` : `${LICHESS_PUZZLE}/next`
+  for (const slack of [0, 250, 500, 1000]) {
+    const matches = pool.filter((puzzle) =>
+      inRatingWindow(puzzle.rating, difficulty, slack),
+    )
+    if (matches.length > 0) return toData(pick(matches))
+  }
+
+  return toData(pick(pool))
+}
+
+function inRatingWindow(
+  rating: number,
+  difficulty: PuzzleDifficultyId,
+  slack: number,
+) {
+  const target = 1500 + RATING_DELTA[difficulty]
+  return rating >= target - 200 - slack && rating <= target + 200 + slack
+}
+
+function pick(pool: StoredPuzzle[]) {
+  return pool[Math.floor(Math.random() * pool.length)]
+}
+
+function dailyIndex(size: number) {
+  const day = new Date().toISOString().slice(0, 10)
+  let hash = 0
+  for (let i = 0; i < day.length; i++) {
+    hash = (Math.imul(hash, 33) + day.charCodeAt(i)) >>> 0
+  }
+  return hash % size
+}
+
+function toData(puzzle: StoredPuzzle): PuzzleData {
+  return {
+    id: puzzle.id,
+    rating: puzzle.rating,
+    plays: puzzle.plays,
+    themes: puzzle.themes,
+    gameId: puzzle.gameId,
+    fen: puzzle.fen,
+    moves: puzzle.moves,
+  }
 }

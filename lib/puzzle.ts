@@ -35,15 +35,8 @@ export const PUZZLE_DIFFICULTIES = [
   { id: "hardest", label: "Hardest" },
 ] as const
 
-export const PUZZLE_COLORS = [
-  { id: "", label: "Either color" },
-  { id: "white", label: "White" },
-  { id: "black", label: "Black" },
-] as const
-
 export type PuzzleThemeId = (typeof PUZZLE_THEMES)[number]["id"]
 export type PuzzleDifficultyId = (typeof PUZZLE_DIFFICULTIES)[number]["id"]
-export type PuzzleColorId = (typeof PUZZLE_COLORS)[number]["id"]
 
 const THEME_LABELS: Record<string, string> = {
   mateIn3: "Mate in 3",
@@ -87,21 +80,20 @@ export type PuzzlePlayer = {
   rating?: number
 }
 
+/** A puzzle from the local Lichess database extract. */
 export type PuzzleData = {
-  game: {
-    id: string
-    perf?: string
-    players: PuzzlePlayer[]
-    pgn: string
-  }
-  puzzle: {
-    id: string
-    rating: number
-    plays: number
-    initialPly: number
-    solution: string[]
-    themes: string[]
-  }
+  id: string
+  rating: number
+  plays: number
+  themes: string[]
+  gameId: string
+  /** Position before the opponent's setup move. */
+  fen: string
+  /**
+   * UCI moves. The first is the opponent's setup move. The rest alternate
+   * between the solver and the opponent, starting with the solver.
+   */
+  moves: string[]
 }
 
 export type PreparedPuzzle = {
@@ -146,125 +138,68 @@ export function isSquare(value: string): value is Square {
 export function parsePuzzleData(value: unknown): PuzzleData | null {
   if (!value || typeof value !== "object") return null
   const data = value as Record<string, unknown>
-  const game = data.game
-  const puzzle = data.puzzle
-  if (!game || typeof game !== "object" || !puzzle || typeof puzzle !== "object") {
+  if (typeof data.id !== "string" || !/^[A-Za-z0-9]{4,8}$/.test(data.id)) return null
+  if (typeof data.rating !== "number" || !Number.isFinite(data.rating)) return null
+  if (typeof data.plays !== "number" || !Number.isFinite(data.plays)) return null
+  if (typeof data.gameId !== "string" || !/^[A-Za-z0-9]{8}$/.test(data.gameId)) {
     return null
   }
-
-  const gameRecord = game as Record<string, unknown>
-  const puzzleRecord = puzzle as Record<string, unknown>
-  if (typeof gameRecord.id !== "string" || typeof gameRecord.pgn !== "string") {
+  if (typeof data.fen !== "string" || data.fen.split(" ").length < 2) return null
+  if (!Array.isArray(data.moves) || data.moves.length < 2 || data.moves.length > 40) {
     return null
   }
-  if (!Array.isArray(gameRecord.players)) return null
-
-  const players: PuzzlePlayer[] = []
-  for (const player of gameRecord.players) {
-    const parsed = parsePlayer(player)
-    if (parsed) players.push(parsed)
-  }
-  if (!players.some((player) => player.color === "white")) return null
-  if (!players.some((player) => player.color === "black")) return null
-
-  if (typeof puzzleRecord.id !== "string" || !puzzleRecord.id.trim()) return null
-  if (typeof puzzleRecord.rating !== "number" || !Number.isFinite(puzzleRecord.rating)) {
-    return null
-  }
-  if (typeof puzzleRecord.plays !== "number" || !Number.isFinite(puzzleRecord.plays)) {
-    return null
-  }
-  if (
-    typeof puzzleRecord.initialPly !== "number" ||
-    !Number.isInteger(puzzleRecord.initialPly) ||
-    puzzleRecord.initialPly < 0 ||
-    puzzleRecord.initialPly > 600
-  ) {
-    return null
-  }
-  if (!Array.isArray(puzzleRecord.solution) || puzzleRecord.solution.length === 0) {
-    return null
-  }
-  if (puzzleRecord.solution.length > 40) return null
-  const solution: string[] = []
-  for (const move of puzzleRecord.solution) {
+  const moves: string[] = []
+  for (const move of data.moves) {
     if (typeof move !== "string" || !UCI_RE.test(move)) return null
-    solution.push(move)
+    moves.push(move)
   }
-  const themes = Array.isArray(puzzleRecord.themes)
-    ? puzzleRecord.themes.filter((theme): theme is string => typeof theme === "string")
+  const themes = Array.isArray(data.themes)
+    ? data.themes.filter((theme): theme is string => typeof theme === "string")
     : []
 
-  const perfRecord = gameRecord.perf
-  const perf =
-    perfRecord &&
-    typeof perfRecord === "object" &&
-    typeof (perfRecord as { name?: unknown }).name === "string"
-      ? (perfRecord as { name: string }).name
-      : undefined
-
   return {
-    game: {
-      id: gameRecord.id,
-      perf,
-      players,
-      pgn: gameRecord.pgn,
-    },
-    puzzle: {
-      id: puzzleRecord.id,
-      rating: puzzleRecord.rating,
-      plays: puzzleRecord.plays,
-      initialPly: puzzleRecord.initialPly,
-      solution,
-      themes,
-    },
+    id: data.id,
+    rating: data.rating,
+    plays: data.plays,
+    themes,
+    gameId: data.gameId,
+    fen: data.fen,
+    moves,
   }
 }
 
 /**
- * Lichess `initialPly` is the position before the opponent's setup move.
- * That move is the next ply in the game PGN. `solution` starts with the
- * solver's move and then alternates with the opponent's replies.
+ * The stored FEN is the position before the opponent's setup move, which is
+ * `moves[0]`. Later moves are the solution, starting with the solver.
  */
 export function preparePuzzle(data: PuzzleData): PreparedPuzzle {
-  const replay = new Chess()
+  let chess: Chess
   try {
-    replay.loadPgn(data.game.pgn)
+    chess = new Chess(data.fen)
   } catch {
     throw new Error("Could not read this puzzle.")
   }
 
-  const history = replay.history({ verbose: true })
-  const setup = history[data.puzzle.initialPly]
-  if (!setup) throw new Error("This puzzle's position is missing.")
-
-  const chess = new Chess()
+  let setup: Move
   try {
-    for (let i = 0; i < data.puzzle.initialPly; i++) {
-      chess.move(history[i].san)
-    }
-  } catch {
-    throw new Error("Could not reach this puzzle's position.")
-  }
-
-  const fenBeforeSetup = chess.fen()
-  try {
-    chess.move(setup.san)
-    for (const uci of data.puzzle.solution) playUci(chess, uci)
+    setup = playUci(chess, data.moves[0])
+    for (const uci of data.moves.slice(1)) playUci(chess, uci)
   } catch {
     throw new Error("This puzzle's solution could not be replayed.")
   }
 
   return {
-    id: data.puzzle.id,
-    rating: data.puzzle.rating,
-    plays: data.puzzle.plays,
-    themes: data.puzzle.themes,
-    solution: data.puzzle.solution,
-    gameId: data.game.id,
-    perf: data.game.perf,
-    players: data.game.players,
-    fenBeforeSetup,
+    id: data.id,
+    rating: data.rating,
+    plays: data.plays,
+    themes: data.themes,
+    solution: data.moves.slice(1),
+    gameId: data.gameId,
+    players: [
+      { name: "White", color: "white" },
+      { name: "Black", color: "black" },
+    ],
+    fenBeforeSetup: data.fen,
     setup: { san: setup.san, from: setup.from, to: setup.to },
     orientation: setup.color === "w" ? "black" : "white",
   }
@@ -327,18 +262,3 @@ export function kingSquare(chess: Chess): Square | null {
   return null
 }
 
-function parsePlayer(value: unknown): PuzzlePlayer | null {
-  if (!value || typeof value !== "object") return null
-  const player = value as Record<string, unknown>
-  if (player.color !== "white" && player.color !== "black") return null
-  const fallback = player.color === "white" ? "White" : "Black"
-  const name =
-    typeof player.name === "string" && player.name.trim()
-      ? player.name.trim()
-      : fallback
-  const rating =
-    typeof player.rating === "number" && Number.isFinite(player.rating)
-      ? player.rating
-      : undefined
-  return { name, color: player.color, rating }
-}

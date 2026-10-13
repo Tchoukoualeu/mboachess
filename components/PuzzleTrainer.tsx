@@ -1,5 +1,5 @@
 import { Chess, type PieceSymbol, type Square } from "chess.js"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type CSSProperties } from "react"
 import { ChessBoard } from "@/components/ChessBoard"
 import { playMoveSound, unlockMoveSounds } from "@/lib/moveSound"
 import {
@@ -11,13 +11,11 @@ import {
   parsePuzzleData,
   playUci,
   preparePuzzle,
-  PUZZLE_COLORS,
   PUZZLE_DIFFICULTIES,
   PUZZLE_THEMES,
   themeLabel,
   uciOf,
   type PreparedPuzzle,
-  type PuzzleColorId,
   type PuzzleDifficultyId,
   type PuzzleThemeId,
 } from "@/lib/puzzle"
@@ -27,6 +25,7 @@ type Tone = "neutral" | "good" | "bad"
 type ListedMove = { san: string; byUser: boolean }
 type Stats = { solved: number; missed: number; streak: number; bestStreak: number }
 type Promotion = { from: Square; to: Square; pieces: PieceSymbol[] }
+type Celebration = { clean: boolean; mate: boolean }
 
 const EMPTY_STATS: Stats = { solved: 0, missed: 0, streak: 0, bestStreak: 0 }
 const STATS_KEY = "mboachess.puzzleStats"
@@ -41,8 +40,8 @@ const primaryButtonClass =
 export function PuzzleTrainer() {
   const [theme, setTheme] = useState<PuzzleThemeId>("mix")
   const [difficulty, setDifficulty] = useState<PuzzleDifficultyId>("normal")
-  const [color, setColor] = useState<PuzzleColorId>("")
   const [status, setStatus] = useState<Status>("loading")
+  const [celebration, setCelebration] = useState<Celebration | null>(null)
   const [message, setMessage] = useState("Loading a puzzle…")
   const [fen, setFen] = useState<string | null>(null)
   const [orientation, setOrientation] = useState<"white" | "black">("white")
@@ -73,8 +72,8 @@ export function PuzzleTrainer() {
   const committedFenRef = useRef<string | null>(null)
   const timerRef = useRef<number | null>(null)
   const abortRef = useRef<AbortController | null>(null)
-  const filtersRef = useRef({ theme, difficulty, color })
-  filtersRef.current = { theme, difficulty, color }
+  const filtersRef = useRef({ theme, difficulty })
+  filtersRef.current = { theme, difficulty }
 
   useEffect(() => {
     setStats(readStats())
@@ -97,7 +96,7 @@ export function PuzzleTrainer() {
       abortRef.current?.abort()
       clearTimer()
     }
-  }, [theme, difficulty, color])
+  }, [theme, difficulty])
 
   function clearTimer() {
     if (timerRef.current != null) {
@@ -162,20 +161,18 @@ export function PuzzleTrainer() {
   function finishSolved(token: number) {
     if (token !== tokenRef.current) return
     const clean = mistakesRef.current === 0
+    const mate = chessRef.current.isCheckmate()
     if (!countedRef.current) {
       countedRef.current = true
       record("solved", clean)
     }
+    setCelebration({ clean, mate })
     setStatus("solved")
     setTone("good")
     setMessage(
-      chessRef.current.isCheckmate()
-        ? clean
-          ? "Solved. Checkmate."
-          : "Solved. Checkmate, after a miss."
-        : clean
-          ? "Solved."
-          : "Solved, after a miss. The streak resets.",
+      clean
+        ? "Clean solve."
+        : "Solved after a miss. The streak resets.",
     )
     rememberSelection(null)
   }
@@ -189,6 +186,7 @@ export function PuzzleTrainer() {
     clearTimer()
     setDaily(kind === "daily")
     setStatus("loading")
+    setCelebration(null)
     setMessage(kind === "daily" ? "Loading the daily puzzle…" : "Loading a puzzle…")
     setPuzzle(null)
     setFen(null)
@@ -266,6 +264,7 @@ export function PuzzleTrainer() {
     const token = tokenRef.current
     actionRef.current += 1
     clearTimer()
+    setCelebration(null)
     setPromotion(null)
     setHint(0)
     setMoves([])
@@ -468,7 +467,9 @@ export function PuzzleTrainer() {
           player={playerByColor(puzzle, opponentColor)}
           active={turn === (opponentColor === "white" ? "w" : "b") && status !== "loading"}
         />
-        <div className="my-1.5">
+        <div
+          className={`relative my-1.5 ${status === "solved" ? "solve-board" : ""}`}
+        >
           <ChessBoard
             fen={fen}
             orientation={orientation}
@@ -496,6 +497,12 @@ export function PuzzleTrainer() {
             onSquare={onSquare}
             onDragMove={onDragMove}
           />
+          {status === "solved" && celebration ? (
+            <SolveCelebration
+              mate={celebration.mate}
+              streak={celebration.clean ? stats.streak : 0}
+            />
+          ) : null}
         </div>
         <PlayerRow
           player={playerByColor(puzzle, userColor)}
@@ -508,15 +515,33 @@ export function PuzzleTrainer() {
         <div
           role="status"
           aria-live="polite"
-          className={`rounded-xl border px-4 py-3 text-sm ${
-            status === "error" || tone === "bad"
-              ? "border-red-400/40 bg-red-500/10 text-foreground"
-              : status === "solved" || tone === "good"
-                ? "border-brand/30 bg-brand-muted text-foreground"
-                : "border-border bg-surface text-foreground"
-          }`}
+          className={
+            status === "solved"
+              ? "solve-card rounded-xl border border-brand/40 bg-brand-muted px-4 py-4 text-foreground"
+              : `rounded-xl border px-4 py-3 text-sm ${
+                  status === "error" || tone === "bad"
+                    ? "border-red-400/40 bg-red-500/10 text-foreground"
+                    : tone === "good"
+                      ? "border-brand/30 bg-brand-muted text-foreground"
+                      : "border-border bg-surface text-foreground"
+                }`
+          }
         >
-          {message}
+          {status === "solved" && celebration ? (
+            <>
+              <p className="font-display text-3xl font-semibold tracking-tight text-brand">
+                {celebration.mate ? "Checkmate" : "Solved"}
+              </p>
+              <p className="mt-1 text-sm">{message}</p>
+              {celebration.clean && stats.streak > 1 ? (
+                <p className="mt-2 text-sm font-medium">
+                  {stats.streak} in a row
+                </p>
+              ) : null}
+            </>
+          ) : (
+            message
+          )}
         </div>
 
         {moves.length > 0 ? (
@@ -576,7 +601,7 @@ export function PuzzleTrainer() {
         </div>
 
         <form
-          className="grid gap-3 sm:grid-cols-3"
+          className="grid gap-3 sm:grid-cols-2"
           onSubmit={(event) => event.preventDefault()}
         >
           <label className="block text-sm">
@@ -609,20 +634,6 @@ export function PuzzleTrainer() {
               ))}
             </select>
           </label>
-          <label className="block text-sm">
-            <span className="mb-1 block text-ink-muted">Play as</span>
-            <select
-              className={fieldClass}
-              value={color}
-              onChange={(event) => setColor(event.target.value as PuzzleColorId)}
-            >
-              {PUZZLE_COLORS.map((item) => (
-                <option key={item.id || "either"} value={item.id}>
-                  {item.label}
-                </option>
-              ))}
-            </select>
-          </label>
         </form>
         <p className="text-xs leading-5 text-ink-muted">
           Difficulty is relative to a 1500 puzzle rating. Changing a filter
@@ -639,7 +650,11 @@ export function PuzzleTrainer() {
         </p>
 
         <div className="grid grid-cols-3 gap-2 text-center">
-          <Stat label="Streak" value={String(stats.streak)} />
+          <Stat
+            label="Streak"
+            value={String(stats.streak)}
+            pop={status === "solved" && stats.streak > 0}
+          />
           <Stat label="Solved" value={String(stats.solved)} />
           <Stat label="Missed" value={String(stats.missed)} />
         </div>
@@ -669,14 +684,6 @@ export function PuzzleTrainer() {
               </ul>
             ) : null}
             <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-              <a
-                href={`https://lichess.org/training/${puzzle.id}`}
-                target="_blank"
-                rel="noreferrer"
-                className="text-brand hover:underline"
-              >
-                Open on Lichess
-              </a>
               <a
                 href={`https://lichess.org/${puzzle.gameId}`}
                 target="_blank"
@@ -719,9 +726,76 @@ function PlayerRow({
   )
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function SolveCelebration({ mate, streak }: { mate: boolean; streak: number }) {
   return (
-    <div className="rounded-lg border border-border bg-surface px-2 py-2">
+    <div className="solve-stage pointer-events-none absolute inset-0 z-10" aria-hidden>
+      <div className="solve-wash absolute inset-0 rounded-md" />
+      {SOLVE_BURST.map((piece) => (
+        <span
+          key={`${piece.dx}-${piece.dy}-${piece.delay}`}
+          className={`solve-piece ${piece.round ? "rounded-full" : "rounded-sm"}`}
+          style={
+            {
+              width: piece.size,
+              height: piece.round ? piece.size : `calc(${piece.size} * 0.62)`,
+              background: piece.color,
+              animationDelay: piece.delay,
+              "--dx": piece.dx,
+              "--dy": piece.dy,
+              "--rot": piece.rot,
+            } as CSSProperties
+          }
+        />
+      ))}
+      <div className="solve-banner absolute inset-x-0 top-[22%] flex justify-center">
+        <div className="rounded-full border border-brand/40 bg-surface px-4 py-1.5 text-center shadow-lg">
+          <p className="font-display text-lg font-semibold leading-none text-brand">
+            {mate ? "Checkmate" : "Solved"}
+          </p>
+          {streak > 0 ? (
+            <p className="mt-1 text-xs font-medium text-foreground">
+              {streak} in a row
+            </p>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const SOLVE_BURST = [
+  { dx: "-38cqi", dy: "-34cqi", rot: "-28deg", delay: "0ms", size: "0.7rem", color: "var(--brand)", round: false },
+  { dx: "34cqi", dy: "-36cqi", rot: "24deg", delay: "40ms", size: "0.55rem", color: "var(--wood)", round: true },
+  { dx: "-18cqi", dy: "-42cqi", rot: "12deg", delay: "80ms", size: "0.45rem", color: "var(--brand-soft)", round: true },
+  { dx: "16cqi", dy: "-40cqi", rot: "-16deg", delay: "20ms", size: "0.6rem", color: "var(--brand)", round: false },
+  { dx: "-42cqi", dy: "-8cqi", rot: "32deg", delay: "60ms", size: "0.5rem", color: "#f3e6c4", round: false },
+  { dx: "40cqi", dy: "-6cqi", rot: "-20deg", delay: "100ms", size: "0.65rem", color: "var(--brand)", round: true },
+  { dx: "-36cqi", dy: "22cqi", rot: "18deg", delay: "30ms", size: "0.5rem", color: "var(--wood)", round: false },
+  { dx: "32cqi", dy: "26cqi", rot: "-30deg", delay: "90ms", size: "0.55rem", color: "var(--brand-soft)", round: true },
+  { dx: "-8cqi", dy: "38cqi", rot: "8deg", delay: "50ms", size: "0.45rem", color: "var(--brand)", round: false },
+  { dx: "8cqi", dy: "-28cqi", rot: "-8deg", delay: "70ms", size: "0.4rem", color: "#f3e6c4", round: true },
+  { dx: "-28cqi", dy: "8cqi", rot: "40deg", delay: "110ms", size: "0.35rem", color: "var(--wood)", round: true },
+  { dx: "24cqi", dy: "8cqi", rot: "-36deg", delay: "15ms", size: "0.4rem", color: "var(--brand)", round: false },
+  { dx: "0cqi", dy: "-44cqi", rot: "6deg", delay: "120ms", size: "0.5rem", color: "var(--wood)", round: false },
+  { dx: "-44cqi", dy: "36cqi", rot: "-14deg", delay: "85ms", size: "0.35rem", color: "#f3e6c4", round: true },
+  { dx: "42cqi", dy: "34cqi", rot: "22deg", delay: "45ms", size: "0.45rem", color: "var(--brand-soft)", round: false },
+] as const
+
+function Stat({
+  label,
+  value,
+  pop = false,
+}: {
+  label: string
+  value: string
+  pop?: boolean
+}) {
+  return (
+    <div
+      className={`rounded-lg border border-border bg-surface px-2 py-2 ${
+        pop ? "solve-pop border-brand/40 bg-brand-muted" : ""
+      }`}
+    >
       <p className="text-xs text-ink-muted">{label}</p>
       <p className="font-display text-xl font-semibold">{value}</p>
     </div>
@@ -766,7 +840,6 @@ function puzzleRequestUrl(
   filters: {
     theme: PuzzleThemeId
     difficulty: PuzzleDifficultyId
-    color: PuzzleColorId
   },
 ) {
   const params = new URLSearchParams()
@@ -775,7 +848,6 @@ function puzzleRequestUrl(
   } else {
     if (filters.theme !== "mix") params.set("angle", filters.theme)
     params.set("difficulty", filters.difficulty)
-    if (filters.color) params.set("color", filters.color)
   }
   return `/api/puzzle?${params.toString()}`
 }
