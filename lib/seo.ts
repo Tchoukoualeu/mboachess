@@ -117,6 +117,7 @@ export function webPageJsonLd({
 
 export const PUBLIC_ROUTES = [
   { path: "/", changefreq: "daily", priority: "1" },
+  { path: "/puzzles", changefreq: "weekly", priority: "0.8" },
   { path: "/chess-cameroon", changefreq: "weekly", priority: "0.8" },
   { path: "/prodige-league", changefreq: "weekly", priority: "0.8" },
   { path: "/top-cameroon-chess-players", changefreq: "daily", priority: "0.8" },

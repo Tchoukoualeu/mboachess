@@ -107,6 +107,11 @@ function Home() {
             {(
               [
                 {
+                  to: "/puzzles" as const,
+                  label: "Chess puzzles",
+                  blurb: "Solve tactics from Lichess",
+                },
+                {
                   to: "/top-cameroon-chess-players" as const,
                   label: "Top 100 players",
                   blurb: "Best Cameroon blitz and rapid on Chess.com",

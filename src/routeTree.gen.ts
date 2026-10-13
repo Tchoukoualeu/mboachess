@@ -14,11 +14,13 @@ import { Route as ChessCameroonRouteImport } from './app/chess-cameroon'
 import { Route as ClubsRouteImport } from './app/clubs'
 import { Route as ContentCreatorsRouteImport } from './app/content-creators'
 import { Route as ProdigeLeagueRouteImport } from './app/prodige-league'
+import { Route as PuzzlesRouteImport } from './app/puzzles'
 import { Route as RatingSpeedRunRouteImport } from './app/rating-speed-run'
 import { Route as RobotsDottxtRouteImport } from './app/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './app/sitemap[.]xml'
 import { Route as TopCameroonChessPlayersRouteImport } from './app/top-cameroon-chess-players'
 import { Route as TopPlayersRouteImport } from './app/top-players'
+import { Route as ApiPuzzleRouteImport } from './app/api/puzzle'
 import { Route as ApiSubmitClubRouteImport } from './app/api/submit-club'
 import { Route as ApiSubmitCreatorRouteImport } from './app/api/submit-creator'
 import { Route as ApiSubmitTournamentRouteImport } from './app/api/submit-tournament'
@@ -56,6 +58,11 @@ const ProdigeLeagueRoute = ProdigeLeagueRouteImport.update({
   path: '/prodige-league',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PuzzlesRoute = PuzzlesRouteImport.update({
+  id: '/puzzles',
+  path: '/puzzles',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RatingSpeedRunRoute = RatingSpeedRunRouteImport.update({
   id: '/rating-speed-run',
   path: '/rating-speed-run',
@@ -79,6 +86,11 @@ const TopCameroonChessPlayersRoute = TopCameroonChessPlayersRouteImport.update({
 const TopPlayersRoute = TopPlayersRouteImport.update({
   id: '/top-players',
   path: '/top-players',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPuzzleRoute = ApiPuzzleRouteImport.update({
+  id: '/api/puzzle',
+  path: '/api/puzzle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSubmitClubRoute = ApiSubmitClubRouteImport.update({
@@ -143,11 +155,13 @@ export interface FileRoutesByFullPath {
   '/clubs': typeof ClubsRoute
   '/content-creators': typeof ContentCreatorsRoute
   '/prodige-league': typeof ProdigeLeagueRoute
+  '/puzzles': typeof PuzzlesRoute
   '/rating-speed-run': typeof RatingSpeedRunRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/top-cameroon-chess-players': typeof TopCameroonChessPlayersRoute
   '/top-players': typeof TopPlayersRoute
+  '/api/puzzle': typeof ApiPuzzleRoute
   '/api/submit-club': typeof ApiSubmitClubRoute
   '/api/submit-creator': typeof ApiSubmitCreatorRoute
   '/api/submit-tournament': typeof ApiSubmitTournamentRoute
@@ -166,10 +180,12 @@ export interface FileRoutesByTo {
   '/clubs': typeof ClubsRoute
   '/content-creators': typeof ContentCreatorsRoute
   '/prodige-league': typeof ProdigeLeagueRoute
+  '/puzzles': typeof PuzzlesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/top-cameroon-chess-players': typeof TopCameroonChessPlayersRoute
   '/top-players': typeof TopPlayersRoute
+  '/api/puzzle': typeof ApiPuzzleRoute
   '/api/submit-club': typeof ApiSubmitClubRoute
   '/api/submit-creator': typeof ApiSubmitCreatorRoute
   '/api/submit-tournament': typeof ApiSubmitTournamentRoute
@@ -189,11 +205,13 @@ export interface FileRoutesById {
   '/clubs': typeof ClubsRoute
   '/content-creators': typeof ContentCreatorsRoute
   '/prodige-league': typeof ProdigeLeagueRoute
+  '/puzzles': typeof PuzzlesRoute
   '/rating-speed-run': typeof RatingSpeedRunRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/top-cameroon-chess-players': typeof TopCameroonChessPlayersRoute
   '/top-players': typeof TopPlayersRoute
+  '/api/puzzle': typeof ApiPuzzleRoute
   '/api/submit-club': typeof ApiSubmitClubRoute
   '/api/submit-creator': typeof ApiSubmitCreatorRoute
   '/api/submit-tournament': typeof ApiSubmitTournamentRoute
@@ -214,11 +232,13 @@ export interface FileRouteTypes {
     | '/clubs'
     | '/content-creators'
     | '/prodige-league'
+    | '/puzzles'
     | '/rating-speed-run'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/top-cameroon-chess-players'
     | '/top-players'
+    | '/api/puzzle'
     | '/api/submit-club'
     | '/api/submit-creator'
     | '/api/submit-tournament'
@@ -237,10 +257,12 @@ export interface FileRouteTypes {
     | '/clubs'
     | '/content-creators'
     | '/prodige-league'
+    | '/puzzles'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/top-cameroon-chess-players'
     | '/top-players'
+    | '/api/puzzle'
     | '/api/submit-club'
     | '/api/submit-creator'
     | '/api/submit-tournament'
@@ -259,11 +281,13 @@ export interface FileRouteTypes {
     | '/clubs'
     | '/content-creators'
     | '/prodige-league'
+    | '/puzzles'
     | '/rating-speed-run'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/top-cameroon-chess-players'
     | '/top-players'
+    | '/api/puzzle'
     | '/api/submit-club'
     | '/api/submit-creator'
     | '/api/submit-tournament'
@@ -283,11 +307,13 @@ export interface RootRouteChildren {
   ClubsRoute: typeof ClubsRoute
   ContentCreatorsRoute: typeof ContentCreatorsRoute
   ProdigeLeagueRoute: typeof ProdigeLeagueRoute
+  PuzzlesRoute: typeof PuzzlesRoute
   RatingSpeedRunRoute: typeof RatingSpeedRunRouteWithChildren
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TopCameroonChessPlayersRoute: typeof TopCameroonChessPlayersRoute
   TopPlayersRoute: typeof TopPlayersRoute
+  ApiPuzzleRoute: typeof ApiPuzzleRoute
   ApiSubmitClubRoute: typeof ApiSubmitClubRoute
   ApiSubmitCreatorRoute: typeof ApiSubmitCreatorRoute
   ApiSubmitTournamentRoute: typeof ApiSubmitTournamentRoute
@@ -336,6 +362,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProdigeLeagueRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/puzzles': {
+      id: '/puzzles'
+      path: '/puzzles'
+      fullPath: '/puzzles'
+      preLoaderRoute: typeof PuzzlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rating-speed-run': {
       id: '/rating-speed-run'
       path: '/rating-speed-run'
@@ -369,6 +402,13 @@ declare module '@tanstack/react-router' {
       path: '/top-players'
       fullPath: '/top-players'
       preLoaderRoute: typeof TopPlayersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/puzzle': {
+      id: '/api/puzzle'
+      path: '/api/puzzle'
+      fullPath: '/api/puzzle'
+      preLoaderRoute: typeof ApiPuzzleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/submit-club': {
@@ -471,11 +511,13 @@ const rootRouteChildren: RootRouteChildren = {
   ClubsRoute: ClubsRoute,
   ContentCreatorsRoute: ContentCreatorsRoute,
   ProdigeLeagueRoute: ProdigeLeagueRoute,
+  PuzzlesRoute: PuzzlesRoute,
   RatingSpeedRunRoute: RatingSpeedRunRouteWithChildren,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TopCameroonChessPlayersRoute: TopCameroonChessPlayersRoute,
   TopPlayersRoute: TopPlayersRoute,
+  ApiPuzzleRoute: ApiPuzzleRoute,
   ApiSubmitClubRoute: ApiSubmitClubRoute,
   ApiSubmitCreatorRoute: ApiSubmitCreatorRoute,
   ApiSubmitTournamentRoute: ApiSubmitTournamentRoute,

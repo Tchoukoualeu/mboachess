@@ -4,7 +4,7 @@ import { GitHubLink } from "@/components/GitHubLink"
 import { WhatsAppLink } from "@/components/WhatsAppLink"
 
 const linkClass =
-  "rounded-md px-2.5 py-1.5 text-sm text-ink-muted transition hover:bg-brand-muted hover:text-brand [&.active]:bg-brand-muted [&.active]:font-medium [&.active]:text-brand"
+  "shrink-0 whitespace-nowrap rounded-md px-2 py-1.5 text-sm text-ink-muted transition hover:bg-brand-muted hover:text-brand [&.active]:bg-brand-muted [&.active]:font-medium [&.active]:text-brand"
 
 const mobileLinkClass =
   "block rounded-lg px-3 py-3 text-base text-foreground transition hover:bg-brand-muted hover:text-brand [&.active]:bg-brand-muted [&.active]:font-medium [&.active]:text-brand"
@@ -56,10 +56,10 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-background/85 backdrop-blur-md">
-      <div className="mx-auto flex w-full max-w-4xl items-center gap-2 px-4 py-3 sm:px-6">
+      <div className="mx-auto flex w-full max-w-6xl items-center gap-4 px-4 py-3 sm:px-6">
         <Link
           to="/"
-          className="group min-w-0 shrink font-display text-lg font-semibold tracking-tight text-foreground transition hover:text-brand sm:text-xl"
+          className="group shrink-0 font-display text-lg font-semibold tracking-tight text-foreground transition hover:text-brand sm:text-xl"
           onClick={() => setOpen(false)}
         >
           <span className="inline-flex items-center gap-2">
@@ -70,16 +70,19 @@ export function SiteHeader() {
               height={28}
               className="h-7 w-7 shrink-0 object-contain transition group-hover:scale-105"
             />
-            <span className="truncate">Mboachess</span>
+            <span>Mboachess</span>
           </span>
         </Link>
 
         <nav
           aria-label="Primary"
-          className="ml-auto hidden items-center gap-1 md:flex"
+          className="ml-auto hidden items-center gap-1 lg:flex"
         >
           <Link to="/" className={linkClass} activeOptions={{ exact: true }}>
             Players
+          </Link>
+          <Link to="/puzzles" className={linkClass}>
+            Puzzles
           </Link>
           <Link to="/top-cameroon-chess-players" className={linkClass}>
             Top 100
@@ -101,12 +104,12 @@ export function SiteHeader() {
           </Link>
         </nav>
 
-        <div className="ml-auto flex shrink-0 items-center gap-1.5 md:ml-1">
+        <div className="ml-auto flex shrink-0 items-center gap-1.5 lg:ml-1">
           <WhatsAppLink />
           <GitHubLink />
           <button
             type="button"
-            className="inline-flex items-center justify-center rounded-lg border border-border p-2 text-ink-muted transition hover:border-brand/40 hover:text-brand md:hidden"
+            className="inline-flex items-center justify-center rounded-lg border border-border p-2 text-ink-muted transition hover:border-brand/40 hover:text-brand lg:hidden"
             aria-expanded={open}
             aria-controls={menuId}
             aria-label={open ? "Close menu" : "Open menu"}
@@ -121,7 +124,7 @@ export function SiteHeader() {
         <nav
           id={menuId}
           aria-label="Mobile"
-          className="border-t border-border/60 px-3 py-2 md:hidden"
+          className="border-t border-border/60 px-3 py-2 lg:hidden"
         >
           <ul className="mx-auto flex w-full max-w-4xl flex-col gap-0.5 sm:px-3">
             <li>
@@ -132,6 +135,15 @@ export function SiteHeader() {
                 onClick={() => setOpen(false)}
               >
                 Players
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/puzzles"
+                className={mobileLinkClass}
+                onClick={() => setOpen(false)}
+              >
+                Puzzles
               </Link>
             </li>
             <li>

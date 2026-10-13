@@ -34,6 +34,14 @@ export function SiteFooter() {
             </li>
             <li>
               <Link
+                to="/puzzles"
+                className="text-ink-muted transition hover:text-brand"
+              >
+                Puzzles
+              </Link>
+            </li>
+            <li>
+              <Link
                 to="/top-cameroon-chess-players"
                 className="text-ink-muted transition hover:text-brand"
               >
