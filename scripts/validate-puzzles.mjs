@@ -1,8 +1,12 @@
 import { Chess } from "chess.js"
 import { readFileSync, writeFileSync } from "node:fs"
 
-const path = process.argv[2]
-const rows = JSON.parse(readFileSync(path, "utf8"))
+const path = process.argv[2] ?? "server/puzzleData.ts"
+const source = readFileSync(path, "utf8")
+const start = source.indexOf("[")
+const end = source.lastIndexOf("]")
+if (start < 0 || end < start) throw new Error("Could not read puzzle rows")
+const rows = JSON.parse(source.slice(start, end + 1))
 const kept = []
 let dropped = 0
 
@@ -23,5 +27,6 @@ for (const row of rows) {
   }
 }
 
-writeFileSync(path, `${JSON.stringify(kept)}\n`)
+const lines = kept.map((row) => JSON.stringify(row))
+writeFileSync(path, `export const puzzleRows = [\n${lines.join(",\n")}\n] as const\n`)
 console.error(`kept ${kept.length}, dropped ${dropped}`)

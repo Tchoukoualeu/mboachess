@@ -1,10 +1,10 @@
-import rawPuzzles from "@/data/puzzles.json"
 import {
   isPuzzleDifficulty,
   isPuzzleTheme,
   type PuzzleData,
   type PuzzleDifficultyId,
 } from "@/lib/puzzle"
+import { puzzleRows } from "./puzzleData"
 
 /**
  * Compact rows extracted from the public Lichess puzzle database:
@@ -40,7 +40,7 @@ const RATING_DELTA: Record<PuzzleDifficultyId, number> = {
   hardest: 600,
 }
 
-const puzzles: StoredPuzzle[] = (rawPuzzles as PuzzleRow[]).map((row) => ({
+const puzzles: StoredPuzzle[] = puzzleRows.map((row) => ({
   id: row[0],
   rating: row[1],
   plays: row[2],
@@ -80,6 +80,10 @@ export type PuzzleRequest = {
 }
 
 export function fetchPuzzle(request: PuzzleRequest): PuzzleData {
+  if (puzzles.length === 0) {
+    throw new PuzzleQueryError("No puzzles are available.", 503)
+  }
+
   if (request.id) {
     if (!/^[A-Za-z0-9]{4,8}$/.test(request.id)) {
       throw new PuzzleQueryError("Unknown puzzle.")

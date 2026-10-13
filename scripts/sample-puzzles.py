@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
-"""Sample the public Lichess puzzle database into data/puzzles.json.
+"""Sample the public Lichess puzzle database into server/puzzleData.ts.
 
-The full file is https://database.lichess.org/lichess_db_puzzle.csv.zst
-(CC0). Stream it into this script:
+The module stays small enough for GitHub to accept. The full file is
+https://database.lichess.org/lichess_db_puzzle.csv.zst (CC0). Stream it in:
 
-  zstd -dc lichess_db_puzzle.csv.zst | python3 scripts/sample-puzzles.py data/puzzles.json
+  zstd -dc lichess_db_puzzle.csv.zst | python3 scripts/sample-puzzles.py server/puzzleData.ts
 """
 
 import csv
 import json
+import os
 import random
 import re
 import sys
+
+# One source file, small enough for GitHub to accept in a normal commit.
+MAX_MODULE_BYTES = 60_000
 
 UCI_RE = re.compile(r"^[a-h][1-8][a-h][1-8][qrbn]?$")
 
@@ -57,8 +61,60 @@ def reservoir_add(bucket, seen, item, cap):
         bucket[slot] = item
 
 
+def select_for_module(puzzles):
+    theme_lists = {theme: [] for theme in THEMES}
+    band_lists = {}
+    for puzzle in puzzles:
+        for theme in puzzle[5].split():
+            if theme in theme_lists:
+                theme_lists[theme].append(puzzle)
+        band = (int(puzzle[1]) // 200) * 200
+        band_lists.setdefault(band, []).append(puzzle)
+    for bucket in list(theme_lists.values()) + list(band_lists.values()):
+        random.shuffle(bucket)
+
+    queues = [theme_lists[theme] for theme in THEMES]
+    queues.extend(band_lists[band] for band in sorted(band_lists))
+    cursors = [0] * len(queues)
+    chosen = []
+    seen = set()
+    size = 40
+    progressed = True
+    while progressed:
+        progressed = False
+        for index, queue in enumerate(queues):
+            while cursors[index] < len(queue) and queue[cursors[index]][0] in seen:
+                cursors[index] += 1
+            if cursors[index] >= len(queue):
+                continue
+            puzzle = queue[cursors[index]]
+            cursors[index] += 1
+            extra = len(json.dumps(puzzle, separators=(",", ":")).encode("utf-8")) + 2
+            if size + extra > MAX_MODULE_BYTES:
+                return chosen
+            seen.add(puzzle[0])
+            chosen.append(puzzle)
+            size += extra
+            progressed = True
+    return chosen
+
+
+def write_puzzle_module(path, puzzles):
+    selected = select_for_module(puzzles)
+    selected.sort(key=lambda puzzle: puzzle[0])
+    lines = [json.dumps(puzzle, separators=(",", ":")) for puzzle in selected]
+    directory = os.path.dirname(path)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as handle:
+        handle.write("export const puzzleRows = [\n")
+        handle.write(",\n".join(lines))
+        handle.write("\n] as const\n")
+    return path, len(selected)
+
+
 def main():
-    out_path = sys.argv[1] if len(sys.argv) > 1 else "data/puzzles.json"
+    out_path = sys.argv[1] if len(sys.argv) > 1 else "server/puzzleData.ts"
     theme_buckets = {theme: [] for theme in THEMES}
     theme_seen = {theme: [0] for theme in THEMES}
     bands = list(range(500, 2800, 100))
@@ -119,11 +175,9 @@ def main():
             chosen[item[0]] = item
     puzzles = list(chosen.values())
     puzzles.sort(key=lambda item: item[0])
-    with open(out_path, "w", encoding="utf-8") as handle:
-        json.dump(puzzles, handle, separators=(",", ":"))
-        handle.write("\n")
+    path, kept = write_puzzle_module(out_path, puzzles)
     print(
-        f"wrote {len(puzzles)} puzzles from {scanned} rows to {out_path}",
+        f"wrote {kept} puzzles from {scanned} rows to {path}",
         file=sys.stderr,
     )
     for theme in THEMES:
