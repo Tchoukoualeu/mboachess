@@ -11,13 +11,11 @@ import {
   parsePuzzleData,
   playUci,
   preparePuzzle,
-  PUZZLE_COLORS,
   PUZZLE_DIFFICULTIES,
   PUZZLE_THEMES,
   themeLabel,
   uciOf,
   type PreparedPuzzle,
-  type PuzzleColorId,
   type PuzzleDifficultyId,
   type PuzzleThemeId,
 } from "@/lib/puzzle"
@@ -42,7 +40,6 @@ const primaryButtonClass =
 export function PuzzleTrainer() {
   const [theme, setTheme] = useState<PuzzleThemeId>("mix")
   const [difficulty, setDifficulty] = useState<PuzzleDifficultyId>("normal")
-  const [color, setColor] = useState<PuzzleColorId>("")
   const [status, setStatus] = useState<Status>("loading")
   const [celebration, setCelebration] = useState<Celebration | null>(null)
   const [message, setMessage] = useState("Loading a puzzle…")
@@ -75,8 +72,8 @@ export function PuzzleTrainer() {
   const committedFenRef = useRef<string | null>(null)
   const timerRef = useRef<number | null>(null)
   const abortRef = useRef<AbortController | null>(null)
-  const filtersRef = useRef({ theme, difficulty, color })
-  filtersRef.current = { theme, difficulty, color }
+  const filtersRef = useRef({ theme, difficulty })
+  filtersRef.current = { theme, difficulty }
 
   useEffect(() => {
     setStats(readStats())
@@ -99,7 +96,7 @@ export function PuzzleTrainer() {
       abortRef.current?.abort()
       clearTimer()
     }
-  }, [theme, difficulty, color])
+  }, [theme, difficulty])
 
   function clearTimer() {
     if (timerRef.current != null) {
@@ -604,7 +601,7 @@ export function PuzzleTrainer() {
         </div>
 
         <form
-          className="grid gap-3 sm:grid-cols-3"
+          className="grid gap-3 sm:grid-cols-2"
           onSubmit={(event) => event.preventDefault()}
         >
           <label className="block text-sm">
@@ -632,20 +629,6 @@ export function PuzzleTrainer() {
             >
               {PUZZLE_DIFFICULTIES.map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-sm">
-            <span className="mb-1 block text-ink-muted">Play as</span>
-            <select
-              className={fieldClass}
-              value={color}
-              onChange={(event) => setColor(event.target.value as PuzzleColorId)}
-            >
-              {PUZZLE_COLORS.map((item) => (
-                <option key={item.id || "either"} value={item.id}>
                   {item.label}
                 </option>
               ))}
@@ -857,7 +840,6 @@ function puzzleRequestUrl(
   filters: {
     theme: PuzzleThemeId
     difficulty: PuzzleDifficultyId
-    color: PuzzleColorId
   },
 ) {
   const params = new URLSearchParams()
@@ -866,7 +848,6 @@ function puzzleRequestUrl(
   } else {
     if (filters.theme !== "mix") params.set("angle", filters.theme)
     params.set("difficulty", filters.difficulty)
-    if (filters.color) params.set("color", filters.color)
   }
   return `/api/puzzle?${params.toString()}`
 }

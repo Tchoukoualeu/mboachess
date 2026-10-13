@@ -35,15 +35,8 @@ export const PUZZLE_DIFFICULTIES = [
   { id: "hardest", label: "Hardest" },
 ] as const
 
-export const PUZZLE_COLORS = [
-  { id: "", label: "Either color" },
-  { id: "white", label: "White" },
-  { id: "black", label: "Black" },
-] as const
-
 export type PuzzleThemeId = (typeof PUZZLE_THEMES)[number]["id"]
 export type PuzzleDifficultyId = (typeof PUZZLE_DIFFICULTIES)[number]["id"]
-export type PuzzleColorId = (typeof PUZZLE_COLORS)[number]["id"]
 
 const THEME_LABELS: Record<string, string> = {
   mateIn3: "Mate in 3",
