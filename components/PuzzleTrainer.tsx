@@ -29,6 +29,8 @@ type Celebration = { clean: boolean; mate: boolean }
 
 const EMPTY_STATS: Stats = { solved: 0, missed: 0, streak: 0, bestStreak: 0 }
 const STATS_KEY = "mboachess.puzzleStats"
+const SEEN_KEY = "mboachess.puzzleSeen"
+const PUZZLE_ID_RE = /^[A-Za-z0-9]{4,8}$/
 
 const fieldClass =
   "w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground"
@@ -214,6 +216,7 @@ export function PuzzleTrainer() {
       if (!data) throw new Error("The puzzle response was incomplete.")
       const session = preparePuzzle(data)
       if (token !== tokenRef.current) return
+      rememberSeen(filtersRef.current, data.id, kind)
       beginSession(session, token)
     } catch (error) {
       if (token !== tokenRef.current) return
@@ -848,8 +851,55 @@ function puzzleRequestUrl(
   } else {
     if (filters.theme !== "mix") params.set("angle", filters.theme)
     params.set("difficulty", filters.difficulty)
+    const seen = readSeen()[seenKey(filters)] ?? []
+    if (seen.length > 0) params.set("exclude", seen.join(","))
   }
   return `/api/puzzle?${params.toString()}`
+}
+
+function seenKey(filters: {
+  theme: PuzzleThemeId
+  difficulty: PuzzleDifficultyId
+}) {
+  return `${filters.theme}:${filters.difficulty}`
+}
+
+function rememberSeen(
+  filters: { theme: PuzzleThemeId; difficulty: PuzzleDifficultyId },
+  id: string,
+  kind: "next" | "daily",
+) {
+  const key = seenKey(filters)
+  const all = readSeen()
+  const list = all[key] ?? []
+  if (kind === "next" && list.includes(id)) {
+    all[key] = [id]
+  } else if (!list.includes(id)) {
+    all[key] = [...list, id].slice(-400)
+  } else {
+    return
+  }
+  localStorage.setItem(SEEN_KEY, JSON.stringify(all))
+}
+
+function readSeen(): Record<string, string[]> {
+  try {
+    const raw = localStorage.getItem(SEEN_KEY)
+    if (!raw) return {}
+    const parsed = JSON.parse(raw) as unknown
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {}
+    const result: Record<string, string[]> = {}
+    for (const [key, value] of Object.entries(parsed)) {
+      if (typeof key !== "string" || key.length > 80 || !Array.isArray(value)) continue
+      const ids = value.filter(
+        (item): item is string => typeof item === "string" && PUZZLE_ID_RE.test(item),
+      )
+      if (ids.length > 0) result[key] = ids.slice(-400)
+    }
+    return result
+  } catch {
+    return {}
+  }
 }
 
 function readStats(): Stats {

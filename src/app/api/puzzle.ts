@@ -13,6 +13,7 @@ export const Route = createFileRoute("/api/puzzle")({
             angle: url.searchParams.get("angle") ?? undefined,
             difficulty: url.searchParams.get("difficulty") ?? undefined,
             color: url.searchParams.get("color") ?? undefined,
+            exclude: url.searchParams.get("exclude") ?? undefined,
           })
           return Response.json(puzzle, {
             headers: { "Cache-Control": "no-store" },
