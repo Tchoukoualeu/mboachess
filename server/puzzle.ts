@@ -77,6 +77,8 @@ export type PuzzleRequest = {
   angle?: string
   difficulty?: string
   color?: string
+  /** Comma-separated puzzle ids the solver has already seen for this filter. */
+  exclude?: string
 }
 
 export function fetchPuzzle(request: PuzzleRequest): PuzzleData {
@@ -129,14 +131,7 @@ export function fetchPuzzle(request: PuzzleRequest): PuzzleData {
     )
   }
 
-  for (const slack of [0, 250, 500, 1000]) {
-    const matches = pool.filter((puzzle) =>
-      inRatingWindow(puzzle.rating, difficulty, slack),
-    )
-    if (matches.length > 0) return toData(pick(matches))
-  }
-
-  return toData(pick(pool))
+  return toData(choosePuzzle(pool, difficulty, parseExclude(request.exclude)))
 }
 
 function inRatingWindow(
@@ -146,6 +141,52 @@ function inRatingWindow(
 ) {
   const target = 1500 + RATING_DELTA[difficulty]
   return rating >= target - 200 - slack && rating <= target + 200 + slack
+}
+
+const PUZZLE_ID_RE = /^[A-Za-z0-9]{4,8}$/
+
+function parseExclude(raw: string | undefined) {
+  if (!raw) return []
+  const ids: string[] = []
+  for (const part of raw.split(",")) {
+    const id = part.trim()
+    if (PUZZLE_ID_RE.test(id)) ids.push(id)
+  }
+  return ids.slice(-400)
+}
+
+/**
+ * Draw from the same rating band the unfiltered picker would use.
+ * Skip ids the solver already saw. When that band is exhausted, start a new
+ * pass and still avoid the most recent puzzle unless it is the only match.
+ */
+function choosePuzzle(
+  pool: StoredPuzzle[],
+  difficulty: PuzzleDifficultyId,
+  excludedIds: string[],
+) {
+  const band = ratingBand(pool, difficulty)
+  const excluded = new Set(excludedIds)
+  const fresh = band.filter((puzzle) => !excluded.has(puzzle.id))
+  if (fresh.length > 0) return pick(fresh)
+
+  const latest = [...excludedIds]
+    .reverse()
+    .find((id) => band.some((puzzle) => puzzle.id === id))
+  const recycled = latest
+    ? band.filter((puzzle) => puzzle.id !== latest)
+    : band
+  return pick(recycled.length > 0 ? recycled : band)
+}
+
+function ratingBand(pool: StoredPuzzle[], difficulty: PuzzleDifficultyId) {
+  for (const slack of [0, 250, 500, 1000]) {
+    const matches = pool.filter((puzzle) =>
+      inRatingWindow(puzzle.rating, difficulty, slack),
+    )
+    if (matches.length > 0) return matches
+  }
+  return pool
 }
 
 function pick(pool: StoredPuzzle[]) {
