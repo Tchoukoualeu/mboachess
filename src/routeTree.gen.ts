@@ -20,6 +20,7 @@ import { Route as RobotsDottxtRouteImport } from './app/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './app/sitemap[.]xml'
 import { Route as TopCameroonChessPlayersRouteImport } from './app/top-cameroon-chess-players'
 import { Route as TopPlayersRouteImport } from './app/top-players'
+import { Route as ApiProdigeLeagueRouteImport } from './app/api/prodige-league'
 import { Route as ApiPuzzleRouteImport } from './app/api/puzzle'
 import { Route as ApiSubmitClubRouteImport } from './app/api/submit-club'
 import { Route as ApiSubmitCreatorRouteImport } from './app/api/submit-creator'
@@ -86,6 +87,11 @@ const TopCameroonChessPlayersRoute = TopCameroonChessPlayersRouteImport.update({
 const TopPlayersRoute = TopPlayersRouteImport.update({
   id: '/top-players',
   path: '/top-players',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProdigeLeagueRoute = ApiProdigeLeagueRouteImport.update({
+  id: '/api/prodige-league',
+  path: '/api/prodige-league',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPuzzleRoute = ApiPuzzleRouteImport.update({
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/top-cameroon-chess-players': typeof TopCameroonChessPlayersRoute
   '/top-players': typeof TopPlayersRoute
+  '/api/prodige-league': typeof ApiProdigeLeagueRoute
   '/api/puzzle': typeof ApiPuzzleRoute
   '/api/submit-club': typeof ApiSubmitClubRoute
   '/api/submit-creator': typeof ApiSubmitCreatorRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/top-cameroon-chess-players': typeof TopCameroonChessPlayersRoute
   '/top-players': typeof TopPlayersRoute
+  '/api/prodige-league': typeof ApiProdigeLeagueRoute
   '/api/puzzle': typeof ApiPuzzleRoute
   '/api/submit-club': typeof ApiSubmitClubRoute
   '/api/submit-creator': typeof ApiSubmitCreatorRoute
@@ -211,6 +219,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/top-cameroon-chess-players': typeof TopCameroonChessPlayersRoute
   '/top-players': typeof TopPlayersRoute
+  '/api/prodige-league': typeof ApiProdigeLeagueRoute
   '/api/puzzle': typeof ApiPuzzleRoute
   '/api/submit-club': typeof ApiSubmitClubRoute
   '/api/submit-creator': typeof ApiSubmitCreatorRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/top-cameroon-chess-players'
     | '/top-players'
+    | '/api/prodige-league'
     | '/api/puzzle'
     | '/api/submit-club'
     | '/api/submit-creator'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/top-cameroon-chess-players'
     | '/top-players'
+    | '/api/prodige-league'
     | '/api/puzzle'
     | '/api/submit-club'
     | '/api/submit-creator'
@@ -287,6 +298,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/top-cameroon-chess-players'
     | '/top-players'
+    | '/api/prodige-league'
     | '/api/puzzle'
     | '/api/submit-club'
     | '/api/submit-creator'
@@ -313,6 +325,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TopCameroonChessPlayersRoute: typeof TopCameroonChessPlayersRoute
   TopPlayersRoute: typeof TopPlayersRoute
+  ApiProdigeLeagueRoute: typeof ApiProdigeLeagueRoute
   ApiPuzzleRoute: typeof ApiPuzzleRoute
   ApiSubmitClubRoute: typeof ApiSubmitClubRoute
   ApiSubmitCreatorRoute: typeof ApiSubmitCreatorRoute
@@ -402,6 +415,13 @@ declare module '@tanstack/react-router' {
       path: '/top-players'
       fullPath: '/top-players'
       preLoaderRoute: typeof TopPlayersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/prodige-league': {
+      id: '/api/prodige-league'
+      path: '/api/prodige-league'
+      fullPath: '/api/prodige-league'
+      preLoaderRoute: typeof ApiProdigeLeagueRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/puzzle': {
@@ -517,6 +537,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TopCameroonChessPlayersRoute: TopCameroonChessPlayersRoute,
   TopPlayersRoute: TopPlayersRoute,
+  ApiProdigeLeagueRoute: ApiProdigeLeagueRoute,
   ApiPuzzleRoute: ApiPuzzleRoute,
   ApiSubmitClubRoute: ApiSubmitClubRoute,
   ApiSubmitCreatorRoute: ApiSubmitCreatorRoute,
