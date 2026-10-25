@@ -214,8 +214,9 @@ export function ProdigeLeagueSignup({
         Inscription
       </h2>
       <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted sm:text-base">
-        Entre ton pseudo Chess.com pour t&apos;inscrire. La liste est classée
-        par Elo rapide, la cadence de la saison.
+        Entre ton pseudo Chess.com pour t&apos;inscrire. Les comptes au-dessus
+        de 2400 Elo rapide ne peuvent pas participer. La liste est classée par
+        Elo rapide, la cadence de la saison.
       </p>
       <div className="mt-4 rounded-xl border border-border bg-surface p-4 sm:p-5">
         <SignupForm />

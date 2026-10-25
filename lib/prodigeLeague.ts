@@ -4,6 +4,9 @@ import { getDb, isMongoConfigured } from "./mongodb"
 
 const COLLECTION = "prodige_league_registrations"
 
+/** Rapid is the season cadence. Ratings above this cannot register. */
+const MAX_RAPID_RATING = 2400
+
 export type ProdigeLeagueRegistration = {
   username: string
   createdAt: Date
@@ -91,6 +94,16 @@ export async function registerProdigeLeague(
     return {
       ok: false,
       error: "Ce compte Chess.com est fermé.",
+      status: 400,
+    }
+  }
+  if (
+    typeof snapshot.rapid === "number" &&
+    snapshot.rapid > MAX_RAPID_RATING
+  ) {
+    return {
+      ok: false,
+      error: `Inscription réservée aux joueurs à ${MAX_RAPID_RATING} Elo rapide ou moins.`,
       status: 400,
     }
   }
