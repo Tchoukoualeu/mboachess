@@ -1,10 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { PageShell } from "@/components/PageShell"
+import { ProdigeLeagueSignup } from "@/components/ProdigeLeagueSignup"
 import { pageHead, SITE_URL } from "@/lib/seo"
-
-/** Chess.com club invite for CENT Chess / Prodige League. */
-const REGISTRATION_URL: string | null =
-  "https://www.chess.com/club/cent-chess/join?utm_campaign=club_invite_link&utm_source=chesscom&utm_medium=copy"
+import { loadProdigeLeague } from "@/server/prodigeLeague"
 
 const TITLE =
   "Prodige League 2026 | Tournoi d'échecs en ligne au Cameroun"
@@ -105,34 +103,24 @@ export const Route = createFileRoute("/prodige-league")({
         },
       },
     }),
+  loader: () => loadProdigeLeague(),
   component: ProdigeLeaguePage,
 })
 
 function SignupButton() {
-  const className =
-    "inline-flex items-center justify-center rounded-lg bg-[#e0b45a] px-4 py-2.5 text-sm font-semibold text-[#1a1408] transition hover:bg-[#efc56e] disabled:cursor-not-allowed disabled:opacity-80 disabled:hover:bg-[#e0b45a]"
-
-  if (REGISTRATION_URL) {
-    return (
-      <a
-        href={REGISTRATION_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={className}
-      >
-        S&apos;inscrire sur Chess.com
-      </a>
-    )
-  }
-
   return (
-    <button type="button" disabled className={className}>
-      Inscriptions sur Chess.com — bientôt
-    </button>
+    <a
+      href="#inscription"
+      className="inline-flex items-center justify-center rounded-lg bg-[#e0b45a] px-4 py-2.5 text-sm font-semibold text-[#1a1408] transition hover:bg-[#efc56e]"
+    >
+      S&apos;inscrire
+    </a>
   )
 }
 
 function ProdigeLeaguePage() {
+  const { players } = Route.useLoaderData()
+
   return (
     <>
       <section className="hero-prodige relative overflow-hidden text-white">
@@ -170,10 +158,13 @@ function ProdigeLeaguePage() {
           <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground sm:text-base sm:leading-7">
             Prodige League is an individual online rapid tournament (10+0) on
             Chess.com, open to everyone, from 15 November to 31 December 2026
-            in Cameroon. The French sections below cover the format, the season
-            path, and the organisers.
+            in Cameroon. Register on this page with your Chess.com username.
+            The French sections below cover the format, the season path, and
+            the organisers.
           </p>
         </section>
+
+        <ProdigeLeagueSignup players={players} />
 
         <section aria-labelledby="facts-heading" className="mb-10">
           <h2
@@ -242,22 +233,6 @@ function ProdigeLeaguePage() {
               </li>
             ))}
           </ul>
-        </section>
-
-        <section
-          aria-labelledby="close-heading"
-          className="rounded-xl border border-border bg-surface px-4 py-6 text-center sm:px-6"
-        >
-          <h2
-            id="close-heading"
-            className="font-display text-2xl font-semibold tracking-tight sm:text-3xl"
-          >
-            Chaque coup compte.
-          </h2>
-          <p className="mt-2 text-sm text-ink-muted">Prodige League Cameroun</p>
-          <div className="mt-5 flex justify-center">
-            <SignupButton />
-          </div>
         </section>
       </PageShell>
     </>
