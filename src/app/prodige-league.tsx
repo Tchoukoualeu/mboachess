@@ -107,17 +107,6 @@ export const Route = createFileRoute("/prodige-league")({
   component: ProdigeLeaguePage,
 })
 
-function SignupButton() {
-  return (
-    <a
-      href="#inscription"
-      className="inline-flex items-center justify-center rounded-lg bg-[#e0b45a] px-4 py-2.5 text-sm font-semibold text-[#1a1408] transition hover:bg-[#efc56e]"
-    >
-      S&apos;inscrire
-    </a>
-  )
-}
-
 function ProdigeLeaguePage() {
   const { players } = Route.useLoaderData()
 
@@ -138,9 +127,6 @@ function ProdigeLeaguePage() {
             <span className="block">Saison officielle 2026</span>
             <span className="block">15 novembre – 31 décembre 2026</span>
           </p>
-          <div className="mt-6">
-            <SignupButton />
-          </div>
         </div>
       </section>
 
@@ -157,10 +143,9 @@ function ProdigeLeaguePage() {
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground sm:text-base sm:leading-7">
             Prodige League is an individual online rapid tournament (10+0) on
-            Chess.com, open to everyone, from 15 November to 31 December 2026
-            in Cameroon. Register on this page with your Chess.com username.
-            The French sections below cover the format, the season path, and
-            the organisers.
+            Chess.com, from 15 November to 31 December 2026 in Cameroon.
+            Registration on this page is closed. The French sections below
+            cover the format, the season path, and the organisers.
           </p>
         </section>
 
