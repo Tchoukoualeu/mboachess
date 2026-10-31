@@ -1,3 +1,4 @@
+import { useRouter } from "@tanstack/react-router"
 import { useState } from "react"
 import type { ProdigeLeaguePlayer } from "@/lib/prodigeLeague"
 
@@ -23,6 +24,102 @@ function formatRegisteredAt(iso: string): string {
     month: "short",
     year: "numeric",
   }).format(date)
+}
+
+function SignupForm() {
+  const router = useRouter()
+  const [value, setValue] = useState("")
+  const [message, setMessage] = useState<{
+    type: "ok" | "err"
+    text: string
+  } | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  async function onSubmit(event: React.FormEvent) {
+    event.preventDefault()
+    setMessage(null)
+    const username = value.trim()
+    if (!username) {
+      setMessage({ type: "err", text: "Indique ton pseudo Chess.com." })
+      return
+    }
+    setLoading(true)
+    try {
+      const res = await fetch("/api/prodige-league", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username }),
+      })
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string
+        ok?: boolean
+        already?: boolean
+      }
+      if (!res.ok) {
+        setMessage({
+          type: "err",
+          text: data.error || "Inscription impossible.",
+        })
+        return
+      }
+      setMessage({
+        type: "ok",
+        text: data.already
+          ? "Ce compte est déjà inscrit."
+          : "Inscription enregistrée. Ton compte apparaît dans la liste.",
+      })
+      setValue("")
+      await router.invalidate()
+    } catch {
+      setMessage({ type: "err", text: "Erreur réseau. Réessaie." })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <form
+      onSubmit={onSubmit}
+      className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end"
+    >
+      <div className="min-w-0 flex-1">
+        <label
+          htmlFor="prodige-username"
+          className="mb-1 block text-sm font-medium text-foreground"
+        >
+          Pseudo Chess.com
+        </label>
+        <input
+          id="prodige-username"
+          name="username"
+          type="text"
+          autoComplete="username"
+          placeholder="ex. hikaru"
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
+          disabled={loading}
+          className="w-full rounded-lg border border-border bg-surface px-3 py-2 font-mono text-sm text-foreground shadow-sm placeholder:text-ink-muted focus:border-wood focus:outline-none focus:ring-2 focus:ring-wood/30 disabled:opacity-50"
+        />
+      </div>
+      <button
+        type="submit"
+        disabled={loading}
+        className="inline-flex h-10 shrink-0 items-center justify-center rounded-lg bg-[#e0b45a] px-4 text-sm font-semibold text-[#1a1408] transition hover:bg-[#efc56e] disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {loading ? "Inscription…" : "S'inscrire"}
+      </button>
+      {message ? (
+        <p
+          role="status"
+          className={`w-full text-sm ${
+            message.type === "ok" ? "text-brand" : "text-red-600"
+          }`}
+        >
+          {message.text}
+        </p>
+      ) : null}
+    </form>
+  )
 }
 
 function PlayerRow({
@@ -117,9 +214,13 @@ export function ProdigeLeagueSignup({
         Inscription
       </h2>
       <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted sm:text-base">
-        Les inscriptions sont closes. La liste est classée par Elo rapide, la
-        cadence de la saison.
+        Entre ton pseudo Chess.com pour t&apos;inscrire. Les comptes au-dessus
+        de 2400 Elo rapide ne peuvent pas participer. La liste est classée par
+        Elo rapide, la cadence de la saison.
       </p>
+      <div className="mt-4 rounded-xl border border-border bg-surface p-4 sm:p-5">
+        <SignupForm />
+      </div>
 
       <div className="mt-6 flex items-end justify-between gap-3">
         <h3 className="font-display text-lg font-semibold tracking-tight">
