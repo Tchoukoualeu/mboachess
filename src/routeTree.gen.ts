@@ -33,6 +33,7 @@ import { Route as TournamentsIdRouteImport } from './app/tournaments.$id'
 import { Route as TournamentsPastOnlineRouteImport } from './app/tournaments.past-online'
 import { Route as ApiRatingSpeedRunCreateRouteImport } from './app/api/rating-speed-run/create'
 import { Route as ApiRatingSpeedRunJoinRouteImport } from './app/api/rating-speed-run/join'
+import { Route as ProdigeLeagueArenaDayRouteImport } from './app/prodige-league_.arena.$day'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -154,6 +155,11 @@ const ApiRatingSpeedRunJoinRoute = ApiRatingSpeedRunJoinRouteImport.update({
   path: '/api/rating-speed-run/join',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProdigeLeagueArenaDayRoute = ProdigeLeagueArenaDayRouteImport.update({
+  id: '/prodige-league_/arena/$day',
+  path: '/prodige-league/arena/$day',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -180,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/tournaments/': typeof TournamentsIndexRoute
   '/api/rating-speed-run/create': typeof ApiRatingSpeedRunCreateRoute
   '/api/rating-speed-run/join': typeof ApiRatingSpeedRunJoinRoute
+  '/prodige-league/arena/$day': typeof ProdigeLeagueArenaDayRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -205,6 +212,7 @@ export interface FileRoutesByTo {
   '/tournaments': typeof TournamentsIndexRoute
   '/api/rating-speed-run/create': typeof ApiRatingSpeedRunCreateRoute
   '/api/rating-speed-run/join': typeof ApiRatingSpeedRunJoinRoute
+  '/prodige-league/arena/$day': typeof ProdigeLeagueArenaDayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -232,6 +240,7 @@ export interface FileRoutesById {
   '/tournaments/': typeof TournamentsIndexRoute
   '/api/rating-speed-run/create': typeof ApiRatingSpeedRunCreateRoute
   '/api/rating-speed-run/join': typeof ApiRatingSpeedRunJoinRoute
+  '/prodige-league_/arena/$day': typeof ProdigeLeagueArenaDayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -260,6 +269,7 @@ export interface FileRouteTypes {
     | '/tournaments/'
     | '/api/rating-speed-run/create'
     | '/api/rating-speed-run/join'
+    | '/prodige-league/arena/$day'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -285,6 +295,7 @@ export interface FileRouteTypes {
     | '/tournaments'
     | '/api/rating-speed-run/create'
     | '/api/rating-speed-run/join'
+    | '/prodige-league/arena/$day'
   id:
     | '__root__'
     | '/'
@@ -311,6 +322,7 @@ export interface FileRouteTypes {
     | '/tournaments/'
     | '/api/rating-speed-run/create'
     | '/api/rating-speed-run/join'
+    | '/prodige-league_/arena/$day'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -336,6 +348,7 @@ export interface RootRouteChildren {
   TournamentsIndexRoute: typeof TournamentsIndexRoute
   ApiRatingSpeedRunCreateRoute: typeof ApiRatingSpeedRunCreateRoute
   ApiRatingSpeedRunJoinRoute: typeof ApiRatingSpeedRunJoinRoute
+  ProdigeLeagueArenaDayRoute: typeof ProdigeLeagueArenaDayRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -508,6 +521,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiRatingSpeedRunJoinRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/prodige-league_/arena/$day': {
+      id: '/prodige-league_/arena/$day'
+      path: '/prodige-league/arena/$day'
+      fullPath: '/prodige-league/arena/$day'
+      preLoaderRoute: typeof ProdigeLeagueArenaDayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -548,6 +568,7 @@ const rootRouteChildren: RootRouteChildren = {
   TournamentsIndexRoute: TournamentsIndexRoute,
   ApiRatingSpeedRunCreateRoute: ApiRatingSpeedRunCreateRoute,
   ApiRatingSpeedRunJoinRoute: ApiRatingSpeedRunJoinRoute,
+  ProdigeLeagueArenaDayRoute: ProdigeLeagueArenaDayRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,7 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { PageShell } from "@/components/PageShell"
 import { ProdigeLeagueSignup } from "@/components/ProdigeLeagueSignup"
 import { pageHead, SITE_URL } from "@/lib/seo"
+import {
+  formatArenaDate,
+  PRODIGE_ARENAS,
+} from "@/lib/prodigeArenaSchedule"
 import { loadProdigeLeague } from "@/server/prodigeLeague"
 
 const TITLE =
@@ -145,7 +149,8 @@ function ProdigeLeaguePage() {
             Prodige League is an individual online rapid tournament (10+0) on
             Chess.com, from 15 November to 31 December 2026 in Cameroon.
             Registration on this page is closed. The French sections below
-            cover the format, the season path, and the organisers.
+            cover the format, the season path, the organisers, and the six
+            arena dates.
           </p>
         </section>
 
@@ -218,6 +223,64 @@ function ProdigeLeaguePage() {
               </li>
             ))}
           </ul>
+        </section>
+
+        <section aria-labelledby="arenas-heading" className="mb-4">
+          <h2
+            id="arenas-heading"
+            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
+          >
+            Les arènes
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted">
+            Six journées de qualification sur Chess.com. La première a eu lieu
+            le 15 novembre 2026. Les dates des suivantes restent à définir.
+          </p>
+          <ol className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {PRODIGE_ARENAS.map((arena) => {
+              const dateLabel = formatArenaDate(arena.date)
+              const body = (
+                <>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-wood">
+                    Jour {String(arena.day).padStart(2, "0")}
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-foreground">
+                    {dateLabel}
+                  </p>
+                  <p
+                    className={`mt-2 text-sm ${
+                      arena.chesscomId ? "text-brand" : "text-ink-muted"
+                    }`}
+                  >
+                    {arena.chesscomId ? "Classement et parties" : "À venir"}
+                  </p>
+                </>
+              )
+
+              if (!arena.chesscomId) {
+                return (
+                  <li
+                    key={arena.day}
+                    className="rounded-xl border border-border bg-surface px-3 py-3"
+                  >
+                    {body}
+                  </li>
+                )
+              }
+
+              return (
+                <li key={arena.day}>
+                  <Link
+                    to="/prodige-league/arena/$day"
+                    params={{ day: String(arena.day) }}
+                    className="flex h-full flex-col rounded-xl border border-border bg-surface px-3 py-3 transition hover:border-wood"
+                  >
+                    {body}
+                  </Link>
+                </li>
+              )
+            })}
+          </ol>
         </section>
       </PageShell>
     </>
