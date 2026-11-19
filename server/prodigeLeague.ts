@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start"
 import { fetchPlayerSnapshot, type PlayerLookupResult } from "@/lib/chesscom"
 import {
-  loadProdigeArenaWinners,
+  loadProdigeArenaDigest,
+  type ProdigeArenaLeader,
   type ProdigeArenaWinner,
 } from "@/lib/prodigeArenaResults"
 import {
@@ -13,9 +14,14 @@ export type ProdigeArenaCardWinner = ProdigeArenaWinner & {
   avatarUrl: string | null
 }
 
+export type ProdigeArenaCardLeader = ProdigeArenaLeader & {
+  avatarUrl: string | null
+}
+
 export type ProdigeLeagueData = {
   players: ProdigeLeaguePlayer[]
   winners: ProdigeArenaCardWinner[]
+  leaders: ProdigeArenaCardLeader[]
 }
 
 const FETCH_CONCURRENCY = 8
@@ -71,26 +77,39 @@ function toPlayer(
   }
 }
 
-async function withWinnerAvatars(
-  winners: ProdigeArenaWinner[],
-): Promise<ProdigeArenaCardWinner[]> {
-  return mapWithConcurrency(winners, FETCH_CONCURRENCY, async (winner) => {
-    const snapshot = await fetchPlayerSnapshot(winner.username)
-    return {
-      ...winner,
-      avatarUrl: snapshot.avatarUrl,
-    }
-  })
+async function avatarMap(
+  usernames: string[],
+): Promise<Map<string, string | null>> {
+  const unique = [...new Set(usernames.map((username) => username.toLowerCase()))]
+  const snapshots = await mapWithConcurrency(
+    unique,
+    FETCH_CONCURRENCY,
+    (username) => fetchPlayerSnapshot(username),
+  )
+  return new Map(
+    unique.map((username, index) => [username, snapshots[index]?.avatarUrl ?? null]),
+  )
 }
 
 export const loadProdigeLeague = createServerFn({ method: "GET" }).handler(
   async (): Promise<ProdigeLeagueData> => {
-    const [registrations, rawWinners] = await Promise.all([
+    const [registrations, digest] = await Promise.all([
       listProdigeLeagueRegistrations(),
-      loadProdigeArenaWinners(),
+      loadProdigeArenaDigest(),
     ])
-    const winners = await withWinnerAvatars(rawWinners)
-    if (registrations.length === 0) return { players: [], winners }
+    const avatars = await avatarMap([
+      ...digest.winners.map((winner) => winner.username),
+      ...digest.leaders.map((leader) => leader.username),
+    ])
+    const winners = digest.winners.map((winner) => ({
+      ...winner,
+      avatarUrl: avatars.get(winner.username.toLowerCase()) ?? null,
+    }))
+    const leaders = digest.leaders.map((leader) => ({
+      ...leader,
+      avatarUrl: avatars.get(leader.username.toLowerCase()) ?? null,
+    }))
+    if (registrations.length === 0) return { players: [], winners, leaders }
 
     const players = await mapWithConcurrency(
       registrations,
@@ -101,6 +120,6 @@ export const loadProdigeLeague = createServerFn({ method: "GET" }).handler(
       },
     )
 
-    return { players: sortPlayers(players), winners }
+    return { players: sortPlayers(players), winners, leaders }
   },
 )

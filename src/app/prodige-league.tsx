@@ -116,7 +116,7 @@ function formatPoints(points: number): string {
 }
 
 function ProdigeLeaguePage() {
-  const { players, winners } = Route.useLoaderData()
+  const { players, winners, leaders } = Route.useLoaderData()
   const winnersByDay = new Map(winners.map((winner) => [winner.day, winner]))
 
   return (
@@ -230,6 +230,79 @@ function ProdigeLeaguePage() {
           </ol>
         </section>
 
+        <section aria-labelledby="standings-heading" className="mb-10">
+          <h2
+            id="standings-heading"
+            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
+          >
+            Classement général
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted">
+            Top 10 des points accumulés sur les arènes terminées.
+          </p>
+          {leaders.length === 0 ? (
+            <p className="mt-4 rounded-xl border border-dashed border-border bg-surface px-4 py-8 text-center text-sm text-ink-muted">
+              Le classement apparaîtra après la première arène.
+            </p>
+          ) : (
+            <ol className="mt-4 overflow-hidden rounded-xl border border-border bg-surface">
+              {leaders.map((leader) => (
+                <li
+                  key={leader.username}
+                  className="border-b border-border last:border-b-0"
+                >
+                  <a
+                    href={leader.profileUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group flex items-center gap-3 px-3 py-3 transition hover:bg-brand-muted/40 sm:gap-4 sm:px-4"
+                  >
+                    <span className="w-8 shrink-0 text-center font-mono text-sm tabular-nums text-ink-muted sm:w-10">
+                      {leader.rank}
+                    </span>
+                    <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-border bg-surface-muted">
+                      {leader.avatarUrl ? (
+                        <img
+                          src={leader.avatarUrl}
+                          alt=""
+                          width={40}
+                          height={40}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-full w-full items-center justify-center text-sm font-semibold text-ink-muted">
+                          {leader.username.slice(0, 1).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium text-foreground group-hover:text-brand group-hover:underline">
+                        {leader.username}
+                      </p>
+                      <p className="mt-0.5 truncate text-xs text-ink-muted">
+                        {leader.days
+                          .map(
+                            (day) =>
+                              `J${day.day} ${formatPoints(day.points)}`,
+                          )
+                          .join(" · ")}
+                      </p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="font-mono text-base font-semibold tabular-nums text-foreground sm:text-lg">
+                        {formatPoints(leader.points)}
+                      </p>
+                      <p className="text-[11px] uppercase tracking-wide text-ink-muted">
+                        Pts
+                      </p>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          )}
+        </section>
+
         <section aria-labelledby="path-heading" className="mb-10">
           <h2
             id="path-heading"
@@ -295,8 +368,8 @@ function ProdigeLeaguePage() {
           <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground sm:text-base sm:leading-7">
             Prodige League is an individual online rapid tournament (10+0) on
             Chess.com, from 15 November to 31 December 2026 in Cameroon.
-            Registration is closed. The arenas, the season path, and the
-            format are above.
+            Registration is closed. The arenas and the overall top 10 are
+            above, followed by the season path and the format.
           </p>
         </section>
 

@@ -451,23 +451,104 @@ export type ProdigeArenaWinner = {
   profileUrl: string
 }
 
-/** First-place player of each finished arena. Upcoming days are omitted. */
-export async function loadProdigeArenaWinners(): Promise<ProdigeArenaWinner[]> {
-  const winners: ProdigeArenaWinner[] = []
+export type ProdigeArenaLeaderDay = {
+  day: number
+  points: number
+}
+
+export type ProdigeArenaLeader = {
+  rank: number
+  username: string
+  points: number
+  profileUrl: string
+  days: ProdigeArenaLeaderDay[]
+}
+
+const GENERAL_TOP = 10
+
+async function loadFinishedArenas(): Promise<ProdigeArenaView[]> {
+  const views: ProdigeArenaView[] = []
   for (const arena of PRODIGE_ARENAS) {
     if (!arena.chesscomId) continue
     const view = await loadProdigeArenaResults(String(arena.day))
     if (!view || view.statusLabel !== "Terminée" || view.players.length === 0) {
       continue
     }
+    views.push(view)
+  }
+  return views
+}
+
+/** First-place player of each finished arena, plus the overall top 10. */
+export async function loadProdigeArenaDigest(): Promise<{
+  winners: ProdigeArenaWinner[]
+  leaders: ProdigeArenaLeader[]
+}> {
+  const views = await loadFinishedArenas()
+  const winners: ProdigeArenaWinner[] = views.map((view) => {
     const first =
       view.players.find((player) => player.place === 1) ?? view.players[0]
-    winners.push({
-      day: arena.day,
+    return {
+      day: view.day,
       username: first.username,
       points: first.points,
       profileUrl: first.profileUrl,
-    })
+    }
+  })
+
+  const byUser = new Map<
+    string,
+    {
+      username: string
+      points: number
+      profileUrl: string
+      sourceDay: number
+      days: ProdigeArenaLeaderDay[]
+    }
+  >()
+
+  for (const view of views) {
+    for (const player of view.players) {
+      const key = player.username.toLowerCase()
+      const row = byUser.get(key) ?? {
+        username: player.username,
+        points: 0,
+        profileUrl: player.profileUrl,
+        sourceDay: view.day,
+        days: [],
+      }
+      row.points += player.points
+      row.days.push({ day: view.day, points: player.points })
+      if (view.day >= row.sourceDay) {
+        row.username = player.username
+        row.profileUrl = player.profileUrl
+        row.sourceDay = view.day
+      }
+      byUser.set(key, row)
+    }
   }
-  return winners
+
+  const sorted = [...byUser.values()].sort((a, b) => {
+    if (a.points !== b.points) return b.points - a.points
+    if (a.days.length !== b.days.length) return b.days.length - a.days.length
+    return a.username.localeCompare(b.username, "fr", { sensitivity: "base" })
+  })
+
+  let rank = 0
+  let previousPoints: number | null = null
+  const leaders = sorted.slice(0, GENERAL_TOP).map((row, index) => {
+    if (previousPoints !== row.points) {
+      rank = index + 1
+      previousPoints = row.points
+    }
+    return {
+      rank,
+      username: row.username,
+      points: row.points,
+      profileUrl: row.profileUrl,
+      days: [...row.days].sort((a, b) => a.day - b.day),
+    }
+  })
+
+  return { winners, leaders }
 }
