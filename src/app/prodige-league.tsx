@@ -122,7 +122,7 @@ function ProdigeLeaguePage() {
   return (
     <>
       <section className="hero-prodige relative overflow-hidden text-white">
-        <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col px-4 py-10 pb-16 sm:px-6 sm:py-14 sm:pb-20">
+        <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col px-4 py-10 sm:px-6 sm:py-14">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#e0b45a]">
             Un seul objectif : le titre
           </p>
@@ -139,98 +139,8 @@ function ProdigeLeaguePage() {
         </div>
       </section>
 
-      <PageShell className="pt-0 sm:pt-0">
-        <section
-          aria-labelledby="english-summary-heading"
-          className="relative z-10 -mt-8 mb-10 rounded-xl border border-border bg-surface p-4 shadow-sm sm:-mt-10 sm:p-5"
-        >
-          <h2
-            id="english-summary-heading"
-            className="text-xs font-semibold uppercase tracking-[0.16em] text-wood"
-          >
-            In English
-          </h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground sm:text-base sm:leading-7">
-            Prodige League is an individual online rapid tournament (10+0) on
-            Chess.com, from 15 November to 31 December 2026 in Cameroon.
-            Registration on this page is closed. The French sections below
-            cover the format, the season path, the organisers, and the six
-            arena dates.
-          </p>
-        </section>
-
-        <ProdigeLeagueSignup players={players} />
-
-        <section aria-labelledby="facts-heading" className="mb-10">
-          <h2
-            id="facts-heading"
-            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
-          >
-            Jouer, apprendre, progresser, devenir prodige
-          </h2>
-          <ul className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-5">
-            {FACTS.map((fact) => (
-              <li
-                key={fact.label}
-                className="rounded-xl border border-border bg-surface px-3 py-3"
-              >
-                <p className="text-xs font-medium uppercase tracking-wide text-ink-muted">
-                  {fact.label}
-                </p>
-                <p className="mt-1 text-sm font-semibold text-foreground">
-                  {fact.value}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section aria-labelledby="path-heading" className="mb-10">
-          <h2
-            id="path-heading"
-            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
-          >
-            Le parcours de la saison
-          </h2>
-          <ol className="mt-4 grid gap-3 md:grid-cols-5">
-            {STEPS.map((step, index) => (
-              <li
-                key={step.title}
-                className="rounded-xl border border-border bg-surface px-3 py-3"
-              >
-                <p className="text-xs font-semibold text-wood">
-                  {String(index + 1).padStart(2, "0")}
-                </p>
-                <p className="mt-1 text-sm font-semibold text-foreground">
-                  {step.title}
-                </p>
-                <p className="mt-1 text-sm text-ink-muted">{step.detail}</p>
-                {"note" in step ? (
-                  <p className="mt-0.5 text-xs text-ink-muted">{step.note}</p>
-                ) : null}
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        <section aria-labelledby="partners-heading" className="mb-10">
-          <h2
-            id="partners-heading"
-            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
-          >
-            Organisation & partenaires
-          </h2>
-          <ul className="mt-4 divide-y divide-border border-y border-border">
-            {PARTNERS.map((partner) => (
-              <li key={partner.name} className="py-3">
-                <p className="font-medium text-foreground">{partner.name}</p>
-                <p className="text-sm text-ink-muted">{partner.detail}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section aria-labelledby="arenas-heading" className="mb-4">
+      <PageShell>
+        <section aria-labelledby="arenas-heading" className="mb-10">
           <h2
             id="arenas-heading"
             className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
@@ -319,6 +229,95 @@ function ProdigeLeaguePage() {
             })}
           </ol>
         </section>
+
+        <section aria-labelledby="path-heading" className="mb-10">
+          <h2
+            id="path-heading"
+            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
+          >
+            Le parcours de la saison
+          </h2>
+          <ol className="mt-4 grid gap-3 md:grid-cols-5">
+            {STEPS.map((step, index) => (
+              <li
+                key={step.title}
+                className="rounded-xl border border-border bg-surface px-3 py-3"
+              >
+                <p className="text-xs font-semibold text-wood">
+                  {String(index + 1).padStart(2, "0")}
+                </p>
+                <p className="mt-1 text-sm font-semibold text-foreground">
+                  {step.title}
+                </p>
+                <p className="mt-1 text-sm text-ink-muted">{step.detail}</p>
+                {"note" in step ? (
+                  <p className="mt-0.5 text-xs text-ink-muted">{step.note}</p>
+                ) : null}
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section aria-labelledby="facts-heading" className="mb-10">
+          <h2
+            id="facts-heading"
+            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
+          >
+            Jouer, apprendre, progresser, devenir prodige
+          </h2>
+          <ul className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-5">
+            {FACTS.map((fact) => (
+              <li
+                key={fact.label}
+                className="rounded-xl border border-border bg-surface px-3 py-3"
+              >
+                <p className="text-xs font-medium uppercase tracking-wide text-ink-muted">
+                  {fact.label}
+                </p>
+                <p className="mt-1 text-sm font-semibold text-foreground">
+                  {fact.value}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section
+          aria-labelledby="english-summary-heading"
+          className="mb-10 rounded-xl border border-border bg-surface p-4 sm:p-5"
+        >
+          <h2
+            id="english-summary-heading"
+            className="text-xs font-semibold uppercase tracking-[0.16em] text-wood"
+          >
+            In English
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground sm:text-base sm:leading-7">
+            Prodige League is an individual online rapid tournament (10+0) on
+            Chess.com, from 15 November to 31 December 2026 in Cameroon.
+            Registration is closed. The arenas, the season path, and the
+            format are above.
+          </p>
+        </section>
+
+        <section aria-labelledby="partners-heading" className="mb-10">
+          <h2
+            id="partners-heading"
+            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
+          >
+            Organisation & partenaires
+          </h2>
+          <ul className="mt-4 divide-y divide-border border-y border-border">
+            {PARTNERS.map((partner) => (
+              <li key={partner.name} className="py-3">
+                <p className="font-medium text-foreground">{partner.name}</p>
+                <p className="text-sm text-ink-muted">{partner.detail}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <ProdigeLeagueSignup players={players} />
       </PageShell>
     </>
   )

@@ -108,60 +108,79 @@ export function ProdigeLeagueSignup({
   const remaining = Math.max(0, players.length - visibleCount)
   const nextBatch = Math.min(PAGE_SIZE, remaining)
 
+  const countLabel = `${players.length} ${players.length === 1 ? "joueur" : "joueurs"}`
+
   return (
-    <section aria-labelledby="inscription-heading" id="inscription" className="mb-10">
-      <h2
-        id="inscription-heading"
-        className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
-      >
-        Inscription
-      </h2>
-      <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted sm:text-base">
-        Les inscriptions sont closes. La liste est classée par Elo rapide, la
-        cadence de la saison.
-      </p>
-
-      <div className="mt-6 flex items-end justify-between gap-3">
-        <h3 className="font-display text-lg font-semibold tracking-tight">
-          Joueurs inscrits
-        </h3>
-        <p className="text-sm text-ink-muted">
-          {players.length} {players.length === 1 ? "joueur" : "joueurs"}
-        </p>
-      </div>
-
-      {players.length === 0 ? (
-        <p className="mt-3 rounded-xl border border-dashed border-border bg-surface px-4 py-10 text-center text-sm text-ink-muted">
-          Aucun joueur inscrit pour le moment.
-        </p>
-      ) : (
-        <>
-          <ol className="mt-3 overflow-hidden rounded-xl border border-border bg-surface">
-            {visible.map((player, index) => (
-              <PlayerRow
-                key={player.username}
-                player={player}
-                rank={index + 1}
+    <section id="inscription" className="mb-4">
+      <details className="group rounded-xl border border-border bg-surface">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 [&::-webkit-details-marker]:hidden">
+          <span>
+            <span className="font-display block text-lg font-semibold tracking-tight">
+              Inscription
+            </span>
+            <span className="mt-0.5 block text-sm text-ink-muted">
+              Les inscriptions sont closes.
+            </span>
+          </span>
+          <span className="flex shrink-0 items-center gap-3">
+            <span className="text-sm text-ink-muted">{countLabel}</span>
+            <svg
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden
+              className="h-4 w-4 text-ink-muted transition group-open:rotate-180"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z"
+                clipRule="evenodd"
               />
-            ))}
-          </ol>
-          {remaining > 0 ? (
-            <div className="mt-4 flex justify-center">
-              <button
-                type="button"
-                onClick={() =>
-                  setVisibleCount((count) =>
-                    Math.min(players.length, count + PAGE_SIZE),
-                  )
-                }
-                className="inline-flex items-center justify-center rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition hover:border-brand/40 hover:bg-brand-muted/50"
-              >
-                Voir plus ({nextBatch})
-              </button>
-            </div>
-          ) : null}
-        </>
-      )}
+            </svg>
+          </span>
+        </summary>
+
+        <div className="border-t border-border px-4 py-4">
+          <p className="max-w-2xl text-sm leading-6 text-ink-muted">
+            La liste est classée par Elo rapide, la cadence de la saison.
+          </p>
+          <h3 className="mt-4 font-display text-lg font-semibold tracking-tight">
+            Joueurs inscrits
+          </h3>
+
+          {players.length === 0 ? (
+            <p className="mt-3 rounded-xl border border-dashed border-border bg-surface px-4 py-10 text-center text-sm text-ink-muted">
+              Aucun joueur inscrit pour le moment.
+            </p>
+          ) : (
+            <>
+              <ol className="mt-3 overflow-hidden rounded-xl border border-border">
+                {visible.map((player, index) => (
+                  <PlayerRow
+                    key={player.username}
+                    player={player}
+                    rank={index + 1}
+                  />
+                ))}
+              </ol>
+              {remaining > 0 ? (
+                <div className="mt-4 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setVisibleCount((count) =>
+                        Math.min(players.length, count + PAGE_SIZE),
+                      )
+                    }
+                    className="inline-flex items-center justify-center rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition hover:border-brand/40 hover:bg-brand-muted/50"
+                  >
+                    Voir plus ({nextBatch})
+                  </button>
+                </div>
+              ) : null}
+            </>
+          )}
+        </div>
+      </details>
     </section>
   )
 }
