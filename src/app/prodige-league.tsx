@@ -116,13 +116,13 @@ function formatPoints(points: number): string {
 }
 
 function ProdigeLeaguePage() {
-  const { players, winners } = Route.useLoaderData()
+  const { players, winners, leaders } = Route.useLoaderData()
   const winnersByDay = new Map(winners.map((winner) => [winner.day, winner]))
 
   return (
     <>
       <section className="hero-prodige relative overflow-hidden text-white">
-        <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col px-4 py-10 pb-16 sm:px-6 sm:py-14 sm:pb-20">
+        <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col px-4 py-10 sm:px-6 sm:py-14">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#e0b45a]">
             Un seul objectif : le titre
           </p>
@@ -139,98 +139,8 @@ function ProdigeLeaguePage() {
         </div>
       </section>
 
-      <PageShell className="pt-0 sm:pt-0">
-        <section
-          aria-labelledby="english-summary-heading"
-          className="relative z-10 -mt-8 mb-10 rounded-xl border border-border bg-surface p-4 shadow-sm sm:-mt-10 sm:p-5"
-        >
-          <h2
-            id="english-summary-heading"
-            className="text-xs font-semibold uppercase tracking-[0.16em] text-wood"
-          >
-            In English
-          </h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground sm:text-base sm:leading-7">
-            Prodige League is an individual online rapid tournament (10+0) on
-            Chess.com, from 15 November to 31 December 2026 in Cameroon.
-            Registration on this page is closed. The French sections below
-            cover the format, the season path, the organisers, and the six
-            arena dates.
-          </p>
-        </section>
-
-        <ProdigeLeagueSignup players={players} />
-
-        <section aria-labelledby="facts-heading" className="mb-10">
-          <h2
-            id="facts-heading"
-            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
-          >
-            Jouer, apprendre, progresser, devenir prodige
-          </h2>
-          <ul className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-5">
-            {FACTS.map((fact) => (
-              <li
-                key={fact.label}
-                className="rounded-xl border border-border bg-surface px-3 py-3"
-              >
-                <p className="text-xs font-medium uppercase tracking-wide text-ink-muted">
-                  {fact.label}
-                </p>
-                <p className="mt-1 text-sm font-semibold text-foreground">
-                  {fact.value}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section aria-labelledby="path-heading" className="mb-10">
-          <h2
-            id="path-heading"
-            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
-          >
-            Le parcours de la saison
-          </h2>
-          <ol className="mt-4 grid gap-3 md:grid-cols-5">
-            {STEPS.map((step, index) => (
-              <li
-                key={step.title}
-                className="rounded-xl border border-border bg-surface px-3 py-3"
-              >
-                <p className="text-xs font-semibold text-wood">
-                  {String(index + 1).padStart(2, "0")}
-                </p>
-                <p className="mt-1 text-sm font-semibold text-foreground">
-                  {step.title}
-                </p>
-                <p className="mt-1 text-sm text-ink-muted">{step.detail}</p>
-                {"note" in step ? (
-                  <p className="mt-0.5 text-xs text-ink-muted">{step.note}</p>
-                ) : null}
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        <section aria-labelledby="partners-heading" className="mb-10">
-          <h2
-            id="partners-heading"
-            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
-          >
-            Organisation & partenaires
-          </h2>
-          <ul className="mt-4 divide-y divide-border border-y border-border">
-            {PARTNERS.map((partner) => (
-              <li key={partner.name} className="py-3">
-                <p className="font-medium text-foreground">{partner.name}</p>
-                <p className="text-sm text-ink-muted">{partner.detail}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section aria-labelledby="arenas-heading" className="mb-4">
+      <PageShell>
+        <section aria-labelledby="arenas-heading" className="mb-10">
           <h2
             id="arenas-heading"
             className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
@@ -319,6 +229,168 @@ function ProdigeLeaguePage() {
             })}
           </ol>
         </section>
+
+        <section aria-labelledby="standings-heading" className="mb-10">
+          <h2
+            id="standings-heading"
+            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
+          >
+            Classement général
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted">
+            Top 10 des points accumulés sur les arènes terminées.
+          </p>
+          {leaders.length === 0 ? (
+            <p className="mt-4 rounded-xl border border-dashed border-border bg-surface px-4 py-8 text-center text-sm text-ink-muted">
+              Le classement apparaîtra après la première arène.
+            </p>
+          ) : (
+            <ol className="mt-4 overflow-hidden rounded-xl border border-border bg-surface">
+              {leaders.map((leader) => (
+                <li
+                  key={leader.username}
+                  className="border-b border-border last:border-b-0"
+                >
+                  <a
+                    href={leader.profileUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group flex items-center gap-3 px-3 py-3 transition hover:bg-brand-muted/40 sm:gap-4 sm:px-4"
+                  >
+                    <span className="w-8 shrink-0 text-center font-mono text-sm tabular-nums text-ink-muted sm:w-10">
+                      {leader.rank}
+                    </span>
+                    <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-border bg-surface-muted">
+                      {leader.avatarUrl ? (
+                        <img
+                          src={leader.avatarUrl}
+                          alt=""
+                          width={40}
+                          height={40}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-full w-full items-center justify-center text-sm font-semibold text-ink-muted">
+                          {leader.username.slice(0, 1).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium text-foreground group-hover:text-brand group-hover:underline">
+                        {leader.username}
+                      </p>
+                      <p className="mt-0.5 truncate text-xs text-ink-muted">
+                        {leader.days
+                          .map(
+                            (day) =>
+                              `J${day.day} ${formatPoints(day.points)}`,
+                          )
+                          .join(" · ")}
+                      </p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="font-mono text-base font-semibold tabular-nums text-foreground sm:text-lg">
+                        {formatPoints(leader.points)}
+                      </p>
+                      <p className="text-[11px] uppercase tracking-wide text-ink-muted">
+                        Pts
+                      </p>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          )}
+        </section>
+
+        <section aria-labelledby="path-heading" className="mb-10">
+          <h2
+            id="path-heading"
+            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
+          >
+            Le parcours de la saison
+          </h2>
+          <ol className="mt-4 grid gap-3 md:grid-cols-5">
+            {STEPS.map((step, index) => (
+              <li
+                key={step.title}
+                className="rounded-xl border border-border bg-surface px-3 py-3"
+              >
+                <p className="text-xs font-semibold text-wood">
+                  {String(index + 1).padStart(2, "0")}
+                </p>
+                <p className="mt-1 text-sm font-semibold text-foreground">
+                  {step.title}
+                </p>
+                <p className="mt-1 text-sm text-ink-muted">{step.detail}</p>
+                {"note" in step ? (
+                  <p className="mt-0.5 text-xs text-ink-muted">{step.note}</p>
+                ) : null}
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section aria-labelledby="facts-heading" className="mb-10">
+          <h2
+            id="facts-heading"
+            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
+          >
+            Jouer, apprendre, progresser, devenir prodige
+          </h2>
+          <ul className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-5">
+            {FACTS.map((fact) => (
+              <li
+                key={fact.label}
+                className="rounded-xl border border-border bg-surface px-3 py-3"
+              >
+                <p className="text-xs font-medium uppercase tracking-wide text-ink-muted">
+                  {fact.label}
+                </p>
+                <p className="mt-1 text-sm font-semibold text-foreground">
+                  {fact.value}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section
+          aria-labelledby="english-summary-heading"
+          className="mb-10 rounded-xl border border-border bg-surface p-4 sm:p-5"
+        >
+          <h2
+            id="english-summary-heading"
+            className="text-xs font-semibold uppercase tracking-[0.16em] text-wood"
+          >
+            In English
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground sm:text-base sm:leading-7">
+            Prodige League is an individual online rapid tournament (10+0) on
+            Chess.com, from 15 November to 31 December 2026 in Cameroon.
+            Registration is closed. The arenas and the overall top 10 are
+            above, followed by the season path and the format.
+          </p>
+        </section>
+
+        <section aria-labelledby="partners-heading" className="mb-10">
+          <h2
+            id="partners-heading"
+            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
+          >
+            Organisation & partenaires
+          </h2>
+          <ul className="mt-4 divide-y divide-border border-y border-border">
+            {PARTNERS.map((partner) => (
+              <li key={partner.name} className="py-3">
+                <p className="font-medium text-foreground">{partner.name}</p>
+                <p className="text-sm text-ink-muted">{partner.detail}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <ProdigeLeagueSignup players={players} />
       </PageShell>
     </>
   )
