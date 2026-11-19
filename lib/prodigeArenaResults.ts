@@ -4,6 +4,7 @@ import {
   chesscomArenaUrl,
   formatArenaDate,
   getProdigeArena,
+  PRODIGE_ARENAS,
   type ProdigeArenaDay,
   type ProdigeArenaView,
 } from "./prodigeArenaSchedule"
@@ -441,4 +442,32 @@ export async function loadProdigeArenaResults(
     arena,
     "Les résultats n'ont pas pu être chargés depuis Chess.com.",
   )
+}
+
+export type ProdigeArenaWinner = {
+  day: number
+  username: string
+  points: number
+  profileUrl: string
+}
+
+/** First-place player of each finished arena. Upcoming days are omitted. */
+export async function loadProdigeArenaWinners(): Promise<ProdigeArenaWinner[]> {
+  const winners: ProdigeArenaWinner[] = []
+  for (const arena of PRODIGE_ARENAS) {
+    if (!arena.chesscomId) continue
+    const view = await loadProdigeArenaResults(String(arena.day))
+    if (!view || view.statusLabel !== "Terminée" || view.players.length === 0) {
+      continue
+    }
+    const first =
+      view.players.find((player) => player.place === 1) ?? view.players[0]
+    winners.push({
+      day: arena.day,
+      username: first.username,
+      points: first.points,
+      profileUrl: first.profileUrl,
+    })
+  }
+  return winners
 }

@@ -111,8 +111,13 @@ export const Route = createFileRoute("/prodige-league")({
   component: ProdigeLeaguePage,
 })
 
+function formatPoints(points: number): string {
+  return Number.isInteger(points) ? String(points) : points.toFixed(1)
+}
+
 function ProdigeLeaguePage() {
-  const { players } = Route.useLoaderData()
+  const { players, winners } = Route.useLoaderData()
+  const winnersByDay = new Map(winners.map((winner) => [winner.day, winner]))
 
   return (
     <>
@@ -240,6 +245,7 @@ function ProdigeLeaguePage() {
           <ol className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {PRODIGE_ARENAS.map((arena) => {
               const dateLabel = formatArenaDate(arena.date)
+              const winner = winnersByDay.get(arena.day)
               const body = (
                 <>
                   <p className="text-xs font-semibold uppercase tracking-wide text-wood">
@@ -248,6 +254,36 @@ function ProdigeLeaguePage() {
                   <p className="mt-1 text-sm font-semibold text-foreground">
                     {dateLabel}
                   </p>
+                  {winner ? (
+                    <div className="mt-3 flex items-center gap-2.5">
+                      <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full border border-border bg-surface-muted">
+                        {winner.avatarUrl ? (
+                          <img
+                            src={winner.avatarUrl}
+                            alt=""
+                            width={36}
+                            height={36}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span className="flex h-full w-full items-center justify-center text-sm font-semibold text-ink-muted">
+                            {winner.username.slice(0, 1).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-wood">
+                          1er
+                        </p>
+                        <p className="truncate text-sm font-medium text-foreground">
+                          {winner.username}
+                        </p>
+                        <p className="text-xs tabular-nums text-ink-muted">
+                          {formatPoints(winner.points)} pts
+                        </p>
+                      </div>
+                    </div>
+                  ) : null}
                   <p
                     className={`mt-2 text-sm ${
                       arena.chesscomId ? "text-brand" : "text-ink-muted"

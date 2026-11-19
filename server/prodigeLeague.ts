@@ -1,12 +1,21 @@
 import { createServerFn } from "@tanstack/react-start"
 import { fetchPlayerSnapshot, type PlayerLookupResult } from "@/lib/chesscom"
 import {
+  loadProdigeArenaWinners,
+  type ProdigeArenaWinner,
+} from "@/lib/prodigeArenaResults"
+import {
   listProdigeLeagueRegistrations,
   type ProdigeLeaguePlayer,
 } from "@/lib/prodigeLeague"
 
+export type ProdigeArenaCardWinner = ProdigeArenaWinner & {
+  avatarUrl: string | null
+}
+
 export type ProdigeLeagueData = {
   players: ProdigeLeaguePlayer[]
+  winners: ProdigeArenaCardWinner[]
 }
 
 const FETCH_CONCURRENCY = 8
@@ -62,10 +71,26 @@ function toPlayer(
   }
 }
 
+async function withWinnerAvatars(
+  winners: ProdigeArenaWinner[],
+): Promise<ProdigeArenaCardWinner[]> {
+  return mapWithConcurrency(winners, FETCH_CONCURRENCY, async (winner) => {
+    const snapshot = await fetchPlayerSnapshot(winner.username)
+    return {
+      ...winner,
+      avatarUrl: snapshot.avatarUrl,
+    }
+  })
+}
+
 export const loadProdigeLeague = createServerFn({ method: "GET" }).handler(
   async (): Promise<ProdigeLeagueData> => {
-    const registrations = await listProdigeLeagueRegistrations()
-    if (registrations.length === 0) return { players: [] }
+    const [registrations, rawWinners] = await Promise.all([
+      listProdigeLeagueRegistrations(),
+      loadProdigeArenaWinners(),
+    ])
+    const winners = await withWinnerAvatars(rawWinners)
+    if (registrations.length === 0) return { players: [], winners }
 
     const players = await mapWithConcurrency(
       registrations,
@@ -76,6 +101,6 @@ export const loadProdigeLeague = createServerFn({ method: "GET" }).handler(
       },
     )
 
-    return { players: sortPlayers(players) }
+    return { players: sortPlayers(players), winners }
   },
 )
