@@ -233,8 +233,9 @@ function ProdigeLeaguePage() {
             Les arènes
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted">
-            Six journées de qualification sur Chess.com. La première a eu lieu
-            le 15 novembre 2026. Les dates des suivantes restent à définir.
+            Six journées de qualification sur Chess.com. Les deux premières ont
+            eu lieu le 15 et le 19 novembre 2026. Les dates des suivantes
+            restent à définir.
           </p>
           <ol className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {PRODIGE_ARENAS.map((arena) => {

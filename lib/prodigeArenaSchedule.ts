@@ -1,11 +1,15 @@
-/** Qualification arenas for Prodige League 2026. Days 2–6 stay undated until announced. */
+/** Qualification arenas for Prodige League 2026. Days 3–6 stay undated until announced. */
 export const PRODIGE_ARENAS = [
   {
     day: 1,
     date: "2026-11-15",
     chesscomId: "prodige-league-31120826",
   },
-  { day: 2, date: null, chesscomId: null },
+  {
+    day: 2,
+    date: "2026-11-19",
+    chesscomId: "prodige-league-2-31202506",
+  },
   { day: 3, date: null, chesscomId: null },
   { day: 4, date: null, chesscomId: null },
   { day: 5, date: null, chesscomId: null },
