@@ -6,7 +6,10 @@ import {
   formatArenaDate,
   PRODIGE_ARENAS,
 } from "@/lib/prodigeArenaSchedule"
-import { loadProdigeLeague } from "@/server/prodigeLeague"
+import {
+  loadProdigeLeague,
+  type ProdigeArenaCardLeader,
+} from "@/server/prodigeLeague"
 
 const TITLE =
   "Prodige League 2026 | Tournoi d'échecs en ligne au Cameroun"
@@ -115,8 +118,70 @@ function formatPoints(points: number): string {
   return Number.isInteger(points) ? String(points) : points.toFixed(1)
 }
 
+function StandingRow({
+  player,
+  label,
+}: {
+  player: ProdigeArenaCardLeader
+  label: string
+}) {
+  return (
+    <li className="border-b border-border last:border-b-0">
+      <a
+        href={player.profileUrl}
+        target="_blank"
+        rel="noreferrer"
+        className="group flex items-center gap-3 px-3 py-3 transition hover:bg-brand-muted/40 sm:gap-4 sm:px-4"
+      >
+        <span
+          className={
+            /^\d+$/.test(label)
+              ? "w-8 shrink-0 text-center font-mono text-sm tabular-nums text-ink-muted sm:w-10"
+              : "w-12 shrink-0 text-center text-[10px] font-semibold uppercase leading-tight tracking-wide text-ink-muted"
+          }
+        >
+          {label}
+        </span>
+        <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-border bg-surface-muted">
+          {player.avatarUrl ? (
+            <img
+              src={player.avatarUrl}
+              alt=""
+              width={40}
+              height={40}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <span className="flex h-full w-full items-center justify-center text-sm font-semibold text-ink-muted">
+              {player.username.slice(0, 1).toUpperCase()}
+            </span>
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-medium text-foreground group-hover:text-brand group-hover:underline">
+            {player.username}
+          </p>
+          <p className="mt-0.5 truncate text-xs text-ink-muted">
+            {player.days
+              .map((day) => `J${day.day} ${formatPoints(day.points)}`)
+              .join(" · ")}
+          </p>
+        </div>
+        <div className="shrink-0 text-right">
+          <p className="font-mono text-base font-semibold tabular-nums text-foreground sm:text-lg">
+            {formatPoints(player.points)}
+          </p>
+          <p className="text-[11px] uppercase tracking-wide text-ink-muted">
+            Pts
+          </p>
+        </div>
+      </a>
+    </li>
+  )
+}
+
 function ProdigeLeaguePage() {
-  const { players, winners, leaders } = Route.useLoaderData()
+  const { players, winners, leaders, banned } = Route.useLoaderData()
   const winnersByDay = new Map(winners.map((winner) => [winner.day, winner]))
 
   return (
@@ -247,60 +312,34 @@ function ProdigeLeaguePage() {
           ) : (
             <ol className="mt-4 overflow-hidden rounded-xl border border-border bg-surface">
               {leaders.map((leader) => (
-                <li
+                <StandingRow
                   key={leader.username}
-                  className="border-b border-border last:border-b-0"
-                >
-                  <a
-                    href={leader.profileUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="group flex items-center gap-3 px-3 py-3 transition hover:bg-brand-muted/40 sm:gap-4 sm:px-4"
-                  >
-                    <span className="w-8 shrink-0 text-center font-mono text-sm tabular-nums text-ink-muted sm:w-10">
-                      {leader.rank}
-                    </span>
-                    <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-border bg-surface-muted">
-                      {leader.avatarUrl ? (
-                        <img
-                          src={leader.avatarUrl}
-                          alt=""
-                          width={40}
-                          height={40}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <span className="flex h-full w-full items-center justify-center text-sm font-semibold text-ink-muted">
-                          {leader.username.slice(0, 1).toUpperCase()}
-                        </span>
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium text-foreground group-hover:text-brand group-hover:underline">
-                        {leader.username}
-                      </p>
-                      <p className="mt-0.5 truncate text-xs text-ink-muted">
-                        {leader.days
-                          .map(
-                            (day) =>
-                              `J${day.day} ${formatPoints(day.points)}`,
-                          )
-                          .join(" · ")}
-                      </p>
-                    </div>
-                    <div className="shrink-0 text-right">
-                      <p className="font-mono text-base font-semibold tabular-nums text-foreground sm:text-lg">
-                        {formatPoints(leader.points)}
-                      </p>
-                      <p className="text-[11px] uppercase tracking-wide text-ink-muted">
-                        Pts
-                      </p>
-                    </div>
-                  </a>
-                </li>
+                  player={leader}
+                  label={String(leader.rank)}
+                />
               ))}
             </ol>
           )}
+          {banned.length > 0 ? (
+            <div className="mt-6">
+              <h3 className="text-sm font-semibold text-foreground">
+                Joueurs bannis
+              </h3>
+              <p className="mt-1 text-sm leading-6 text-ink-muted">
+                Exclus du top 16. Leurs points ne comptent pas pour la
+                qualification.
+              </p>
+              <ul className="mt-3 overflow-hidden rounded-xl border border-border bg-surface">
+                {banned.map((player) => (
+                  <StandingRow
+                    key={player.username}
+                    player={player}
+                    label="Banni"
+                  />
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </section>
 
         <section aria-labelledby="path-heading" className="mb-10">

@@ -22,6 +22,7 @@ export type ProdigeLeagueData = {
   players: ProdigeLeaguePlayer[]
   winners: ProdigeArenaCardWinner[]
   leaders: ProdigeArenaCardLeader[]
+  banned: ProdigeArenaCardLeader[]
 }
 
 const FETCH_CONCURRENCY = 8
@@ -100,16 +101,19 @@ export const loadProdigeLeague = createServerFn({ method: "GET" }).handler(
     const avatars = await avatarMap([
       ...digest.winners.map((winner) => winner.username),
       ...digest.leaders.map((leader) => leader.username),
+      ...digest.banned.map((player) => player.username),
     ])
     const winners = digest.winners.map((winner) => ({
       ...winner,
       avatarUrl: avatars.get(winner.username.toLowerCase()) ?? null,
     }))
-    const leaders = digest.leaders.map((leader) => ({
+    const withAvatar = (leader: ProdigeArenaLeader): ProdigeArenaCardLeader => ({
       ...leader,
       avatarUrl: avatars.get(leader.username.toLowerCase()) ?? null,
-    }))
-    if (registrations.length === 0) return { players: [], winners, leaders }
+    })
+    const leaders = digest.leaders.map(withAvatar)
+    const banned = digest.banned.map(withAvatar)
+    if (registrations.length === 0) return { players: [], winners, leaders, banned }
 
     const players = await mapWithConcurrency(
       registrations,
@@ -120,6 +124,6 @@ export const loadProdigeLeague = createServerFn({ method: "GET" }).handler(
       },
     )
 
-    return { players: sortPlayers(players), winners, leaders }
+    return { players: sortPlayers(players), winners, leaders, banned }
   },
 )

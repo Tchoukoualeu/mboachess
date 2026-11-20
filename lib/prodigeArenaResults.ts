@@ -466,6 +466,13 @@ export type ProdigeArenaLeader = {
 
 const GENERAL_TOP = 16
 
+/** Excluded from the overall top 16. Arena result pages stay unchanged. */
+const BANNED_USERNAMES = new Set(["m_sergeaubry"])
+
+function isBannedUsername(username: string): boolean {
+  return BANNED_USERNAMES.has(username.toLowerCase())
+}
+
 async function loadFinishedArenas(): Promise<ProdigeArenaView[]> {
   const views: ProdigeArenaView[] = []
   for (const arena of PRODIGE_ARENAS) {
@@ -479,10 +486,48 @@ async function loadFinishedArenas(): Promise<ProdigeArenaView[]> {
   return views
 }
 
+function toLeader(
+  row: {
+    username: string
+    points: number
+    profileUrl: string
+    days: ProdigeArenaLeaderDay[]
+  },
+  rank: number,
+): ProdigeArenaLeader {
+  return {
+    rank,
+    username: row.username,
+    points: row.points,
+    profileUrl: row.profileUrl,
+    days: [...row.days].sort((a, b) => a.day - b.day),
+  }
+}
+
+function withRanks(
+  rows: {
+    username: string
+    points: number
+    profileUrl: string
+    days: ProdigeArenaLeaderDay[]
+  }[],
+): ProdigeArenaLeader[] {
+  let rank = 0
+  let previousPoints: number | null = null
+  return rows.map((row, index) => {
+    if (previousPoints !== row.points) {
+      rank = index + 1
+      previousPoints = row.points
+    }
+    return toLeader(row, rank)
+  })
+}
+
 /** First-place player of each finished arena, plus the overall top 16. */
 export async function loadProdigeArenaDigest(): Promise<{
   winners: ProdigeArenaWinner[]
   leaders: ProdigeArenaLeader[]
+  banned: ProdigeArenaLeader[]
 }> {
   const views = await loadFinishedArenas()
   const winners: ProdigeArenaWinner[] = views.map((view) => {
@@ -534,21 +579,11 @@ export async function loadProdigeArenaDigest(): Promise<{
     return a.username.localeCompare(b.username, "fr", { sensitivity: "base" })
   })
 
-  let rank = 0
-  let previousPoints: number | null = null
-  const leaders = sorted.slice(0, GENERAL_TOP).map((row, index) => {
-    if (previousPoints !== row.points) {
-      rank = index + 1
-      previousPoints = row.points
-    }
-    return {
-      rank,
-      username: row.username,
-      points: row.points,
-      profileUrl: row.profileUrl,
-      days: [...row.days].sort((a, b) => a.day - b.day),
-    }
-  })
+  const eligible = sorted.filter((row) => !isBannedUsername(row.username))
+  const leaders = withRanks(eligible.slice(0, GENERAL_TOP))
+  const banned = withRanks(
+    sorted.filter((row) => isBannedUsername(row.username)),
+  )
 
-  return { winners, leaders }
+  return { winners, leaders, banned }
 }
