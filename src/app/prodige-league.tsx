@@ -238,7 +238,7 @@ function ProdigeLeaguePage() {
             Classement général
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted">
-            Top 10 des points accumulés sur les arènes terminées.
+            Top 16 des points accumulés sur les arènes terminées.
           </p>
           {leaders.length === 0 ? (
             <p className="mt-4 rounded-xl border border-dashed border-border bg-surface px-4 py-8 text-center text-sm text-ink-muted">
@@ -368,7 +368,7 @@ function ProdigeLeaguePage() {
           <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground sm:text-base sm:leading-7">
             Prodige League is an individual online rapid tournament (10+0) on
             Chess.com, from 15 November to 31 December 2026 in Cameroon.
-            Registration is closed. The arenas and the overall top 10 are
+            Registration is closed. The arenas and the overall top 16 are
             above, followed by the season path and the format.
           </p>
         </section>

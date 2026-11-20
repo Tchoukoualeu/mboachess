@@ -464,7 +464,7 @@ export type ProdigeArenaLeader = {
   days: ProdigeArenaLeaderDay[]
 }
 
-const GENERAL_TOP = 10
+const GENERAL_TOP = 16
 
 async function loadFinishedArenas(): Promise<ProdigeArenaView[]> {
   const views: ProdigeArenaView[] = []
@@ -479,7 +479,7 @@ async function loadFinishedArenas(): Promise<ProdigeArenaView[]> {
   return views
 }
 
-/** First-place player of each finished arena, plus the overall top 10. */
+/** First-place player of each finished arena, plus the overall top 16. */
 export async function loadProdigeArenaDigest(): Promise<{
   winners: ProdigeArenaWinner[]
   leaders: ProdigeArenaLeader[]
