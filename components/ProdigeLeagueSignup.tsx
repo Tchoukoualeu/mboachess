@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Await } from "@tanstack/react-router"
 import type { ProdigeLeaguePlayer } from "@/lib/prodigeLeague"
 
 const PAGE_SIZE = 20
@@ -98,18 +99,65 @@ function PlayerRow({
   )
 }
 
-export function ProdigeLeagueSignup({
-  players,
-}: {
-  players: ProdigeLeaguePlayer[]
-}) {
+function PlayerList({ players }: { players: ProdigeLeaguePlayer[] | null }) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+
+  if (players === null) {
+    return (
+      <p className="mt-3 rounded-xl border border-dashed border-border bg-surface px-4 py-10 text-center text-sm text-ink-muted">
+        La liste des joueurs n'a pas pu être chargée.
+      </p>
+    )
+  }
+
+  if (players.length === 0) {
+    return (
+      <p className="mt-3 rounded-xl border border-dashed border-border bg-surface px-4 py-10 text-center text-sm text-ink-muted">
+        Aucun joueur inscrit pour le moment.
+      </p>
+    )
+  }
+
   const visible = players.slice(0, visibleCount)
   const remaining = Math.max(0, players.length - visibleCount)
   const nextBatch = Math.min(PAGE_SIZE, remaining)
 
-  const countLabel = `${players.length} ${players.length === 1 ? "joueur" : "joueurs"}`
+  return (
+    <>
+      <ol className="mt-3 overflow-hidden rounded-xl border border-border">
+        {visible.map((player, index) => (
+          <PlayerRow key={player.username} player={player} rank={index + 1} />
+        ))}
+      </ol>
+      {remaining > 0 ? (
+        <div className="mt-4 flex justify-center">
+          <button
+            type="button"
+            onClick={() =>
+              setVisibleCount((count) =>
+                Math.min(players.length, count + PAGE_SIZE),
+              )
+            }
+            className="inline-flex items-center justify-center rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition hover:border-brand/40 hover:bg-brand-muted/50"
+          >
+            Voir plus ({nextBatch})
+          </button>
+        </div>
+      ) : null}
+    </>
+  )
+}
 
+function countLabel(players: ProdigeLeaguePlayer[] | null): string {
+  if (players === null) return ""
+  return `${players.length} ${players.length === 1 ? "joueur" : "joueurs"}`
+}
+
+export function ProdigeLeagueSignup({
+  players,
+}: {
+  players: Promise<ProdigeLeaguePlayer[] | null>
+}) {
   return (
     <section id="inscription" className="mb-4">
       <details className="group rounded-xl border border-border bg-surface">
@@ -123,7 +171,11 @@ export function ProdigeLeagueSignup({
             </span>
           </span>
           <span className="flex shrink-0 items-center gap-3">
-            <span className="text-sm text-ink-muted">{countLabel}</span>
+            <span className="text-sm text-ink-muted">
+              <Await promise={players} fallback="…">
+                {(list) => countLabel(list)}
+              </Await>
+            </span>
             <svg
               viewBox="0 0 20 20"
               fill="currentColor"
@@ -147,38 +199,16 @@ export function ProdigeLeagueSignup({
             Joueurs inscrits
           </h3>
 
-          {players.length === 0 ? (
-            <p className="mt-3 rounded-xl border border-dashed border-border bg-surface px-4 py-10 text-center text-sm text-ink-muted">
-              Aucun joueur inscrit pour le moment.
-            </p>
-          ) : (
-            <>
-              <ol className="mt-3 overflow-hidden rounded-xl border border-border">
-                {visible.map((player, index) => (
-                  <PlayerRow
-                    key={player.username}
-                    player={player}
-                    rank={index + 1}
-                  />
-                ))}
-              </ol>
-              {remaining > 0 ? (
-                <div className="mt-4 flex justify-center">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setVisibleCount((count) =>
-                        Math.min(players.length, count + PAGE_SIZE),
-                      )
-                    }
-                    className="inline-flex items-center justify-center rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition hover:border-brand/40 hover:bg-brand-muted/50"
-                  >
-                    Voir plus ({nextBatch})
-                  </button>
-                </div>
-              ) : null}
-            </>
-          )}
+          <Await
+            promise={players}
+            fallback={
+              <p className="mt-3 rounded-xl border border-dashed border-border bg-surface px-4 py-10 text-center text-sm text-ink-muted">
+                Chargement des joueurs…
+              </p>
+            }
+          >
+            {(list) => <PlayerList players={list} />}
+          </Await>
         </div>
       </details>
     </section>

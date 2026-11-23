@@ -1,99 +1,110 @@
-import type { PlayerLookupResult } from "@/lib/chesscom"
+import { useMemo } from "react"
 import { CrownIcon } from "@/components/CrownIcon"
+import type { PlayerLookupResult } from "@/lib/chesscom"
+import { topNByRating } from "@/lib/ratingLeaders"
 
-const AVATAR_PX = 48
+const AVATAR_PX = 40
+const PODIUM_SIZE = 3
+
+type Mode = "blitz" | "rapid"
 
 type Props = {
-  blitzLeader: PlayerLookupResult | null
-  rapidLeader: PlayerLookupResult | null
+  rows: PlayerLookupResult[]
 }
 
-function Leader({
-  kind,
-  leader,
-  rating,
-}: {
-  kind: "Blitz" | "Rapid"
-  leader: PlayerLookupResult | null
-  rating: number | null
-}) {
-  if (!leader || rating == null) {
-    return (
-      <div className="min-w-0 flex-1 rounded-lg border border-zinc-200/90 bg-zinc-50/90 px-2 py-2 text-center dark:border-zinc-800 dark:bg-zinc-900/50 sm:px-3 sm:py-2.5">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-          Top {kind}
-        </p>
-        <p className="mt-0.5 text-xs text-zinc-500">—</p>
-      </div>
-    )
+const MODE_STYLES: Record<Mode, { label: string; dot: string; text: string }> =
+  {
+    blitz: { label: "Blitz", dot: "bg-brand", text: "text-brand" },
+    rapid: { label: "Rapid", dot: "bg-wood", text: "text-wood" },
   }
 
-  const href = `https://www.chess.com/member/${encodeURIComponent(leader.username)}`
-  const initial = leader.username.slice(0, 1).toUpperCase()
-
+function Avatar({ player, size }: { player: PlayerLookupResult; size: string }) {
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      className="group flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-amber-200/70 bg-linear-to-r from-amber-50/80 to-white py-1.5 pl-1.5 pr-2 shadow-sm transition hover:border-amber-300/90 hover:shadow dark:border-amber-900/40 dark:from-amber-950/20 dark:to-zinc-900/60 sm:gap-2.5 sm:rounded-xl sm:py-2 sm:pl-2 sm:pr-3"
+    <span
+      className={`flex shrink-0 overflow-hidden rounded-full border border-border bg-brand-muted ${size}`}
     >
-      <div className="relative h-10 w-10 shrink-0 sm:h-12 sm:w-12">
-        <div
-          className="pointer-events-none absolute top-0 left-1/2 z-10 -translate-x-1/2 translate-y-[-20%] sm:translate-y-[-15%]"
-          aria-hidden
-        >
-          <CrownIcon className="h-3.5 w-3.5 text-amber-500 drop-shadow sm:h-4 sm:w-4 dark:text-amber-400" />
-        </div>
-        <div className="relative h-full w-full overflow-hidden rounded-full border border-amber-200/90 bg-zinc-100 dark:border-amber-600/40 dark:bg-zinc-800">
-          {leader.avatarUrl ? (
-            <img
-              src={leader.avatarUrl}
-              alt=""
-              width={AVATAR_PX}
-              height={AVATAR_PX}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <span className="flex h-full w-full items-center justify-center text-sm font-semibold text-zinc-500 sm:text-base">
-              {initial}
-            </span>
-          )}
-        </div>
-      </div>
-      <div className="min-w-0 flex-1 text-left">
-        <p className="text-[10px] font-semibold uppercase leading-tight tracking-wide text-amber-800/80 dark:text-amber-200/85">
-          Top {kind}
-        </p>
-        <p className="font-mono text-base font-bold leading-tight tabular-nums text-zinc-900 sm:text-lg dark:text-zinc-100">
-          {rating}
-        </p>
-        <p className="truncate text-[11px] font-medium text-zinc-600 group-hover:underline sm:text-xs dark:text-zinc-300">
-          {leader.username}
-        </p>
-      </div>
-    </a>
+      {player.avatarUrl ? (
+        <img
+          src={player.avatarUrl}
+          alt=""
+          width={AVATAR_PX}
+          height={AVATAR_PX}
+          loading="lazy"
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <span className="flex h-full w-full items-center justify-center text-sm font-semibold text-brand">
+          {player.username.slice(0, 1).toUpperCase()}
+        </span>
+      )}
+    </span>
   )
 }
 
-export function RatingLeaders({ blitzLeader, rapidLeader }: Props) {
+function Podium({ mode, players }: { mode: Mode; players: PlayerLookupResult[] }) {
+  const style = MODE_STYLES[mode]
+
   return (
-    <section
-      className="mb-3 sm:mb-5"
-      aria-label="Highest rated players"
-    >
-      <div className="grid grid-cols-2 gap-2 sm:gap-3">
-        <Leader
-          kind="Blitz"
-          leader={blitzLeader}
-          rating={blitzLeader?.blitz ?? null}
-        />
-        <Leader
-          kind="Rapid"
-          leader={rapidLeader}
-          rating={rapidLeader?.rapid ?? null}
-        />
-      </div>
-    </section>
+    <div className="rounded-xl border border-border bg-surface shadow-sm">
+      <h3 className="flex items-center gap-2 border-b border-border px-4 py-3 text-sm font-semibold">
+        <span className={`h-2 w-2 rounded-full ${style.dot}`} aria-hidden />
+        Top {style.label}
+      </h3>
+      {players.length === 0 ? (
+        <p className="px-4 py-6 text-center text-sm text-ink-muted">
+          No rated players yet.
+        </p>
+      ) : (
+        <ol>
+          {players.map((player, index) => {
+            const first = index === 0
+            return (
+              <li key={player.username} className="border-b border-border/70 last:border-0">
+                <a
+                  href={`https://www.chess.com/member/${encodeURIComponent(player.username)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`group flex items-center gap-3 px-4 transition hover:bg-brand-muted/40 ${
+                    first ? "py-3" : "py-2.5"
+                  }`}
+                >
+                  <span
+                    className={`w-4 shrink-0 text-center text-sm font-semibold tabular-nums ${
+                      first ? "text-wood" : "text-ink-muted"
+                    }`}
+                  >
+                    {first ? <CrownIcon className="h-4 w-4" /> : index + 1}
+                    {first ? <span className="sr-only">1</span> : null}
+                  </span>
+                  <Avatar player={player} size={first ? "h-10 w-10" : "h-8 w-8"} />
+                  <span className="min-w-0 flex-1 truncate font-mono text-sm group-hover:text-brand">
+                    {player.username}
+                  </span>
+                  <span
+                    className={`shrink-0 font-semibold tabular-nums ${
+                      first ? `text-lg ${style.text}` : "text-sm"
+                    }`}
+                  >
+                    {player[mode]}
+                  </span>
+                </a>
+              </li>
+            )
+          })}
+        </ol>
+      )}
+    </div>
+  )
+}
+
+export function RatingLeaders({ rows }: Props) {
+  const blitz = useMemo(() => topNByRating(rows, "blitz", PODIUM_SIZE), [rows])
+  const rapid = useMemo(() => topNByRating(rows, "rapid", PODIUM_SIZE), [rows])
+
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
+      <Podium mode="blitz" players={blitz} />
+      <Podium mode="rapid" players={rapid} />
+    </div>
   )
 }

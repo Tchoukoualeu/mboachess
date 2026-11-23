@@ -27,37 +27,19 @@ function displayRating(player: PlayerLookupResult): number | null {
   return null
 }
 
-function tickerNames(names: string[]): string[] {
-  if (names.length === 0) return []
-  const min = 8
-  const copies = Math.max(1, Math.ceil(min / names.length))
-  return Array.from({ length: copies }, () => names).flat()
-}
-
-function PlayerChip({
-  player,
-  index,
-}: {
-  player: PlayerLookupResult
-  index: number
-}) {
+function PlayerChip({ player }: { player: PlayerLookupResult }) {
   const href = `https://www.chess.com/member/${encodeURIComponent(player.username)}`
   const initial = player.username.slice(0, 1).toUpperCase()
   const rating = displayRating(player)
-  const floatDuration = `${3.2 + (index % 5) * 0.35}s`
 
   return (
     <a
       href={href}
       target="_blank"
       rel="noreferrer"
-      className="online-now-chip group inline-flex items-center gap-2 rounded-full border border-brand/20 bg-surface/90 py-1 pr-3 pl-1 shadow-sm backdrop-blur-sm transition hover:border-brand/50 hover:shadow"
-      style={{
-        ["--float-duration" as string]: floatDuration,
-      }}
+      className="group inline-flex items-center gap-2 rounded-full border border-brand/20 bg-surface py-1 pr-3 pl-1 shadow-sm transition hover:-translate-y-0.5 hover:border-brand/50 hover:shadow focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
     >
       <span className="relative h-9 w-9 shrink-0">
-        <span className="online-now-avatar-ring absolute inset-0 rounded-full" />
         <span className="relative flex h-full w-full overflow-hidden rounded-full border border-brand/30 bg-brand-muted">
           {player.avatarUrl ? (
             <img
@@ -93,7 +75,6 @@ function PlayerChip({
 export function OnlineNowBox({ rows }: Props) {
   const online = useMemo(() => onlinePlayers(rows), [rows])
   const names = online.map((player) => player.username)
-  const ticker = tickerNames(names)
   const minutes = ONLINE_WITHIN_SEC / 60
   const few = online.length > 0 && online.length <= 3
 
@@ -122,9 +103,9 @@ export function OnlineNowBox({ rows }: Props) {
         </p>
       </header>
 
-      <div className="online-now-board relative min-h-40">
+      <div className="online-now-board relative">
         {online.length === 0 ? (
-          <div className="flex min-h-40 flex-col items-center justify-center px-4 py-8 text-center">
+          <div className="flex min-h-32 flex-col items-center justify-center px-4 py-8 text-center">
             <img
               src="/queen.png"
               alt=""
@@ -141,48 +122,28 @@ export function OnlineNowBox({ rows }: Props) {
             </p>
           </div>
         ) : (
-          <>
-            <ul
-              className={
-                few
-                  ? "relative z-10 flex min-h-40 flex-wrap items-center justify-center gap-3 px-4 py-6"
-                  : "relative z-10 flex min-h-40 flex-wrap content-center gap-2 px-4 py-5"
-              }
-              aria-label={
-                names.length === 1
-                  ? `${names[0]} is online`
-                  : `${names.join(", ")} are online`
-              }
-            >
-              {online.map((player, index) => (
-                <li
-                  key={player.username}
-                  className="online-now-chip-in"
-                  style={{ animationDelay: `${(index % 8) * 0.12}s` }}
-                >
-                  <PlayerChip player={player} index={index} />
-                </li>
-              ))}
-            </ul>
-            {online.length >= 3 ? (
-              <div className="online-now-ticker" aria-hidden>
-                <div className="online-now-ticker-track">
-                  {[0, 1].map((half) => (
-                    <div key={half} className="online-now-ticker-group">
-                      {ticker.map((name, index) => (
-                        <span
-                          key={`${half}-${name}-${index}`}
-                          className="font-mono text-[11px] tracking-wide text-brand/70"
-                        >
-                          {name}
-                        </span>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </>
+          <ul
+            className={
+              few
+                ? "flex min-h-32 flex-wrap items-center justify-center gap-3 px-4 py-6"
+                : "flex flex-wrap gap-2 px-4 py-5"
+            }
+            aria-label={
+              names.length === 1
+                ? `${names[0]} is online`
+                : `${names.join(", ")} are online`
+            }
+          >
+            {online.map((player, index) => (
+              <li
+                key={player.username}
+                className="online-now-chip-in"
+                style={{ animationDelay: `${(index % 8) * 0.12}s` }}
+              >
+                <PlayerChip player={player} />
+              </li>
+            ))}
+          </ul>
         )}
       </div>
     </section>

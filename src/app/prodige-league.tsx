@@ -8,6 +8,7 @@ import {
 } from "@/lib/prodigeArenaSchedule"
 import {
   loadProdigeLeague,
+  loadProdigeLeaguePlayers,
   type ProdigeArenaCardLeader,
 } from "@/server/prodigeLeague"
 
@@ -110,7 +111,13 @@ export const Route = createFileRoute("/prodige-league")({
         },
       },
     }),
-  loader: () => loadProdigeLeague(),
+  loader: async () => {
+    const data = await loadProdigeLeague()
+    // Started after the core data so a cold start doesn't open extra DB
+    // connections in parallel. Not awaited: the list streams in later.
+    const players = loadProdigeLeaguePlayers().catch(() => null)
+    return { ...data, players }
+  },
   component: ProdigeLeaguePage,
 })
 

@@ -1,6 +1,7 @@
-import { Link } from "@tanstack/react-router"
 import { GitHubLink } from "@/components/GitHubLink"
+import { SiteNavLink } from "@/components/SiteNavLink"
 import { WhatsAppLink } from "@/components/WhatsAppLink"
+import { SITE_LINKS } from "@/lib/navigation"
 
 export function SiteFooter() {
   return (
@@ -24,71 +25,14 @@ export function SiteFooter() {
 
         <nav aria-label="Footer">
           <ul className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
-            <li>
-              <Link
-                to="/"
-                className="text-ink-muted transition hover:text-brand"
-              >
-                Players
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/puzzles"
-                className="text-ink-muted transition hover:text-brand"
-              >
-                Puzzles
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/top-cameroon-chess-players"
-                className="text-ink-muted transition hover:text-brand"
-              >
-                Top 100
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/tournaments"
-                className="text-ink-muted transition hover:text-brand"
-              >
-                Tournaments
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/clubs"
-                className="text-ink-muted transition hover:text-brand"
-              >
-                Clubs
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/content-creators"
-                className="text-ink-muted transition hover:text-brand"
-              >
-                Creators
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/rating-speed-run"
-                search={{}}
-                className="text-ink-muted transition hover:text-brand"
-              >
-                Speed run
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/chess-cameroon"
-                className="text-ink-muted transition hover:text-brand"
-              >
-                Chess Cameroon
-              </Link>
-            </li>
+            {SITE_LINKS.map((item) => (
+              <li key={item.to}>
+                <SiteNavLink
+                  item={item}
+                  className="text-ink-muted transition hover:text-brand"
+                />
+              </li>
+            ))}
           </ul>
         </nav>
       </div>

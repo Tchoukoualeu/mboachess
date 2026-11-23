@@ -207,36 +207,36 @@ export function EloDistributionChart({ rows }: Props) {
             </p>
           </div>
           <div className="flex flex-wrap gap-2 text-xs font-medium">
-            <span className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1.5 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-brand-muted px-2.5 py-1.5 text-brand">
+              <span className="h-2 w-2 rounded-full bg-brand" aria-hidden />
               Blitz
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-lg bg-sky-50 px-2.5 py-1.5 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300">
-              <span className="h-2 w-2 rounded-full bg-sky-500" aria-hidden />
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-wood/15 px-2.5 py-1.5 text-wood">
+              <span className="h-2 w-2 rounded-full bg-wood" aria-hidden />
               Rapid
             </span>
           </div>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-3">
-          <div className="rounded-lg bg-emerald-50 px-3 py-3 dark:bg-emerald-900/20">
-            <div className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
+          <div className="rounded-lg bg-brand-muted/60 px-3 py-3">
+            <div className="text-[11px] font-semibold uppercase tracking-wide text-brand">
               Avg blitz
             </div>
-            <div className="mt-1 text-2xl font-semibold tabular-nums text-emerald-900 dark:text-emerald-100">
+            <div className="mt-1 text-2xl font-semibold tabular-nums text-foreground">
               {avgBlitz ?? "—"}
             </div>
-            <div className="mt-0.5 text-xs text-emerald-700/80 dark:text-emerald-300/80">
+            <div className="mt-0.5 text-xs text-ink-muted">
               {blitzValues.length} rated
             </div>
           </div>
-          <div className="rounded-lg bg-sky-50 px-3 py-3 dark:bg-sky-900/20">
-            <div className="text-[11px] font-semibold uppercase tracking-wide text-sky-700 dark:text-sky-300">
+          <div className="rounded-lg bg-wood/10 px-3 py-3">
+            <div className="text-[11px] font-semibold uppercase tracking-wide text-wood">
               Avg rapid
             </div>
-            <div className="mt-1 text-2xl font-semibold tabular-nums text-sky-900 dark:text-sky-100">
+            <div className="mt-1 text-2xl font-semibold tabular-nums text-foreground">
               {avgRapid ?? "—"}
             </div>
-            <div className="mt-0.5 text-xs text-sky-700/80 dark:text-sky-300/80">
+            <div className="mt-0.5 text-xs text-ink-muted">
               {rapidValues.length} rated
             </div>
           </div>
@@ -285,11 +285,11 @@ export function EloDistributionChart({ rows }: Props) {
           />
           {rapid.length > 0 ? (
             <>
-              <path d={areaPath(rapid, xMin, xMax, yMax)} className="fill-sky-500/25" />
+              <path d={areaPath(rapid, xMin, xMax, yMax)} className="fill-wood/25" />
               <path
                 d={strokePath(rapid, xMin, xMax, yMax)}
                 fill="none"
-                className="stroke-sky-500"
+                className="stroke-wood"
                 strokeWidth={2.5}
                 strokeLinejoin="round"
                 strokeLinecap="round"
@@ -298,11 +298,11 @@ export function EloDistributionChart({ rows }: Props) {
           ) : null}
           {blitz.length > 0 ? (
             <>
-              <path d={areaPath(blitz, xMin, xMax, yMax)} className="fill-emerald-500/25" />
+              <path d={areaPath(blitz, xMin, xMax, yMax)} className="fill-brand/20" />
               <path
                 d={strokePath(blitz, xMin, xMax, yMax)}
                 fill="none"
-                className="stroke-emerald-600 dark:stroke-emerald-400"
+                className="stroke-brand"
                 strokeWidth={2.5}
                 strokeLinejoin="round"
                 strokeLinecap="round"
@@ -315,7 +315,7 @@ export function EloDistributionChart({ rows }: Props) {
               x2={xOf(avgBlitz, xMin, xMax)}
               y1={PAD_T}
               y2={baseline}
-              className="stroke-emerald-700/50 dark:stroke-emerald-300/50"
+              className="stroke-brand/60"
               strokeWidth={1}
               strokeDasharray="4 4"
             />
@@ -326,7 +326,7 @@ export function EloDistributionChart({ rows }: Props) {
               x2={xOf(avgRapid, xMin, xMax)}
               y1={PAD_T}
               y2={baseline}
-              className="stroke-sky-700/50 dark:stroke-sky-300/50"
+              className="stroke-wood/70"
               strokeWidth={1}
               strokeDasharray="4 4"
             />
@@ -363,12 +363,12 @@ export function EloDistributionChart({ rows }: Props) {
           >
             <div className="font-semibold tabular-nums">{Math.round(hover)}</div>
             {blitzValues.length > 0 ? (
-              <div className="text-emerald-700 dark:text-emerald-400">
+              <div className="text-brand">
                 Blitz {valueAt(blitz, hover).toFixed(1)}
               </div>
             ) : null}
             {rapidValues.length > 0 ? (
-              <div className="text-sky-700 dark:text-sky-400">
+              <div className="text-wood">
                 Rapid {valueAt(rapid, hover).toFixed(1)}
               </div>
             ) : null}
