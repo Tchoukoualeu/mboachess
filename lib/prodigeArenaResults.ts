@@ -287,17 +287,40 @@ async function fetchSnapshot(arena: ProdigeArenaDay): Promise<StoredArena | null
   return normalizeSnapshot(arena, tournament, { players, games })
 }
 
-async function readStored(chesscomId: string): Promise<StoredArena | null> {
-  if (!isMongoConfigured()) return null
-  const db = await getDb()
-  if (!db) return null
-  const doc = await db.collection(COLLECTION).findOne<StoredArena>({ chesscomId })
+function normalizeStored(doc: StoredArena | null): StoredArena | null {
   if (!doc || !Array.isArray(doc.players)) return null
   return {
     ...doc,
     games: Array.isArray(doc.games) ? doc.games : [],
     syncedAt: doc.syncedAt instanceof Date ? doc.syncedAt : new Date(0),
   }
+}
+
+async function readStored(chesscomId: string): Promise<StoredArena | null> {
+  if (!isMongoConfigured()) return null
+  const db = await getDb()
+  if (!db) return null
+  const doc = await db.collection(COLLECTION).findOne<StoredArena>({ chesscomId })
+  return normalizeStored(doc)
+}
+
+/** One query for several arenas; parallel single reads each open a pooled connection. */
+async function readStoredMany(
+  chesscomIds: string[],
+): Promise<Map<string, StoredArena>> {
+  const found = new Map<string, StoredArena>()
+  if (chesscomIds.length === 0 || !isMongoConfigured()) return found
+  const db = await getDb()
+  if (!db) return found
+  const docs = await db
+    .collection(COLLECTION)
+    .find<StoredArena>({ chesscomId: { $in: chesscomIds } })
+    .toArray()
+  for (const doc of docs) {
+    const stored = normalizeStored(doc)
+    if (stored) found.set(stored.chesscomId, stored)
+  }
+  return found
 }
 
 async function saveStored(snapshot: StoredArena): Promise<void> {
@@ -394,10 +417,22 @@ function emptyView(arena: ProdigeArenaDay, error: string): ProdigeArenaView {
   }
 }
 
+/** Finished arenas never change, so their views are kept in memory after the first load. */
+const completeViews = new Map<string, ProdigeArenaView>()
+
+function completeView(
+  arena: ProdigeArenaDay,
+  snapshot: StoredArena,
+): ProdigeArenaView {
+  const view = toView(arena, snapshot, null, null)
+  completeViews.set(snapshot.chesscomId, view)
+  return view
+}
+
 /**
  * Load one arena's standings and games.
- * Finished arenas are served from the database. Chess.com is called only
- * when nothing complete is stored yet, including while an arena is in progress.
+ * Finished arenas are served from memory or the database. Chess.com is called
+ * only when nothing complete is stored yet, including while an arena is in progress.
  */
 export async function loadProdigeArenaResults(
   dayRaw: string,
@@ -407,8 +442,11 @@ export async function loadProdigeArenaResults(
   const arena = getProdigeArena(day)
   if (!arena?.chesscomId) return null
 
+  const memo = completeViews.get(arena.chesscomId)
+  if (memo) return memo
+
   const cached = await readStored(arena.chesscomId).catch(() => null)
-  if (cached && isComplete(cached)) return toView(arena, cached, null, null)
+  if (cached && isComplete(cached)) return completeView(arena, cached)
 
   try {
     const fresh = await fetchSnapshot(arena)
@@ -423,6 +461,7 @@ export async function loadProdigeArenaResults(
           null,
         )
       }
+      if (isComplete(fresh)) return completeView(arena, fresh)
       return toView(arena, fresh, null, null)
     }
   } catch {
@@ -473,17 +512,32 @@ function isBannedUsername(username: string): boolean {
   return BANNED_USERNAMES.has(username.toLowerCase())
 }
 
+type ScheduledArena = ProdigeArenaDay & { chesscomId: string }
+
+function isScheduled(arena: ProdigeArenaDay): arena is ScheduledArena {
+  return arena.chesscomId !== null
+}
+
 async function loadFinishedArenas(): Promise<ProdigeArenaView[]> {
-  const views: ProdigeArenaView[] = []
-  for (const arena of PRODIGE_ARENAS) {
-    if (!arena.chesscomId) continue
-    const view = await loadProdigeArenaResults(String(arena.day))
-    if (!view || view.statusLabel !== "Terminée" || view.players.length === 0) {
-      continue
-    }
-    views.push(view)
+  const arenas = PRODIGE_ARENAS.filter(isScheduled)
+  const unseen = arenas.filter((arena) => !completeViews.has(arena.chesscomId))
+  const stored = await readStoredMany(
+    unseen.map((arena) => arena.chesscomId),
+  ).catch(() => new Map<string, StoredArena>())
+  for (const arena of unseen) {
+    const snapshot = stored.get(arena.chesscomId)
+    if (snapshot && isComplete(snapshot)) completeView(arena, snapshot)
   }
-  return views
+
+  const views = await Promise.all(
+    arenas.map((arena) => loadProdigeArenaResults(String(arena.day))),
+  )
+  return views.filter(
+    (view): view is ProdigeArenaView =>
+      view !== null &&
+      view.statusLabel === "Terminée" &&
+      view.players.length > 0,
+  )
 }
 
 function toLeader(

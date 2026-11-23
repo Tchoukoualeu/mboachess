@@ -12,6 +12,7 @@
   --surface-muted: #e8ece8;
   --ink-muted: #4a554e;
   --border: #d4ddd6;
+  --gold: #e3c78f;
 }
 
 @theme inline {
@@ -26,6 +27,7 @@
   --color-surface-muted: var(--surface-muted);
   --color-ink-muted: var(--ink-muted);
   --color-border: var(--border);
+  --color-gold: var(--gold);
   --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Fraunces", ui-serif, Georgia, serif;
   --font-mono: ui-monospace, monospace;
@@ -91,12 +93,20 @@ body {
 
 .hero-board {
   background-image:
+    repeating-conic-gradient(
+      from 90deg,
+      rgb(255 255 255 / 0.04) 0% 25%,
+      transparent 0% 50%
+    ),
     linear-gradient(
       135deg,
       color-mix(in srgb, var(--brand) 88%, #000) 0%,
       color-mix(in srgb, var(--brand-soft) 70%, #0a1f14) 55%,
       color-mix(in srgb, var(--wood) 35%, #0f1a12) 100%
     );
+  background-size:
+    64px 64px,
+    auto;
 }
 
 .hero-prodige {
@@ -122,16 +132,6 @@ body {
   }
 }
 
-@keyframes online-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
 @keyframes online-chip-in {
   from {
     opacity: 0;
@@ -140,33 +140,6 @@ body {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes online-avatar-ring {
-  0% {
-    transform: scale(1);
-    opacity: 0.55;
-  }
-  70% {
-    transform: scale(1.35);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1.35);
-    opacity: 0;
-  }
-}
-
-@keyframes online-board-shift {
-  to {
-    background-position: 40px 40px;
-  }
-}
-
-@keyframes online-ticker {
-  to {
-    transform: translateX(-50%);
   }
 }
 
@@ -188,52 +161,10 @@ body {
     transparent 0% 50%
   );
   background-size: 20px 20px;
-  animation: online-board-shift 28s linear infinite;
 }
 
 .online-now-chip-in {
   animation: online-chip-in 0.5s ease-out both;
-}
-
-.online-now-chip {
-  animation: online-float var(--float-duration, 3.6s) ease-in-out infinite;
-}
-
-.online-now-avatar-ring {
-  border: 2px solid color-mix(in srgb, var(--brand) 55%, transparent);
-  animation: online-avatar-ring 2.2s ease-out infinite;
-}
-
-.online-now-ticker {
-  overflow: hidden;
-  border-top: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
-  background: color-mix(in srgb, var(--surface) 82%, transparent);
-  padding: 0.45rem 0;
-  mask-image: linear-gradient(
-    90deg,
-    transparent,
-    #000 6%,
-    #000 94%,
-    transparent
-  );
-}
-
-.online-now-ticker-track {
-  display: flex;
-  width: max-content;
-  animation: online-ticker 32s linear infinite;
-}
-
-.online-now-ticker-group {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: 1.5rem;
-  padding-right: 1.5rem;
-}
-
-.online-now-ticker:hover .online-now-ticker-track {
-  animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -241,11 +172,7 @@ body {
   .animate-fade-up-delay,
   .animate-fade-in,
   .online-live-dot,
-  .online-now-board,
   .online-now-chip-in,
-  .online-now-chip,
-  .online-now-avatar-ring,
-  .online-now-ticker-track,
   .solve-board,
   .solve-wash,
   .solve-banner,

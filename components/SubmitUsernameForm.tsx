@@ -48,7 +48,7 @@ export function SubmitUsernameForm() {
       }
       setMessage({
         type: "ok",
-        text: "Your username was added. It will show in the table below.",
+        text: "Your username was added. It will show in the ratings table.",
       });
       setValue("");
       await router.invalidate();
@@ -60,7 +60,7 @@ export function SubmitUsernameForm() {
   }
 
   return (
-    <div className="mb-4 max-w-xl sm:mb-6">
+    <div className="max-w-xl">
       <form
         onSubmit={onSubmit}
         className="flex flex-col gap-3 sm:flex-row sm:items-end"
@@ -68,7 +68,7 @@ export function SubmitUsernameForm() {
         <div className="min-w-0 flex-1">
           <label
             htmlFor="chess-username"
-            className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+            className="mb-1 block text-sm font-medium text-foreground"
           >
             Add your Chess.com username
           </label>
@@ -81,15 +81,15 @@ export function SubmitUsernameForm() {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             disabled={loading}
-            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 font-mono text-sm text-zinc-900 shadow-sm placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-zinc-500 dark:focus:ring-zinc-600"
+            className="h-10 w-full rounded-lg border border-border bg-surface px-3 font-mono text-sm text-foreground shadow-sm placeholder:text-ink-muted/70 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/25 disabled:opacity-50"
           />
         </div>
         <button
           type="submit"
           disabled={loading}
-          className="h-10 shrink-0 rounded-lg bg-zinc-900 px-4 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="h-10 shrink-0 rounded-lg bg-brand px-5 text-sm font-semibold text-white transition hover:bg-brand-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-50"
         >
-          {loading ? "Saving…" : "Save"}
+          {loading ? "Adding…" : "Add player"}
         </button>
       </form>
       {message ? (
@@ -97,7 +97,7 @@ export function SubmitUsernameForm() {
           role="status"
           className={`mt-2 text-sm ${
             message.type === "ok"
-              ? "text-emerald-700 dark:text-emerald-300"
+              ? "text-brand"
               : "text-red-600 dark:text-red-400"
           }`}
         >

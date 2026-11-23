@@ -1,5 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
+import type { ReactNode } from "react"
 import { EloDistributionChart } from "@/components/EloDistributionChart"
+import { ExploreGrid } from "@/components/ExploreGrid"
 import { OnlineNowBox } from "@/components/OnlineNowBox"
 import { PageShell } from "@/components/PageShell"
 import { RatingLeaders } from "@/components/RatingLeaders"
@@ -30,214 +32,152 @@ export const Route = createFileRoute("/")({
   component: Home,
 })
 
+function SectionHeading({
+  id,
+  title,
+  description,
+}: {
+  id: string
+  title: string
+  description: ReactNode
+}) {
+  return (
+    <div className="mb-4">
+      <h2
+        id={id}
+        className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
+      >
+        {title}
+      </h2>
+      <p className="mt-1 text-sm text-ink-muted">{description}</p>
+    </div>
+  )
+}
+
 function Home() {
   const { rows, blitzLeader, rapidLeader } = Route.useLoaderData()
+  const onlineCount = rows.filter((row) => row.online).length
+
+  const stats = [
+    { label: "Players tracked", value: rows.length },
+    { label: "Online now", value: onlineCount },
+    { label: "Top blitz", value: blitzLeader?.blitz ?? "—" },
+    { label: "Top rapid", value: rapidLeader?.rapid ?? "—" },
+  ]
 
   return (
     <>
       <section className="hero-board relative overflow-hidden text-white">
-        <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col justify-center px-4 py-10 pb-14 sm:px-6 sm:py-12 sm:pb-16">
-          <div className="animate-fade-up relative z-10 max-w-xl rounded-xl bg-black/35 px-4 py-4 backdrop-blur-[2px] sm:px-5 sm:py-5">
-            <h1 className="font-display text-3xl font-semibold tracking-tight drop-shadow-sm sm:text-4xl md:text-5xl">
+        <div className="relative mx-auto w-full max-w-4xl px-4 pt-10 pb-20 sm:px-6 sm:pt-14 sm:pb-24">
+          <div
+            aria-hidden
+            className="animate-fade-in pointer-events-none absolute top-1/2 -right-10 -translate-y-1/2 sm:right-2"
+          >
+            <img
+              src="/queen.png"
+              alt=""
+              width={224}
+              height={224}
+              className="h-44 w-44 object-contain opacity-10 invert sm:h-56 sm:w-56"
+            />
+          </div>
+
+          <div className="relative max-w-2xl">
+            <p className="animate-fade-up text-xs font-semibold uppercase tracking-[0.2em] text-gold">
               Mboachess
-            </h1>
-            <p className="animate-fade-up-delay mt-2 max-w-md text-sm leading-6 text-white sm:text-base sm:leading-7">
-              Follow Cameroonian players on Chess.com—ratings, activity, and the
-              community in one place.
             </p>
-            <div className="mt-4 flex flex-wrap gap-3">
+            <h1 className="animate-fade-up mt-3 font-display text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
+              Chess in Cameroon, <span className="text-gold">live.</span>
+            </h1>
+            <p className="animate-fade-up-delay mt-4 max-w-xl text-base leading-7 text-white/80 sm:text-lg">
+              Ratings, live activity and leaders for Cameroonian players on
+              Chess.com, plus tournaments, clubs and puzzles.
+            </p>
+            <div className="animate-fade-up-delay mt-6 flex flex-wrap gap-3">
               <a
                 href="#ratings"
-                className="inline-flex items-center justify-center rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-brand transition hover:bg-brand-muted"
+                className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-brand shadow-sm transition hover:bg-brand-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 View ratings
               </a>
               <a
                 href="#submit"
-                className="inline-flex items-center justify-center rounded-lg border border-white/50 bg-white/15 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/25"
+                className="inline-flex items-center justify-center rounded-lg border border-white/40 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 Add a player
               </a>
             </div>
           </div>
-          <img
-            src="/queen.png"
-            alt=""
-            width={180}
-            height={180}
-            className="animate-fade-in pointer-events-none absolute right-2 top-1/2 h-28 w-28 -translate-y-1/2 object-contain opacity-15 sm:right-6 sm:h-36 sm:w-36"
-          />
+
+          <dl className="animate-fade-up-delay relative mt-8 grid max-w-2xl grid-cols-2 gap-px overflow-hidden rounded-xl bg-white/15 ring-1 ring-white/15 sm:grid-cols-4">
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                className="flex flex-col-reverse bg-black/25 px-4 py-3"
+              >
+                <dt className="text-xs text-white/65">{stat.label}</dt>
+                <dd className="font-display text-2xl font-semibold tabular-nums">
+                  {stat.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
 
       <PageShell className="pt-0 sm:pt-0">
-        <div className="relative z-10 -mt-6 mb-8 sm:-mt-8">
+        <div className="relative -mt-10 mb-12 sm:-mt-12">
           <OnlineNowBox rows={rows} />
         </div>
 
-        <section aria-labelledby="leaders-heading" className="mb-8">
-          <h2
-            id="leaders-heading"
-            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
-          >
-            Leaders
-          </h2>
-          <p className="mt-1 text-sm text-ink-muted">
-            Top blitz and rapid ratings among tracked players.
-          </p>
-          <div className="mt-4">
-            <RatingLeaders
-              blitzLeader={blitzLeader}
-              rapidLeader={rapidLeader}
-            />
-          </div>
-        </section>
-
-        <section aria-labelledby="explore-heading" className="mb-10">
-          <h2
-            id="explore-heading"
-            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
-          >
-            Explore
-          </h2>
-          <p className="mt-1 text-sm text-ink-muted">
-            Tournaments, clubs, creators, and more across Cameroon chess.
-          </p>
-          <ul className="mt-4 divide-y divide-border border-y border-border">
-            {(
-              [
-                {
-                  to: "/puzzles" as const,
-                  label: "Chess puzzles",
-                  blurb: "Solve tactics from Lichess",
-                },
-                {
-                  to: "/top-cameroon-chess-players" as const,
-                  label: "Top 100 players",
-                  blurb: "Best Cameroon blitz and rapid on Chess.com",
-                },
-                {
-                  to: "/tournaments" as const,
-                  label: "Tournaments",
-                  blurb: "Upcoming events to play or follow",
-                },
-                {
-                  to: "/prodige-league" as const,
-                  label: "Prodige League",
-                  blurb: "Online rapid season, 15 Nov–31 Dec 2026",
-                },
-                {
-                  to: "/tournaments/past-online" as const,
-                  label: "Past online",
-                  blurb: "Previous online tournament results",
-                },
-                {
-                  to: "/rating-speed-run" as const,
-                  label: "Rating speed run",
-                  blurb: "Timed rating-gain competitions",
-                  search: {} as Record<string, never>,
-                },
-                {
-                  to: "/clubs" as const,
-                  label: "Chess clubs",
-                  blurb: "Local clubs and meetups",
-                },
-                {
-                  to: "/content-creators" as const,
-                  label: "Content creators",
-                  blurb: "Streams, channels, and socials",
-                },
-                {
-                  to: "/chess-cameroon" as const,
-                  label: "Chess Cameroon",
-                  blurb: "Start here if you searched for chess cameroon",
-                },
-              ] as const
-            ).map((item) => (
-              <li key={item.to}>
-                {"search" in item && item.search !== undefined ? (
-                  <Link
-                    to={item.to}
-                    search={item.search}
-                    className="group flex items-baseline justify-between gap-4 py-3.5 transition hover:bg-brand-muted/40"
-                  >
-                    <span>
-                      <span className="font-medium text-foreground group-hover:text-brand">
-                        {item.label}
-                      </span>
-                      <span className="mt-0.5 block text-sm text-ink-muted">
-                        {item.blurb}
-                      </span>
-                    </span>
-                    <span
-                      aria-hidden
-                      className="shrink-0 text-brand opacity-60 transition group-hover:translate-x-0.5 group-hover:opacity-100"
-                    >
-                      →
-                    </span>
-                  </Link>
-                ) : (
-                  <Link
-                    to={item.to}
-                    className="group flex items-baseline justify-between gap-4 py-3.5 transition hover:bg-brand-muted/40"
-                  >
-                    <span>
-                      <span className="font-medium text-foreground group-hover:text-brand">
-                        {item.label}
-                      </span>
-                      <span className="mt-0.5 block text-sm text-ink-muted">
-                        {item.blurb}
-                      </span>
-                    </span>
-                    <span
-                      aria-hidden
-                      className="shrink-0 text-brand opacity-60 transition group-hover:translate-x-0.5 group-hover:opacity-100"
-                    >
-                      →
-                    </span>
-                  </Link>
-                )}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section id="submit" aria-labelledby="submit-heading" className="mb-8">
-          <h2
-            id="submit-heading"
-            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
-          >
-            Add a player
-          </h2>
-          <p className="mt-1 mb-4 text-sm text-ink-muted">
-            Submit a Chess.com username to include them in the ratings table.
-          </p>
-          <SubmitUsernameForm />
-        </section>
-
-        <section id="ratings" aria-labelledby="ratings-heading">
-          <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-            <div>
-              <h2
-                id="ratings-heading"
-                className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
-              >
-                Player ratings
-              </h2>
-              <p className="mt-1 text-sm text-ink-muted">
-                Blitz and rapid from the Chess.com public API. Online (green
-                dot) uses recent profile and game times within{" "}
-                {ONLINE_WITHIN_SEC / 60} minutes.
-              </p>
-            </div>
-            <p className="text-sm font-medium text-ink-muted">
-              {rows.length} players
-            </p>
-          </div>
-
+        <section
+          id="ratings"
+          aria-labelledby="ratings-heading"
+          className="mb-12 scroll-mt-20"
+        >
+          <SectionHeading
+            id="ratings-heading"
+            title="Player ratings"
+            description={
+              <>
+                Blitz and rapid from the Chess.com public API. The green dot
+                marks activity within the last {ONLINE_WITHIN_SEC / 60} minutes.
+              </>
+            }
+          />
           <RatingsTable rows={rows} />
-
           <EloDistributionChart rows={rows} />
+        </section>
+
+        <section aria-labelledby="leaders-heading" className="mb-12">
+          <SectionHeading
+            id="leaders-heading"
+            title="Leaders"
+            description="Top three blitz and rapid ratings among tracked players."
+          />
+          <RatingLeaders rows={rows} />
+        </section>
+
+        <section aria-labelledby="explore-heading" className="mb-12">
+          <SectionHeading
+            id="explore-heading"
+            title="Explore"
+            description="Tournaments, clubs, creators, and more across Cameroon chess."
+          />
+          <ExploreGrid />
+        </section>
+
+        <section
+          id="submit"
+          aria-labelledby="submit-heading"
+          className="mb-4 scroll-mt-20 rounded-xl border border-brand/20 bg-brand-muted/40 p-5 sm:p-6"
+        >
+          <SectionHeading
+            id="submit-heading"
+            title="Add a player"
+            description="Not in the list? Submit a Chess.com username and it will appear in the ratings table."
+          />
+          <SubmitUsernameForm />
         </section>
       </PageShell>
     </>

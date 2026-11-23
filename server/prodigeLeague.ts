@@ -19,7 +19,6 @@ export type ProdigeArenaCardLeader = ProdigeArenaLeader & {
 }
 
 export type ProdigeLeagueData = {
-  players: ProdigeLeaguePlayer[]
   winners: ProdigeArenaCardWinner[]
   leaders: ProdigeArenaCardLeader[]
   banned: ProdigeArenaCardLeader[]
@@ -94,10 +93,7 @@ async function avatarMap(
 
 export const loadProdigeLeague = createServerFn({ method: "GET" }).handler(
   async (): Promise<ProdigeLeagueData> => {
-    const [registrations, digest] = await Promise.all([
-      listProdigeLeagueRegistrations(),
-      loadProdigeArenaDigest(),
-    ])
+    const digest = await loadProdigeArenaDigest()
     const avatars = await avatarMap([
       ...digest.winners.map((winner) => winner.username),
       ...digest.leaders.map((leader) => leader.username),
@@ -113,7 +109,15 @@ export const loadProdigeLeague = createServerFn({ method: "GET" }).handler(
     })
     const leaders = digest.leaders.map(withAvatar)
     const banned = digest.banned.map(withAvatar)
-    if (registrations.length === 0) return { players: [], winners, leaders, banned }
+    return { winners, leaders, banned }
+  },
+)
+
+/** Registered players with live Chess.com ratings. Slow when the cache is cold, so the page streams it. */
+export const loadProdigeLeaguePlayers = createServerFn({ method: "GET" }).handler(
+  async (): Promise<ProdigeLeaguePlayer[]> => {
+    const registrations = await listProdigeLeagueRegistrations()
+    if (registrations.length === 0) return []
 
     const players = await mapWithConcurrency(
       registrations,
@@ -124,6 +128,6 @@ export const loadProdigeLeague = createServerFn({ method: "GET" }).handler(
       },
     )
 
-    return { players: sortPlayers(players), winners, leaders, banned }
+    return sortPlayers(players)
   },
 )
