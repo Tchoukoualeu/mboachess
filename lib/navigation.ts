@@ -26,7 +26,7 @@ export type SiteLink = {
 /** Single source for header, mobile menu, footer, and home Explore links. */
 export const SITE_LINKS: readonly SiteLink[] = [
   { to: "/", id: "players", inHeader: true, inExplore: false },
-  { to: "/prodige-league", id: "prodige", inHeader: true, inExplore: true },
+  { to: "/prodige-league", id: "prodige", inHeader: false, inExplore: true },
   { to: "/puzzles", id: "puzzles", inHeader: true, inExplore: true },
   {
     to: "/top-cameroon-chess-players",

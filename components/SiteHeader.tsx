@@ -113,7 +113,7 @@ export function SiteHeader() {
           className="border-t border-border/60 px-3 py-2 lg:hidden"
         >
           <ul className="mx-auto flex w-full max-w-4xl flex-col gap-0.5 sm:px-3">
-            {SITE_LINKS.map((item) => (
+            {SITE_LINKS.filter((item) => item.to !== "/prodige-league").map((item) => (
               <li key={item.to}>
                 <SiteNavLink
                   item={item}
