@@ -479,7 +479,7 @@ export const en = {
     dates: "15 November – 31 December 2026",
     arenasTitle: "The arenas",
     arenasLede:
-      "Six qualification days on Chess.com. The first three were played on 15, 19 and 22 November 2026. Later dates are still to be announced.",
+      "Six qualification days on Chess.com. The first four were played on 15, 19, 22 and 24 November 2026. Later dates are still to be announced.",
     day: "Day {day}",
     first: "1st",
     pointsShort: "{points} pts",

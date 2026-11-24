@@ -146,6 +146,7 @@ export const PUBLIC_ROUTES = [
   { path: "/prodige-league/arena/1", changefreq: "weekly", priority: "0.6" },
   { path: "/prodige-league/arena/2", changefreq: "weekly", priority: "0.6" },
   { path: "/prodige-league/arena/3", changefreq: "weekly", priority: "0.6" },
+  { path: "/prodige-league/arena/4", changefreq: "weekly", priority: "0.6" },
   { path: "/top-cameroon-chess-players", changefreq: "daily", priority: "0.8" },
   { path: "/tournaments", changefreq: "daily", priority: "0.7" },
   { path: "/tournaments/past-online", changefreq: "weekly", priority: "0.6" },
