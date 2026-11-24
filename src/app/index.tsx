@@ -8,26 +8,28 @@ import { RatingLeaders } from "@/components/RatingLeaders"
 import { RatingsTable } from "@/components/RatingsTable"
 import { SubmitUsernameForm } from "@/components/SubmitUsernameForm"
 import { ONLINE_WITHIN_SEC } from "@/lib/chesscom"
+import { fill, getDictionary, useDictionary, useRouteLoaderData, type Locale } from "@/lib/i18n"
 import { pageHead, webPageJsonLd } from "@/lib/seo"
 import { loadHomeData } from "@/server/home"
 
-const HOME_TITLE =
-  "Mboachess - Chess in Cameroon | Players, Clubs & Tournaments"
-const HOME_DESCRIPTION =
-  "The hub for chess in Cameroon. Track Cameroonian chess players' ratings, discover local chess clubs, view upcoming tournaments, and connect with the chess community across Cameroon."
+export function homeHead(locale: Locale) {
+  const copy = getDictionary(locale).home
+  return pageHead({
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+    path: "/",
+    locale,
+    jsonLd: webPageJsonLd({
+      title: copy.metaTitle,
+      description: copy.metaDescription,
+      path: "/",
+      locale,
+    }),
+  })
+}
 
 export const Route = createFileRoute("/")({
-  head: () =>
-    pageHead({
-      title: HOME_TITLE,
-      description: HOME_DESCRIPTION,
-      path: "/",
-      jsonLd: webPageJsonLd({
-        title: HOME_TITLE,
-        description: HOME_DESCRIPTION,
-        path: "/",
-      }),
-    }),
+  head: () => homeHead("fr"),
   loader: () => loadHomeData(),
   component: Home,
 })
@@ -54,15 +56,17 @@ function SectionHeading({
   )
 }
 
-function Home() {
-  const { rows, blitzLeader, rapidLeader } = Route.useLoaderData()
+export function Home() {
+  const dict = useDictionary().home
+  const { rows, blitzLeader, rapidLeader } =
+    useRouteLoaderData<Awaited<ReturnType<typeof loadHomeData>>>()
   const onlineCount = rows.filter((row) => row.online).length
 
   const stats = [
-    { label: "Players tracked", value: rows.length },
-    { label: "Online now", value: onlineCount },
-    { label: "Top blitz", value: blitzLeader?.blitz ?? "—" },
-    { label: "Top rapid", value: rapidLeader?.rapid ?? "—" },
+    { label: dict.playersTracked, value: rows.length },
+    { label: dict.onlineNow, value: onlineCount },
+    { label: dict.topBlitz, value: blitzLeader?.blitz ?? "—" },
+    { label: dict.topRapid, value: rapidLeader?.rapid ?? "—" },
   ]
 
   return (
@@ -84,27 +88,26 @@ function Home() {
 
           <div className="relative max-w-2xl">
             <p className="animate-fade-up text-xs font-semibold uppercase tracking-[0.2em] text-gold">
-              Mboachess
+              {dict.kicker}
             </p>
             <h1 className="animate-fade-up mt-3 font-display text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
-              Chess in Cameroon, <span className="text-gold">live.</span>
+              {dict.title} <span className="text-gold">{dict.titleAccent}</span>
             </h1>
             <p className="animate-fade-up-delay mt-4 max-w-xl text-base leading-7 text-white/80 sm:text-lg">
-              Ratings, live activity and leaders for Cameroonian players on
-              Chess.com, plus tournaments, clubs and puzzles.
+              {dict.lede}
             </p>
             <div className="animate-fade-up-delay mt-6 flex flex-wrap gap-3">
               <a
                 href="#ratings"
                 className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-brand shadow-sm transition hover:bg-brand-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
-                View ratings
+                {dict.viewRatings}
               </a>
               <a
                 href="#submit"
                 className="inline-flex items-center justify-center rounded-lg border border-white/40 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
-                Add a player
+                {dict.addPlayer}
               </a>
             </div>
           </div>
@@ -137,13 +140,10 @@ function Home() {
         >
           <SectionHeading
             id="ratings-heading"
-            title="Player ratings"
-            description={
-              <>
-                Blitz and rapid from the Chess.com public API. The green dot
-                marks activity within the last {ONLINE_WITHIN_SEC / 60} minutes.
-              </>
-            }
+            title={dict.ratingsTitle}
+            description={fill(dict.ratingsDescription, {
+              minutes: ONLINE_WITHIN_SEC / 60,
+            })}
           />
           <RatingsTable rows={rows} />
           <EloDistributionChart rows={rows} />
@@ -152,8 +152,8 @@ function Home() {
         <section aria-labelledby="leaders-heading" className="mb-12">
           <SectionHeading
             id="leaders-heading"
-            title="Leaders"
-            description="Top three blitz and rapid ratings among tracked players."
+            title={dict.leadersTitle}
+            description={dict.leadersDescription}
           />
           <RatingLeaders rows={rows} />
         </section>
@@ -161,8 +161,8 @@ function Home() {
         <section aria-labelledby="explore-heading" className="mb-12">
           <SectionHeading
             id="explore-heading"
-            title="Explore"
-            description="Tournaments, clubs, creators, and more across Cameroon chess."
+            title={dict.exploreTitle}
+            description={dict.exploreDescription}
           />
           <ExploreGrid />
         </section>
@@ -174,8 +174,8 @@ function Home() {
         >
           <SectionHeading
             id="submit-heading"
-            title="Add a player"
-            description="Not in the list? Submit a Chess.com username and it will appear in the ratings table."
+            title={dict.submitTitle}
+            description={dict.submitDescription}
           />
           <SubmitUsernameForm />
         </section>

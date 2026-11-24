@@ -1,41 +1,45 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { AddContentCreatorForm } from "@/components/AddContentCreatorForm"
 import { PageShell } from "@/components/PageShell"
+import { fill, getDictionary, useDictionary, useRouteLoaderData, type Locale } from "@/lib/i18n"
 import { loadContentCreators } from "@/server/contentCreators"
 import { pageHead, webPageJsonLd } from "@/lib/seo"
 
-const TITLE = "Chess Content Creators in Cameroon | mboachess"
-const DESCRIPTION =
-  "Discover chess content creators from Cameroon. Find YouTube channels, streams, and social profiles from the local chess community."
+export function creatorsHead(locale: Locale) {
+  const copy = getDictionary(locale).creators
+  return pageHead({
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+    path: "/content-creators",
+    locale,
+    jsonLd: webPageJsonLd({
+      title: copy.metaTitle,
+      description: copy.metaDescription,
+      path: "/content-creators",
+      locale,
+    }),
+  })
+}
 
 export const Route = createFileRoute("/content-creators")({
-  head: () =>
-    pageHead({
-      title: TITLE,
-      description: DESCRIPTION,
-      path: "/content-creators",
-      jsonLd: webPageJsonLd({
-        title: TITLE,
-        description: DESCRIPTION,
-        path: "/content-creators",
-      }),
-    }),
+  head: () => creatorsHead("fr"),
   loader: () => loadContentCreators(),
   component: ContentCreatorsPage,
 })
 
-function ContentCreatorsPage() {
-  const creators = Route.useLoaderData()
+export function ContentCreatorsPage() {
+  const dict = useDictionary()
+  const copy = dict.creators
+  const creators = useRouteLoaderData<Awaited<ReturnType<typeof loadContentCreators>>>()
 
   return (
     <PageShell>
       <header className="mb-6 sm:mb-8">
         <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">
-          Content creators
+          {copy.title}
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted">
-          Discover chess creators from Cameroon. Share your content and connect
-          with the community.
+          {copy.lede}
         </p>
       </header>
 
@@ -43,7 +47,7 @@ function ContentCreatorsPage() {
 
       {creators.length === 0 ? (
         <p className="py-10 text-center text-ink-muted">
-          No content creators yet. Be the first to add your profile!
+          {copy.empty}
         </p>
       ) : (
         <section aria-labelledby="creators-heading" className="space-y-4">
@@ -51,7 +55,7 @@ function ContentCreatorsPage() {
             id="creators-heading"
             className="text-sm font-medium text-ink-muted"
           >
-            All creators ({creators.length})
+            {fill(copy.all, { count: creators.length })}
           </h2>
           {creators.map((creator, index) => (
             <article
@@ -94,7 +98,7 @@ function ContentCreatorsPage() {
                     rel="noopener noreferrer"
                     className="block text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
                   >
-                    Visit website
+                    {dict.common.visitWebsite}
                   </a>
                 )}
               </div>

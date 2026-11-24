@@ -1,8 +1,11 @@
-import { Link, useRouterState } from "@tanstack/react-router"
+import { useRouterState } from "@tanstack/react-router"
 import { useEffect, useId, useState } from "react"
 import { GitHubLink } from "@/components/GitHubLink"
+import { LanguageSwitcher } from "@/components/LanguageSwitcher"
+import { LocaleLink } from "@/components/LocaleLink"
 import { SiteNavLink } from "@/components/SiteNavLink"
 import { WhatsAppLink } from "@/components/WhatsAppLink"
+import { useDictionary } from "@/lib/i18n"
 import { SITE_LINKS } from "@/lib/navigation"
 
 const linkClass =
@@ -39,6 +42,7 @@ function MenuIcon({ open }: { open: boolean }) {
 }
 
 export function SiteHeader() {
+  const dict = useDictionary()
   const [open, setOpen] = useState(false)
   const menuId = useId()
   const pathname = useRouterState({ select: (s) => s.location.pathname })
@@ -59,7 +63,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4 sm:px-6">
-        <Link
+        <LocaleLink
           to="/"
           className="group shrink-0 font-display text-lg font-semibold tracking-tight text-foreground transition hover:text-brand sm:text-xl"
           onClick={() => setOpen(false)}
@@ -74,10 +78,10 @@ export function SiteHeader() {
             />
             <span>Mboachess</span>
           </span>
-        </Link>
+        </LocaleLink>
 
         <nav
-          aria-label="Primary"
+          aria-label={dict.nav.primary}
           className="ml-auto hidden items-center gap-1 lg:flex"
         >
           {SITE_LINKS.filter((item) => item.inHeader).map((item) => (
@@ -86,6 +90,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex shrink-0 items-center gap-1.5 lg:ml-1">
+          <LanguageSwitcher />
           <WhatsAppLink />
           <GitHubLink />
           <button
@@ -93,7 +98,7 @@ export function SiteHeader() {
             className="inline-flex items-center justify-center rounded-lg border border-border p-2 text-ink-muted transition hover:border-brand/40 hover:text-brand lg:hidden"
             aria-expanded={open}
             aria-controls={menuId}
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={open ? dict.nav.closeMenu : dict.nav.openMenu}
             onClick={() => setOpen((value) => !value)}
           >
             <MenuIcon open={open} />
@@ -104,7 +109,7 @@ export function SiteHeader() {
       {open ? (
         <nav
           id={menuId}
-          aria-label="Mobile"
+          aria-label={dict.nav.mobile}
           className="border-t border-border/60 px-3 py-2 lg:hidden"
         >
           <ul className="mx-auto flex w-full max-w-4xl flex-col gap-0.5 sm:px-3">

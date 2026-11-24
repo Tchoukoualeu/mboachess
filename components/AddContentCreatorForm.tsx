@@ -1,7 +1,10 @@
 import { useRouter } from "@tanstack/react-router"
 import { useState } from "react"
+import { translateApiError, useDictionary } from "@/lib/i18n"
 
 export function AddContentCreatorForm() {
+  const dict = useDictionary()
+  const copy = dict.creators
   const router = useRouter()
   const [isExpanded, setIsExpanded] = useState(false)
   const [formData, setFormData] = useState({
@@ -28,7 +31,7 @@ export function AddContentCreatorForm() {
     setMessage(null)
 
     if (!formData.name.trim()) {
-      setMessage({ type: "err", text: "Creator name is required." })
+      setMessage({ type: "err", text: copy.nameRequired })
       return
     }
 
@@ -46,13 +49,13 @@ export function AddContentCreatorForm() {
       if (!res.ok) {
         setMessage({
           type: "err",
-          text: data.error || "Request failed",
+          text: translateApiError(data.error, dict, dict.common.requestFailed),
         })
         return
       }
       setMessage({
         type: "ok",
-        text: "Content creator added successfully!",
+        text: copy.added,
       })
       setFormData({
         name: "",
@@ -69,7 +72,7 @@ export function AddContentCreatorForm() {
       })
       await router.invalidate()
     } catch {
-      setMessage({ type: "err", text: "Network error. Try again." })
+      setMessage({ type: "err", text: dict.common.networkError })
     } finally {
       setLoading(false)
     }
@@ -83,9 +86,9 @@ export function AddContentCreatorForm() {
         className="flex w-full items-center justify-between p-4 text-left transition hover:bg-zinc-50 dark:hover:bg-zinc-800/50 sm:p-6"
       >
         <div>
-          <h2 className="text-lg font-semibold">Add Content Creator</h2>
+          <h2 className="text-lg font-semibold">{copy.addTitle}</h2>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-            Share your chess content with the community
+            {copy.addLede}
           </p>
         </div>
         <svg
@@ -115,13 +118,13 @@ export function AddContentCreatorForm() {
               htmlFor="name"
               className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              Creator Name *
+              {copy.name}
             </label>
             <input
               id="name"
               name="name"
               type="text"
-              placeholder="e.g. ChessMaster Pro"
+              placeholder={copy.namePlaceholder}
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
@@ -136,13 +139,13 @@ export function AddContentCreatorForm() {
               htmlFor="contentType"
               className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              Content Type
+              {copy.contentType}
             </label>
             <input
               id="contentType"
               name="contentType"
               type="text"
-              placeholder="e.g. Videos, Streams, Articles, Tutorials"
+              placeholder={copy.contentTypePlaceholder}
               value={formData.contentType}
               onChange={(e) =>
                 setFormData({ ...formData, contentType: e.target.value })
@@ -157,13 +160,13 @@ export function AddContentCreatorForm() {
               htmlFor="description"
               className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              Description
+              {copy.description}
             </label>
             <textarea
               id="description"
               name="description"
               rows={3}
-              placeholder="Brief description of your content..."
+              placeholder={copy.descriptionPlaceholder}
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
@@ -179,13 +182,13 @@ export function AddContentCreatorForm() {
                 htmlFor="email"
                 className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
               >
-                Email
+                {copy.email}
               </label>
               <input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="creator@example.com"
+                placeholder={copy.emailPlaceholder}
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
@@ -200,13 +203,13 @@ export function AddContentCreatorForm() {
                 htmlFor="phone"
                 className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
               >
-                Phone
+                {copy.phone}
               </label>
               <input
                 id="phone"
                 name="phone"
                 type="tel"
-                placeholder="e.g. +237 659 46 17 38"
+                placeholder={copy.phonePlaceholder}
                 value={formData.phone}
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
@@ -222,7 +225,7 @@ export function AddContentCreatorForm() {
               htmlFor="website"
               className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              Website
+              {copy.website}
             </label>
             <input
               id="website"
@@ -240,7 +243,7 @@ export function AddContentCreatorForm() {
 
           <div>
             <h3 className="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Social Media Links
+              {copy.socials}
             </h3>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -355,7 +358,7 @@ export function AddContentCreatorForm() {
             disabled={loading}
             className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 sm:w-auto"
           >
-            {loading ? "Adding…" : "Add Content Creator"}
+            {loading ? dict.common.adding : copy.submit}
           </button>
 
           {message ? (

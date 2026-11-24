@@ -1,5 +1,6 @@
 import { useRouter } from "@tanstack/react-router"
 import { useState, useEffect, useMemo } from "react"
+import { fill, translateApiError, useDictionary, useLocale } from "@/lib/i18n"
 import {
   getUserTimezone,
   getTimezoneName,
@@ -7,6 +8,9 @@ import {
 } from "@/lib/utils"
 
 export function AddTournamentForm() {
+  const dict = useDictionary()
+  const copy = dict.tournaments
+  const locale = useLocale()
   const router = useRouter()
   const [isExpanded, setIsExpanded] = useState(false)
   const [formData, setFormData] = useState({
@@ -33,13 +37,13 @@ export function AddTournamentForm() {
 
   // Preview German time for start and end dates
   const startDateGermanPreview = useMemo(
-    () => previewGermanTime(formData.startDate, userTimezone),
-    [formData.startDate, userTimezone],
+    () => previewGermanTime(formData.startDate, userTimezone, locale),
+    [formData.startDate, userTimezone, locale],
   )
 
   const endDateGermanPreview = useMemo(
-    () => previewGermanTime(formData.endDate, userTimezone),
-    [formData.endDate, userTimezone],
+    () => previewGermanTime(formData.endDate, userTimezone, locale),
+    [formData.endDate, userTimezone, locale],
   )
 
   async function onSubmit(e: React.FormEvent) {
@@ -47,12 +51,12 @@ export function AddTournamentForm() {
     setMessage(null)
 
     if (!formData.name.trim()) {
-      setMessage({ type: "err", text: "Tournament name is required." })
+      setMessage({ type: "err", text: copy.nameRequired })
       return
     }
 
     if (!formData.startDate) {
-      setMessage({ type: "err", text: "Start date is required." })
+      setMessage({ type: "err", text: copy.startRequired })
       return
     }
 
@@ -73,13 +77,13 @@ export function AddTournamentForm() {
       if (!res.ok) {
         setMessage({
           type: "err",
-          text: data.error || "Request failed",
+          text: translateApiError(data.error, dict, dict.common.requestFailed),
         })
         return
       }
       setMessage({
         type: "ok",
-        text: "Tournament added successfully!",
+        text: copy.added,
       })
       setFormData({
         name: "",
@@ -93,7 +97,7 @@ export function AddTournamentForm() {
       })
       await router.invalidate()
     } catch {
-      setMessage({ type: "err", text: "Network error. Try again." })
+      setMessage({ type: "err", text: dict.common.networkError })
     } finally {
       setLoading(false)
     }
@@ -107,9 +111,9 @@ export function AddTournamentForm() {
         className="flex w-full items-center justify-between p-4 text-left transition hover:bg-zinc-50 dark:hover:bg-zinc-800/50 sm:p-6"
       >
         <div>
-          <h2 className="text-lg font-semibold">Add New Tournament</h2>
+          <h2 className="text-lg font-semibold">{copy.addTitle}</h2>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-            Submit your own tournament to share with the community
+            {copy.addLede}
           </p>
         </div>
         <svg
@@ -139,13 +143,13 @@ export function AddTournamentForm() {
               htmlFor="name"
               className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              Tournament Name *
+              {copy.name}
             </label>
             <input
               id="name"
               name="name"
               type="text"
-              placeholder="e.g. National Chess Championship 2026"
+              placeholder={copy.namePlaceholder}
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
@@ -157,12 +161,11 @@ export function AddTournamentForm() {
 
           <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-800/50">
             <p className="text-xs text-zinc-600 dark:text-zinc-400">
-              <strong>Your timezone:</strong> {getTimezoneName(userTimezone)} (
+              <strong>{copy.yourTimezone}</strong> {getTimezoneName(userTimezone, locale)} (
               {userTimezone})
             </p>
             <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
-              Enter times in your local time. They will be stored in UTC and
-              displayed in your timezone when viewing.
+              {copy.timezoneHelp}
             </p>
           </div>
 
@@ -172,7 +175,7 @@ export function AddTournamentForm() {
                 htmlFor="startDate"
                 className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
               >
-                Start Date * (Your Time)
+                {copy.startLabel}
               </label>
               <input
                 id="startDate"
@@ -187,7 +190,7 @@ export function AddTournamentForm() {
               />
               {startDateGermanPreview && (
                 <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400">
-                  → German time: {startDateGermanPreview}
+                  {fill(copy.germanPreview, { time: startDateGermanPreview })}
                 </p>
               )}
             </div>
@@ -197,7 +200,7 @@ export function AddTournamentForm() {
                 htmlFor="endDate"
                 className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
               >
-                End Date (Your Time)
+                {copy.endLabel}
               </label>
               <input
                 id="endDate"
@@ -212,7 +215,7 @@ export function AddTournamentForm() {
               />
               {endDateGermanPreview && (
                 <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400">
-                  → German time: {endDateGermanPreview}
+                  {fill(copy.germanPreview, { time: endDateGermanPreview })}
                 </p>
               )}
             </div>
@@ -223,13 +226,13 @@ export function AddTournamentForm() {
               htmlFor="location"
               className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              Location
+              {copy.location}
             </label>
             <input
               id="location"
               name="location"
               type="text"
-              placeholder="e.g. Yaoundé, Cameroon"
+              placeholder={copy.locationPlaceholder}
               value={formData.location}
               onChange={(e) =>
                 setFormData({ ...formData, location: e.target.value })
@@ -255,7 +258,7 @@ export function AddTournamentForm() {
               htmlFor="isOnline"
               className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              This is an online tournament
+              {copy.onlineToggle}
             </label>
           </div>
 
@@ -264,13 +267,13 @@ export function AddTournamentForm() {
               htmlFor="link"
               className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              Tournament Link
+              {copy.linkLabel}
             </label>
             <input
               id="link"
               name="link"
               type="url"
-              placeholder="e.g. https://www.chess.com/tournament/..."
+              placeholder={copy.linkPlaceholder}
               value={formData.link}
               onChange={(e) =>
                 setFormData({ ...formData, link: e.target.value })
@@ -280,8 +283,7 @@ export function AddTournamentForm() {
             />
             {formData.isOnline && (
               <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                Use a Chess.com tournament URL so winners can be fetched
-                automatically for past online events.
+                {copy.linkHelp}
               </p>
             )}
           </div>
@@ -291,13 +293,13 @@ export function AddTournamentForm() {
               htmlFor="phone"
               className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              Contact Phone
+              {copy.phone}
             </label>
             <input
               id="phone"
               name="phone"
               type="tel"
-              placeholder="e.g. +237 659 46 17 38"
+              placeholder={copy.phonePlaceholder}
               value={formData.phone}
               onChange={(e) =>
                 setFormData({ ...formData, phone: e.target.value })
@@ -312,13 +314,13 @@ export function AddTournamentForm() {
               htmlFor="description"
               className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              Description
+              {copy.description}
             </label>
             <textarea
               id="description"
               name="description"
               rows={3}
-              placeholder="Brief description of the tournament..."
+              placeholder={copy.descriptionPlaceholder}
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
@@ -333,7 +335,7 @@ export function AddTournamentForm() {
             disabled={loading}
             className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 sm:w-auto"
           >
-            {loading ? "Adding…" : "Add Tournament"}
+            {loading ? dict.common.adding : copy.submit}
           </button>
 
           {message ? (

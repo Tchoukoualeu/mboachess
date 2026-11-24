@@ -1,6 +1,14 @@
 import { Chess, type PieceSymbol, type Square } from "chess.js"
 import { useEffect, useRef, useState, type CSSProperties } from "react"
 import { ChessBoard } from "@/components/ChessBoard"
+import {
+  fill,
+  intlLocale,
+  translateApiError,
+  useDictionary,
+  useLocale,
+  type Dictionary,
+} from "@/lib/i18n"
 import { playMoveSound, unlockMoveSounds } from "@/lib/moveSound"
 import {
   kingSquare,
@@ -13,7 +21,6 @@ import {
   preparePuzzle,
   PUZZLE_DIFFICULTIES,
   PUZZLE_THEMES,
-  themeLabel,
   uciOf,
   type PreparedPuzzle,
   type PuzzleDifficultyId,
@@ -26,6 +33,16 @@ type ListedMove = { san: string; byUser: boolean }
 type Stats = { solved: number; missed: number; streak: number; bestStreak: number }
 type Promotion = { from: Square; to: Square; pieces: PieceSymbol[] }
 type Celebration = { clean: boolean; mate: boolean }
+type Notice =
+  | { kind: "loading"; daily: boolean }
+  | { kind: "error"; text: string }
+  | { kind: "watch" }
+  | { kind: "turn"; san?: string; side: "white" | "black"; check: boolean }
+  | { kind: "wrong" }
+  | { kind: "best" }
+  | { kind: "solution" }
+  | { kind: "clean" }
+  | { kind: "missed" }
 
 const EMPTY_STATS: Stats = { solved: 0, missed: 0, streak: 0, bestStreak: 0 }
 const STATS_KEY = "mboachess.puzzleStats"
@@ -39,12 +56,60 @@ const secondaryButtonClass =
 const primaryButtonClass =
   "inline-flex items-center justify-center rounded-lg bg-brand px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-soft disabled:cursor-not-allowed disabled:opacity-50"
 
+function noticeText(notice: Notice, dict: Dictionary): string {
+  const copy = dict.puzzles
+  switch (notice.kind) {
+    case "loading":
+      return notice.daily ? copy.loadingDaily : copy.loading
+    case "error":
+      return notice.text
+    case "watch":
+      return copy.watch
+    case "wrong":
+      return copy.wrong
+    case "best":
+      return copy.best
+    case "solution":
+      return copy.solutionShown
+    case "clean":
+      return copy.clean
+    case "missed":
+      return copy.missed
+    case "turn": {
+      const side = notice.side === "white" ? copy.white : copy.black
+      const rest = fill(notice.check ? copy.turnCheck : copy.turn, { side })
+      return notice.san ? fill(copy.sanTurn, { san: notice.san, rest }) : rest
+    }
+  }
+}
+
+function turnNotice(chess: Chess, san?: string): Notice {
+  return {
+    kind: "turn",
+    san,
+    side: chess.turn() === "w" ? "white" : "black",
+    check: chess.isCheck(),
+  }
+}
+
+function themeName(key: string, dict: Dictionary): string {
+  const themes = dict.puzzles.themes
+  if (key in themes) return themes[key as keyof typeof themes]
+  return key
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/^./, (char) => char.toUpperCase())
+}
+
 export function PuzzleTrainer() {
+  const dict = useDictionary()
+  const locale = useLocale()
+  const copy = dict.puzzles
   const [theme, setTheme] = useState<PuzzleThemeId>("mix")
   const [difficulty, setDifficulty] = useState<PuzzleDifficultyId>("normal")
   const [status, setStatus] = useState<Status>("loading")
   const [celebration, setCelebration] = useState<Celebration | null>(null)
-  const [message, setMessage] = useState("Loading a puzzle…")
+  const [notice, setNotice] = useState<Notice>({ kind: "loading", daily: false })
+  const message = noticeText(notice, dict)
   const [fen, setFen] = useState<string | null>(null)
   const [orientation, setOrientation] = useState<"white" | "black">("white")
   const [turn, setTurn] = useState<"w" | "b">("w")
@@ -171,11 +236,7 @@ export function PuzzleTrainer() {
     setCelebration({ clean, mate })
     setStatus("solved")
     setTone("good")
-    setMessage(
-      clean
-        ? "Clean solve."
-        : "Solved after a miss. The streak resets.",
-    )
+    setNotice(clean ? { kind: "clean" } : { kind: "missed" })
     rememberSelection(null)
   }
 
@@ -189,7 +250,7 @@ export function PuzzleTrainer() {
     setDaily(kind === "daily")
     setStatus("loading")
     setCelebration(null)
-    setMessage(kind === "daily" ? "Loading the daily puzzle…" : "Loading a puzzle…")
+    setNotice({ kind: "loading", daily: kind === "daily" })
     setPuzzle(null)
     setFen(null)
     setMoves([])
@@ -210,10 +271,10 @@ export function PuzzleTrainer() {
       }
       if (token !== tokenRef.current) return
       if (!response.ok) {
-        throw new Error(body.error || "Could not load a puzzle.")
+        throw new Error(body.error || dict.errors.puzzleLoad)
       }
       const data = parsePuzzleData(body)
-      if (!data) throw new Error("The puzzle response was incomplete.")
+      if (!data) throw new Error(dict.errors.puzzleIncomplete)
       const session = preparePuzzle(data)
       if (token !== tokenRef.current) return
       rememberSeen(filtersRef.current, data.id, kind)
@@ -222,9 +283,14 @@ export function PuzzleTrainer() {
       if (token !== tokenRef.current) return
       if (error instanceof DOMException && error.name === "AbortError") return
       setStatus("error")
-      setMessage(
-        error instanceof Error ? error.message : "Could not load a puzzle.",
-      )
+      setNotice({
+        kind: "error",
+        text: translateApiError(
+          error instanceof Error ? error.message : undefined,
+          dict,
+          dict.errors.puzzleLoad,
+        ),
+      })
     }
   }
 
@@ -238,7 +304,7 @@ export function PuzzleTrainer() {
     moveCursor(0)
     publish()
     setStatus("setup")
-    setMessage("Watch the opponent's move.")
+    setNotice({ kind: "watch" })
     const action = ++actionRef.current
     void animateSetup(session, token, action)
   }
@@ -258,7 +324,7 @@ export function PuzzleTrainer() {
     setTone("neutral")
     publish()
     setStatus("playing")
-    setMessage(`${move.san}. ${turnMessage(chessRef.current)}`)
+    setNotice(turnNotice(chessRef.current, move.san))
   }
 
   function retry() {
@@ -352,7 +418,7 @@ export function PuzzleTrainer() {
       setHint(0)
       setTone("bad")
       setStatus("reply")
-      setMessage("That's not the move. Try again.")
+      setNotice({ kind: "wrong" })
       const token = tokenRef.current
       const action = actionRef.current
       const ok = await delay(700, token, action)
@@ -366,7 +432,7 @@ export function PuzzleTrainer() {
       setLastMove(previous ? { from: previous.from, to: previous.to } : null)
       publish()
       setStatus("playing")
-      setMessage(turnMessage(chessRef.current))
+      setNotice(turnNotice(chessRef.current))
       return
     }
 
@@ -382,7 +448,7 @@ export function PuzzleTrainer() {
     }
 
     setStatus("reply")
-    setMessage("Best move.")
+    setNotice({ kind: "best" })
     const token = tokenRef.current
     const action = actionRef.current
     const ok = await delay(450, token, action)
@@ -411,7 +477,7 @@ export function PuzzleTrainer() {
       return
     }
     setStatus("playing")
-    setMessage(turnMessage(chessRef.current))
+    setNotice(turnNotice(chessRef.current))
   }
 
   async function showSolution() {
@@ -433,7 +499,7 @@ export function PuzzleTrainer() {
     setPromotion(null)
     rememberSelection(null)
     setStatus("reply")
-    setMessage("Here's the solution.")
+    setNotice({ kind: "solution" })
     setHint(0)
 
     while (indexRef.current < session.solution.length) {
@@ -467,7 +533,7 @@ export function PuzzleTrainer() {
     <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,32rem)_minmax(0,1fr)] lg:gap-8">
       <div className="mx-auto w-full max-w-lg lg:mx-0 lg:max-w-none">
         <PlayerRow
-          player={playerByColor(puzzle, opponentColor)}
+          player={playerByColor(puzzle, opponentColor, copy)}
           active={turn === (opponentColor === "white" ? "w" : "b") && status !== "loading"}
         />
         <div
@@ -508,7 +574,7 @@ export function PuzzleTrainer() {
           ) : null}
         </div>
         <PlayerRow
-          player={playerByColor(puzzle, userColor)}
+          player={playerByColor(puzzle, userColor, copy)}
           active={turn === (userColor === "white" ? "w" : "b") && status !== "loading"}
           you
         />
@@ -533,12 +599,12 @@ export function PuzzleTrainer() {
           {status === "solved" && celebration ? (
             <>
               <p className="font-display text-3xl font-semibold tracking-tight text-brand">
-                {celebration.mate ? "Checkmate" : "Solved"}
+                {celebration.mate ? copy.checkmate : copy.solved}
               </p>
               <p className="mt-1 text-sm">{message}</p>
               {celebration.clean && stats.streak > 1 ? (
                 <p className="mt-2 text-sm font-medium">
-                  {stats.streak} in a row
+                  {fill(copy.inARow, { count: stats.streak })}
                 </p>
               ) : null}
             </>
@@ -568,7 +634,7 @@ export function PuzzleTrainer() {
             disabled={status !== "playing" || hint >= 2}
             onClick={showHint}
           >
-            {hint === 0 ? "Hint" : hint === 1 ? "Hint again" : "Hint shown"}
+            {hint === 0 ? copy.hint : hint === 1 ? copy.hintAgain : copy.hintShown}
           </button>
           <button
             type="button"
@@ -583,7 +649,7 @@ export function PuzzleTrainer() {
             }
             onClick={() => void showSolution()}
           >
-            Solution
+            {copy.solution}
           </button>
           <button
             type="button"
@@ -591,7 +657,7 @@ export function PuzzleTrainer() {
             disabled={!puzzle || status === "loading"}
             onClick={retry}
           >
-            Retry
+            {copy.retry}
           </button>
           <button
             type="button"
@@ -599,7 +665,7 @@ export function PuzzleTrainer() {
             disabled={status === "loading"}
             onClick={() => void loadPuzzle("next")}
           >
-            Next puzzle
+            {copy.next}
           </button>
         </div>
 
@@ -608,7 +674,7 @@ export function PuzzleTrainer() {
           onSubmit={(event) => event.preventDefault()}
         >
           <label className="block text-sm">
-            <span className="mb-1 block text-ink-muted">Theme</span>
+            <span className="mb-1 block text-ink-muted">{copy.theme}</span>
             <select
               className={fieldClass}
               value={theme}
@@ -616,13 +682,13 @@ export function PuzzleTrainer() {
             >
               {PUZZLE_THEMES.map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.label}
+                  {copy.themes[item.id]}
                 </option>
               ))}
             </select>
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block text-ink-muted">Difficulty</span>
+            <span className="mb-1 block text-ink-muted">{copy.difficulty}</span>
             <select
               className={fieldClass}
               value={difficulty}
@@ -632,45 +698,44 @@ export function PuzzleTrainer() {
             >
               {PUZZLE_DIFFICULTIES.map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.label}
+                  {copy.difficulties[item.id]}
                 </option>
               ))}
             </select>
           </label>
         </form>
         <p className="text-xs leading-5 text-ink-muted">
-          Difficulty is relative to a 1500 puzzle rating. Changing a filter
-          loads a new puzzle.{" "}
+          {copy.filterNote}{" "}
           <button
             type="button"
             className="font-medium text-brand hover:underline disabled:opacity-50"
             disabled={status === "loading"}
             onClick={() => void loadPuzzle("daily")}
           >
-            Play the daily puzzle
+            {copy.daily}
           </button>
-          {daily ? " · this is today’s daily" : null}
+          {daily ? copy.dailyCurrent : null}
         </p>
 
         <div className="grid grid-cols-3 gap-2 text-center">
           <Stat
-            label="Streak"
+            label={copy.streak}
             value={String(stats.streak)}
             pop={status === "solved" && stats.streak > 0}
           />
-          <Stat label="Solved" value={String(stats.solved)} />
-          <Stat label="Missed" value={String(stats.missed)} />
+          <Stat label={copy.solvedStat} value={String(stats.solved)} />
+          <Stat label={copy.missedStat} value={String(stats.missed)} />
         </div>
-        <p className="text-xs text-ink-muted">Best streak {stats.bestStreak}</p>
+        <p className="text-xs text-ink-muted">{fill(copy.bestStreak, { count: stats.bestStreak })}</p>
 
         {puzzle ? (
           <div className="rounded-xl border border-border bg-surface p-4">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <p className="font-display text-lg font-semibold">
-                Rating {puzzle.rating.toLocaleString("en-US")}
+                {fill(copy.rating, { rating: puzzle.rating.toLocaleString(intlLocale(locale)) })}
               </p>
               <p className="text-sm text-ink-muted">
-                {puzzle.plays.toLocaleString("en-US")} plays
+                {fill(copy.plays, { count: puzzle.plays.toLocaleString(intlLocale(locale)) })}
                 {puzzle.perf ? ` · ${puzzle.perf}` : ""}
               </p>
             </div>
@@ -681,7 +746,7 @@ export function PuzzleTrainer() {
                     key={item}
                     className="rounded-full bg-brand-muted px-2.5 py-1 text-xs font-medium text-brand"
                   >
-                    {themeLabel(item)}
+                    {themeName(item, dict)}
                   </li>
                 ))}
               </ul>
@@ -693,7 +758,7 @@ export function PuzzleTrainer() {
                 rel="noreferrer"
                 className="text-brand hover:underline"
               >
-                View game
+                {copy.viewGame}
               </a>
             </p>
           </div>
@@ -712,6 +777,7 @@ function PlayerRow({
   active: boolean
   you?: boolean
 }) {
+  const youLabel = useDictionary().puzzles.you
   return (
     <div className="flex items-center gap-2 px-1 py-1 text-sm">
       <span
@@ -724,12 +790,13 @@ function PlayerRow({
       {player.rating ? (
         <span className="text-ink-muted">{player.rating}</span>
       ) : null}
-      {you ? <span className="text-ink-muted">· you</span> : null}
+      {you ? <span className="text-ink-muted">{youLabel}</span> : null}
     </div>
   )
 }
 
 function SolveCelebration({ mate, streak }: { mate: boolean; streak: number }) {
+  const copy = useDictionary().puzzles
   return (
     <div className="solve-stage pointer-events-none absolute inset-0 z-10" aria-hidden>
       <div className="solve-wash absolute inset-0 rounded-md" />
@@ -753,11 +820,11 @@ function SolveCelebration({ mate, streak }: { mate: boolean; streak: number }) {
       <div className="solve-banner absolute inset-x-0 top-[22%] flex justify-center">
         <div className="rounded-full border border-brand/40 bg-surface px-4 py-1.5 text-center shadow-lg">
           <p className="font-display text-lg font-semibold leading-none text-brand">
-            {mate ? "Checkmate" : "Solved"}
+            {mate ? copy.checkmate : copy.solved}
           </p>
           {streak > 0 ? (
             <p className="mt-1 text-xs font-medium text-foreground">
-              {streak} in a row
+              {fill(copy.inARow, { count: streak })}
             </p>
           ) : null}
         </div>
@@ -808,19 +875,13 @@ function Stat({
 function playerByColor(
   puzzle: PreparedPuzzle | null,
   color: "white" | "black",
+  copy: Dictionary["puzzles"],
 ) {
   const player = puzzle?.players.find((item) => item.color === color)
   return {
-    name: player?.name ?? (color === "white" ? "White" : "Black"),
+    name: player?.name ?? (color === "white" ? copy.white : copy.black),
     rating: player?.rating,
   }
-}
-
-function turnMessage(chess: Chess) {
-  const side = chess.turn() === "w" ? "White" : "Black"
-  return chess.isCheck()
-    ? `${side} is in check. Find the best move.`
-    : `${side} to move. Find the best move.`
 }
 
 function currentHintSquares(

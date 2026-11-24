@@ -1,116 +1,67 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
+import { LocaleLink } from "@/components/LocaleLink"
 import { PageShell } from "@/components/PageShell"
 import { ProdigeLeagueSignup } from "@/components/ProdigeLeagueSignup"
+import { fill, getDictionary, localizePath, useDictionary, useLocale, useRouteLoaderData, type Locale } from "@/lib/i18n"
 import { pageHead, SITE_URL } from "@/lib/seo"
 import {
   formatArenaDate,
   PRODIGE_ARENAS,
 } from "@/lib/prodigeArenaSchedule"
+import type { ProdigeLeaguePlayer } from "@/lib/prodigeLeague"
 import {
   loadProdigeLeague,
   loadProdigeLeaguePlayers,
   type ProdigeArenaCardLeader,
+  type ProdigeLeagueData,
 } from "@/server/prodigeLeague"
 
-const TITLE =
-  "Prodige League 2026 | Tournoi d'échecs en ligne au Cameroun"
-const DESCRIPTION =
-  "Saison officielle 2026, 15 novembre–31 décembre : format individuel, rapide 10+0, 100 % en ligne sur Chess.com. Individual online rapid tournament in Cameroon, open entry."
 const PATH = "/prodige-league"
 const SHARE_IMAGE = "/prodige-league-og.jpg"
 
-const FACTS = [
-  { label: "Format", value: "Individuel" },
-  { label: "Compétition", value: "100 % en ligne" },
-  { label: "Plateforme", value: "Chess.com" },
-  { label: "Cadence", value: "Rapide 10+0" },
-  { label: "Inscriptions", value: "Illimitées" },
-] as const
-
-const STEPS = [
-  {
-    title: "Qualifications",
-    detail: "15 nov. → 26 déc.",
-    note: "Inscriptions illimitées",
-  },
-  {
-    title: "Classement général",
-    detail: "Accumulation des points",
-  },
-  {
-    title: "Top 16",
-    detail: "Meilleurs joueurs du classement",
-  },
-  {
-    title: "Masters des Prodiges",
-    detail: "Top 16 → Top 4",
-  },
-  {
-    title: "Échecs d'Or",
-    detail: "Grande finale Top 4",
-  },
-] as const
-
-const PARTNERS = [
-  {
-    name: "Prodige League",
-    detail: "Ensemble vers l'excellence",
-  },
-  {
-    name: "CENT",
-    detail: "Conseil Échiquéen National des Tournois",
-  },
-  {
-    name: "Union Académie",
-    detail: "Former · Accompagner · Révéler",
-  },
-  {
-    name: "Chess.com",
-    detail: "Partenaire officiel",
-  },
-  {
-    name: "Structures nationales des échecs",
-    detail: "Partenaires",
-  },
-] as const
-
-export const Route = createFileRoute("/prodige-league")({
-  head: () =>
-    pageHead({
-      title: TITLE,
-      description: DESCRIPTION,
-      path: PATH,
-      image: SHARE_IMAGE,
-      imageAlt: "Prodige League, saison officielle 2026",
-      imageWidth: 1024,
-      imageHeight: 558,
-      jsonLd: {
-        "@context": "https://schema.org",
-        "@type": "SportsEvent",
-        name: "Prodige League — Saison officielle 2026",
-        description: DESCRIPTION,
-        startDate: "2026-11-15",
-        endDate: "2026-12-31",
-        eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
-        eventStatus: "https://schema.org/EventScheduled",
-        sport: "Chess",
-        image: `${SITE_URL}${SHARE_IMAGE}`,
-        url: `${SITE_URL}${PATH}`,
-        location: {
-          "@type": "Place",
-          name: "Cameroon",
-          address: {
-            "@type": "PostalAddress",
-            addressCountry: "CM",
-          },
-        },
-        organizer: {
-          "@type": "Organization",
-          name: "Prodige League Cameroun",
-          url: `${SITE_URL}${PATH}`,
+export function prodigeHead(locale: Locale) {
+  const copy = getDictionary(locale).prodige
+  return pageHead({
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+    path: PATH,
+    locale,
+    image: SHARE_IMAGE,
+    imageAlt: copy.imageAlt,
+    imageWidth: 1024,
+    imageHeight: 558,
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "SportsEvent",
+      name: copy.eventName,
+      description: copy.metaDescription,
+      inLanguage: locale,
+      startDate: "2026-11-15",
+      endDate: "2026-12-31",
+      eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
+      eventStatus: "https://schema.org/EventScheduled",
+      sport: "Chess",
+      image: `${SITE_URL}${SHARE_IMAGE}`,
+      url: `${SITE_URL}${localizePath(PATH, locale)}`,
+      location: {
+        "@type": "Place",
+        name: "Cameroon",
+        address: {
+          "@type": "PostalAddress",
+          addressCountry: "CM",
         },
       },
-    }),
+      organizer: {
+        "@type": "Organization",
+        name: "Prodige League Cameroun",
+        url: `${SITE_URL}${localizePath(PATH, locale)}`,
+      },
+    },
+  })
+}
+
+export const Route = createFileRoute("/prodige-league")({
+  head: () => prodigeHead("fr"),
   loader: async () => {
     const data = await loadProdigeLeague()
     // Started after the core data so a cold start doesn't open extra DB
@@ -132,6 +83,7 @@ function StandingRow({
   player: ProdigeArenaCardLeader
   label: string
 }) {
+  const copy = useDictionary().prodige
   return (
     <li className="border-b border-border last:border-b-0">
       <a
@@ -170,7 +122,12 @@ function StandingRow({
           </p>
           <p className="mt-0.5 truncate text-xs text-ink-muted">
             {player.days
-              .map((day) => `J${day.day} ${formatPoints(day.points)}`)
+              .map((day) =>
+                fill(copy.dayPoints, {
+                  day: day.day,
+                  points: formatPoints(day.points),
+                }),
+              )
               .join(" · ")}
           </p>
         </div>
@@ -179,7 +136,7 @@ function StandingRow({
             {formatPoints(player.points)}
           </p>
           <p className="text-[11px] uppercase tracking-wide text-ink-muted">
-            Pts
+            {copy.points}
           </p>
         </div>
       </a>
@@ -187,8 +144,13 @@ function StandingRow({
   )
 }
 
-function ProdigeLeaguePage() {
-  const { players, winners, leaders, banned } = Route.useLoaderData()
+export function ProdigeLeaguePage() {
+  const dict = useDictionary()
+  const copy = dict.prodige
+  const locale = useLocale()
+  const { players, winners, leaders, banned } = useRouteLoaderData<
+    ProdigeLeagueData & { players: Promise<ProdigeLeaguePlayer[] | null> }
+  >()
   const winnersByDay = new Map(winners.map((winner) => [winner.day, winner]))
 
   return (
@@ -196,17 +158,17 @@ function ProdigeLeaguePage() {
       <section className="hero-prodige relative overflow-hidden text-white">
         <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col px-4 py-10 sm:px-6 sm:py-14">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#e0b45a]">
-            Un seul objectif : le titre
+            {copy.kicker}
           </p>
           <h1 className="font-display mt-3 max-w-xl text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
             Prodige League
           </h1>
           <p className="mt-3 max-w-lg text-base leading-7 text-white/90 sm:text-lg">
-            La compétition qui révèle les talents
+            {copy.tagline}
           </p>
           <p className="mt-5 w-fit max-w-full rounded-lg bg-[#e0b45a] px-3 py-1.5 text-xs font-semibold uppercase leading-5 tracking-wide text-[#1a1408] sm:text-sm">
-            <span className="block">Saison officielle 2026</span>
-            <span className="block">15 novembre – 31 décembre 2026</span>
+            <span className="block">{copy.season}</span>
+            <span className="block">{copy.dates}</span>
           </p>
         </div>
       </section>
@@ -217,21 +179,20 @@ function ProdigeLeaguePage() {
             id="arenas-heading"
             className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
           >
-            Les arènes
+            {copy.arenasTitle}
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted">
-            Six journées de qualification sur Chess.com. Les trois premières ont
-            eu lieu le 15, le 19 et le 22 novembre 2026. Les dates des suivantes
-            restent à définir.
+            {copy.arenasLede}
           </p>
           <ol className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {PRODIGE_ARENAS.map((arena) => {
-              const dateLabel = formatArenaDate(arena.date)
+              const dateLabel =
+                formatArenaDate(arena.date, locale) || dict.prodigeArena.datePending
               const winner = winnersByDay.get(arena.day)
               const body = (
                 <>
                   <p className="text-xs font-semibold uppercase tracking-wide text-wood">
-                    Jour {String(arena.day).padStart(2, "0")}
+                    {fill(copy.day, { day: String(arena.day).padStart(2, "0") })}
                   </p>
                   <p className="mt-1 text-sm font-semibold text-foreground">
                     {dateLabel}
@@ -255,13 +216,13 @@ function ProdigeLeaguePage() {
                       </div>
                       <div className="min-w-0">
                         <p className="text-xs font-semibold uppercase tracking-wide text-wood">
-                          1er
+                          {copy.first}
                         </p>
                         <p className="truncate text-sm font-medium text-foreground">
                           {winner.username}
                         </p>
                         <p className="text-xs tabular-nums text-ink-muted">
-                          {formatPoints(winner.points)} pts
+                          {fill(copy.pointsShort, { points: formatPoints(winner.points) })}
                         </p>
                       </div>
                     </div>
@@ -271,7 +232,7 @@ function ProdigeLeaguePage() {
                       arena.chesscomId ? "text-brand" : "text-ink-muted"
                     }`}
                   >
-                    {arena.chesscomId ? "Classement et parties" : "À venir"}
+                    {arena.chesscomId ? copy.standingsLink : copy.upcoming}
                   </p>
                 </>
               )
@@ -289,13 +250,13 @@ function ProdigeLeaguePage() {
 
               return (
                 <li key={arena.day}>
-                  <Link
+                  <LocaleLink
                     to="/prodige-league/arena/$day"
                     params={{ day: String(arena.day) }}
                     className="flex h-full flex-col rounded-xl border border-border bg-surface px-3 py-3 transition hover:border-wood"
                   >
                     {body}
-                  </Link>
+                  </LocaleLink>
                 </li>
               )
             })}
@@ -307,14 +268,14 @@ function ProdigeLeaguePage() {
             id="standings-heading"
             className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
           >
-            Classement général
+            {copy.standingsTitle}
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted">
-            Top 16 des points accumulés sur les arènes terminées.
+            {copy.standingsLede}
           </p>
           {leaders.length === 0 ? (
             <p className="mt-4 rounded-xl border border-dashed border-border bg-surface px-4 py-8 text-center text-sm text-ink-muted">
-              Le classement apparaîtra après la première arène.
+              {copy.standingsEmpty}
             </p>
           ) : (
             <ol className="mt-4 overflow-hidden rounded-xl border border-border bg-surface">
@@ -330,18 +291,17 @@ function ProdigeLeaguePage() {
           {banned.length > 0 ? (
             <div className="mt-6">
               <h3 className="text-sm font-semibold text-foreground">
-                Joueurs bannis
+                {copy.bannedTitle}
               </h3>
               <p className="mt-1 text-sm leading-6 text-ink-muted">
-                Exclus du top 16. Leurs points ne comptent pas pour la
-                qualification.
+                {copy.bannedLede}
               </p>
               <ul className="mt-3 overflow-hidden rounded-xl border border-border bg-surface">
                 {banned.map((player) => (
                   <StandingRow
                     key={player.username}
                     player={player}
-                    label="Banni"
+                    label={copy.banned}
                   />
                 ))}
               </ul>
@@ -354,10 +314,10 @@ function ProdigeLeaguePage() {
             id="path-heading"
             className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
           >
-            Le parcours de la saison
+            {copy.pathTitle}
           </h2>
           <ol className="mt-4 grid gap-3 md:grid-cols-5">
-            {STEPS.map((step, index) => (
+            {copy.steps.map((step, index) => (
               <li
                 key={step.title}
                 className="rounded-xl border border-border bg-surface px-3 py-3"
@@ -369,7 +329,7 @@ function ProdigeLeaguePage() {
                   {step.title}
                 </p>
                 <p className="mt-1 text-sm text-ink-muted">{step.detail}</p>
-                {"note" in step ? (
+                {step.note ? (
                   <p className="mt-0.5 text-xs text-ink-muted">{step.note}</p>
                 ) : null}
               </li>
@@ -382,10 +342,10 @@ function ProdigeLeaguePage() {
             id="facts-heading"
             className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
           >
-            Jouer, apprendre, progresser, devenir prodige
+            {copy.factsTitle}
           </h2>
           <ul className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-5">
-            {FACTS.map((fact) => (
+            {copy.facts.map((fact) => (
               <li
                 key={fact.label}
                 className="rounded-xl border border-border bg-surface px-3 py-3"
@@ -401,33 +361,32 @@ function ProdigeLeaguePage() {
           </ul>
         </section>
 
-        <section
-          aria-labelledby="english-summary-heading"
-          className="mb-10 rounded-xl border border-border bg-surface p-4 sm:p-5"
-        >
-          <h2
-            id="english-summary-heading"
-            className="text-xs font-semibold uppercase tracking-[0.16em] text-wood"
+        {locale === "fr" ? (
+          <section
+            aria-labelledby="english-summary-heading"
+            className="mb-10 rounded-xl border border-border bg-surface p-4 sm:p-5"
           >
-            In English
-          </h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground sm:text-base sm:leading-7">
-            Prodige League is an individual online rapid tournament (10+0) on
-            Chess.com, from 15 November to 31 December 2026 in Cameroon.
-            Registration is closed. The arenas and the overall top 16 are
-            above, followed by the season path and the format.
-          </p>
-        </section>
+            <h2
+              id="english-summary-heading"
+              className="text-xs font-semibold uppercase tracking-[0.16em] text-wood"
+            >
+              {copy.englishTitle}
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground sm:text-base sm:leading-7">
+              {copy.englishBody}
+            </p>
+          </section>
+        ) : null}
 
         <section aria-labelledby="partners-heading" className="mb-10">
           <h2
             id="partners-heading"
             className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
           >
-            Organisation & partenaires
+            {copy.partnersTitle}
           </h2>
           <ul className="mt-4 divide-y divide-border border-y border-border">
-            {PARTNERS.map((partner) => (
+            {copy.partners.map((partner) => (
               <li key={partner.name} className="py-3">
                 <p className="font-medium text-foreground">{partner.name}</p>
                 <p className="text-sm text-ink-muted">{partner.detail}</p>

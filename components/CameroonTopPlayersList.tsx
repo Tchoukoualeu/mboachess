@@ -3,6 +3,7 @@ import type {
   CameroonTopPlayer,
   TopPlayerMode,
 } from "@/lib/cameroonTopPlayers"
+import { fill, useDictionary } from "@/lib/i18n"
 
 const PAGE_SIZE = 20
 
@@ -12,6 +13,7 @@ type Props = {
 }
 
 function PlayerRow({ player }: { player: CameroonTopPlayer }) {
+  const copy = useDictionary().topPlayers
   const href = `https://www.chess.com/member/${encodeURIComponent(player.username)}`
 
   return (
@@ -37,8 +39,8 @@ function PlayerRow({ player }: { player: CameroonTopPlayer }) {
           ) : (
             <span
               className="flex h-full w-full items-center justify-center text-xl leading-none"
-              aria-label="Cameroon"
-              title="Cameroon"
+              aria-label={copy.cameroon}
+              title={copy.cameroon}
             >
               🇨🇲
             </span>
@@ -49,8 +51,14 @@ function PlayerRow({ player }: { player: CameroonTopPlayer }) {
             {player.username}
           </p>
           <p className="mt-0.5 text-xs text-ink-muted">
-            {player.winCount}W / {player.lossCount}L / {player.drawCount}D
-            {player.gameCount > 0 ? ` · ${player.gameCount} games` : null}
+            {fill(copy.record, {
+              wins: player.winCount,
+              losses: player.lossCount,
+              draws: player.drawCount,
+            })}
+            {player.gameCount > 0
+              ? ` · ${fill(copy.games, { count: player.gameCount })}`
+              : null}
           </p>
         </div>
         <span className="shrink-0 font-mono text-base font-semibold tabular-nums text-foreground sm:text-lg">
@@ -62,6 +70,7 @@ function PlayerRow({ player }: { player: CameroonTopPlayer }) {
 }
 
 export function CameroonTopPlayersList({ blitz, rapid }: Props) {
+  const copy = useDictionary().topPlayers
   const [mode, setMode] = useState<TopPlayerMode>("blitz")
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
@@ -79,13 +88,13 @@ export function CameroonTopPlayersList({ blitz, rapid }: Props) {
     <div>
       <div
         role="tablist"
-        aria-label="Rating type"
+        aria-label={copy.tablist}
         className="mb-4 flex gap-1 rounded-lg border border-border bg-surface-muted/60 p-1"
       >
         {(
           [
-            { id: "blitz" as const, label: "Best blitz" },
-            { id: "rapid" as const, label: "Best rapid" },
+            { id: "blitz" as const, label: copy.bestBlitz },
+            { id: "rapid" as const, label: copy.bestRapid },
           ] as const
         ).map((tab) => {
           const selected = mode === tab.id
@@ -110,16 +119,15 @@ export function CameroonTopPlayersList({ blitz, rapid }: Props) {
 
       {players.length === 0 ? (
         <p className="rounded-xl border border-dashed border-border bg-surface px-4 py-10 text-center text-sm text-ink-muted">
-          Could not load the Chess.com country leaderboard right now. Try again
-          shortly.
+          {copy.empty}
         </p>
       ) : (
         <>
           <div className="mb-2 flex items-end justify-between gap-2 px-1 text-sm text-ink-muted">
             <p>
-              Showing {visible.length} of {players.length}
+              {fill(copy.showing, { visible: visible.length, total: players.length })}
             </p>
-            <p className="capitalize">{mode} rating</p>
+            <p>{fill(copy.rating, { mode })}</p>
           </div>
 
           <ol className="overflow-hidden rounded-xl border border-border bg-surface">
@@ -139,12 +147,12 @@ export function CameroonTopPlayersList({ blitz, rapid }: Props) {
                 }
                 className="inline-flex items-center justify-center rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition hover:border-brand/40 hover:bg-brand-muted/50"
               >
-                Load more ({nextBatch})
+                {fill(copy.loadMore, { count: nextBatch })}
               </button>
             </div>
           ) : (
             <p className="mt-4 text-center text-sm text-ink-muted">
-              Full top {players.length} list loaded.
+              {fill(copy.full, { count: players.length })}
             </p>
           )}
         </>

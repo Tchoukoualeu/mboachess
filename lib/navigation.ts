@@ -1,3 +1,5 @@
+import type { Dictionary } from "@/locales/fr"
+
 export type SiteRoute =
   | "/"
   | "/puzzles"
@@ -10,10 +12,11 @@ export type SiteRoute =
   | "/content-creators"
   | "/chess-cameroon"
 
+export type SiteLinkId = keyof Dictionary["nav"]["links"]
+
 export type SiteLink = {
   to: SiteRoute
-  label: string
-  blurb: string
+  id: SiteLinkId
   /** Shown in the desktop header (space is limited there). */
   inHeader: boolean
   /** Shown as a card in the home page "Explore" grid. */
@@ -22,73 +25,28 @@ export type SiteLink = {
 
 /** Single source for header, mobile menu, footer, and home Explore links. */
 export const SITE_LINKS: readonly SiteLink[] = [
-  {
-    to: "/",
-    label: "Players",
-    blurb: "Ratings and activity of tracked players",
-    inHeader: true,
-    inExplore: false,
-  },
-  {
-    to: "/prodige-league",
-    label: "Prodige League",
-    blurb: "Online rapid season, 15 Nov–31 Dec 2026",
-    inHeader: true,
-    inExplore: true,
-  },
-  {
-    to: "/puzzles",
-    label: "Puzzles",
-    blurb: "Solve tactics from Lichess",
-    inHeader: true,
-    inExplore: true,
-  },
+  { to: "/", id: "players", inHeader: true, inExplore: false },
+  { to: "/prodige-league", id: "prodige", inHeader: true, inExplore: true },
+  { to: "/puzzles", id: "puzzles", inHeader: true, inExplore: true },
   {
     to: "/top-cameroon-chess-players",
-    label: "Top 100",
-    blurb: "Best Cameroon blitz and rapid on Chess.com",
+    id: "top",
     inHeader: true,
     inExplore: true,
   },
-  {
-    to: "/tournaments",
-    label: "Tournaments",
-    blurb: "Upcoming events to play or follow",
-    inHeader: true,
-    inExplore: true,
-  },
+  { to: "/tournaments", id: "tournaments", inHeader: true, inExplore: true },
   {
     to: "/tournaments/past-online",
-    label: "Past online",
-    blurb: "Previous online tournament results",
+    id: "pastOnline",
     inHeader: false,
     inExplore: true,
   },
-  {
-    to: "/rating-speed-run",
-    label: "Speed run",
-    blurb: "Timed rating-gain competitions",
-    inHeader: true,
-    inExplore: true,
-  },
-  {
-    to: "/clubs",
-    label: "Clubs",
-    blurb: "Local clubs and meetups",
-    inHeader: true,
-    inExplore: true,
-  },
-  {
-    to: "/content-creators",
-    label: "Creators",
-    blurb: "Streams, channels, and socials",
-    inHeader: true,
-    inExplore: true,
-  },
+  { to: "/rating-speed-run", id: "speedRun", inHeader: true, inExplore: true },
+  { to: "/clubs", id: "clubs", inHeader: true, inExplore: true },
+  { to: "/content-creators", id: "creators", inHeader: true, inExplore: true },
   {
     to: "/chess-cameroon",
-    label: "Chess Cameroon",
-    blurb: "Start here if you searched for chess cameroon",
+    id: "chessCameroon",
     inHeader: false,
     inExplore: true,
   },

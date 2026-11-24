@@ -1,6 +1,7 @@
 import { useMemo } from "react"
 import { CrownIcon } from "@/components/CrownIcon"
 import type { PlayerLookupResult } from "@/lib/chesscom"
+import { fill, useDictionary } from "@/lib/i18n"
 import { topNByRating } from "@/lib/ratingLeaders"
 
 const AVATAR_PX = 40
@@ -12,11 +13,10 @@ type Props = {
   rows: PlayerLookupResult[]
 }
 
-const MODE_STYLES: Record<Mode, { label: string; dot: string; text: string }> =
-  {
-    blitz: { label: "Blitz", dot: "bg-brand", text: "text-brand" },
-    rapid: { label: "Rapid", dot: "bg-wood", text: "text-wood" },
-  }
+const MODE_STYLES: Record<Mode, { dot: string; text: string }> = {
+  blitz: { dot: "bg-brand", text: "text-brand" },
+  rapid: { dot: "bg-wood", text: "text-wood" },
+}
 
 function Avatar({ player, size }: { player: PlayerLookupResult; size: string }) {
   return (
@@ -42,17 +42,19 @@ function Avatar({ player, size }: { player: PlayerLookupResult; size: string }) 
 }
 
 function Podium({ mode, players }: { mode: Mode; players: PlayerLookupResult[] }) {
+  const dict = useDictionary()
   const style = MODE_STYLES[mode]
+  const label = dict.common[mode]
 
   return (
     <div className="rounded-xl border border-border bg-surface shadow-sm">
       <h3 className="flex items-center gap-2 border-b border-border px-4 py-3 text-sm font-semibold">
         <span className={`h-2 w-2 rounded-full ${style.dot}`} aria-hidden />
-        Top {style.label}
+        {fill(dict.leaders.top, { label })}
       </h3>
       {players.length === 0 ? (
         <p className="px-4 py-6 text-center text-sm text-ink-muted">
-          No rated players yet.
+          {dict.leaders.empty}
         </p>
       ) : (
         <ol>
@@ -74,7 +76,7 @@ function Podium({ mode, players }: { mode: Mode; players: PlayerLookupResult[] }
                     }`}
                   >
                     {first ? <CrownIcon className="h-4 w-4" /> : index + 1}
-                    {first ? <span className="sr-only">1</span> : null}
+                    {first ? <span className="sr-only">{dict.leaders.first}</span> : null}
                   </span>
                   <Avatar player={player} size={first ? "h-10 w-10" : "h-8 w-8"} />
                   <span className="min-w-0 flex-1 truncate font-mono text-sm group-hover:text-brand">

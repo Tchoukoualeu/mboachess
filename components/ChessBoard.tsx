@@ -1,17 +1,10 @@
 import { Chess, type Color, type PieceSymbol, type Square } from "chess.js"
 import { useEffect, useMemo, useRef, useState } from "react"
+import { fill, useDictionary, type Dictionary } from "@/lib/i18n"
 import { isSquare, moveTargets } from "@/lib/puzzle"
 
 const LIGHT = "#f0d9b5"
 const DARK = "#b58863"
-const PIECE_NAMES: Record<PieceSymbol, string> = {
-  p: "pawn",
-  n: "knight",
-  b: "bishop",
-  r: "rook",
-  q: "queen",
-  k: "king",
-}
 const UNICODE: Record<Color, Record<PieceSymbol, string>> = {
   w: { k: "♔", q: "♕", r: "♖", b: "♗", n: "♘", p: "♙" },
   b: { k: "♚", q: "♛", r: "♜", b: "♝", n: "♞", p: "♟" },
@@ -58,6 +51,7 @@ export function ChessBoard({
   onSquare,
   onDragMove,
 }: ChessBoardProps) {
+  const dict = useDictionary()
   const gridRef = useRef<HTMLDivElement>(null)
   const dragRef = useRef<{
     from: Square
@@ -151,7 +145,7 @@ export function ChessBoard({
       <div
         ref={gridRef}
         role="grid"
-        aria-label="Chess board"
+        aria-label={dict.board.label}
         className="grid aspect-square w-full grid-cols-8 grid-rows-8 overflow-hidden rounded-md touch-none select-none"
         onContextMenu={(event) => event.preventDefault()}
         onAuxClick={(event) => event.preventDefault()}
@@ -255,7 +249,7 @@ export function ChessBoard({
                 key={square}
                 type="button"
                 role="gridcell"
-                aria-label={squareLabel(square, piece)}
+                aria-label={squareLabel(square, piece, dict)}
                 aria-pressed={isSelected}
                 className="relative flex items-center justify-center"
                 style={{ backgroundColor: isDark ? DARK : LIGHT }}
@@ -337,7 +331,7 @@ export function ChessBoard({
         <div className="absolute inset-1 z-20 flex items-center justify-center rounded-md bg-black/45">
           <div
             role="dialog"
-            aria-label="Choose a promotion piece"
+            aria-label={dict.board.choosePromotion}
             className="flex items-center gap-2 rounded-xl bg-surface p-3 shadow-lg"
           >
             {promotion.pieces.map((piece) => (
@@ -345,7 +339,7 @@ export function ChessBoard({
                 key={piece}
                 type="button"
                 className="flex h-14 w-14 items-center justify-center rounded-lg bg-[#f0d9b5] transition hover:bg-brand-muted"
-                aria-label={`Promote to ${PIECE_NAMES[piece]}`}
+                aria-label={fill(dict.board.promoteTo, { piece: dict.board.pieces[piece] })}
                 onClick={() => promotion.onChoose(piece)}
               >
                 <PieceImage color={promotion.color} type={piece} />
@@ -356,7 +350,7 @@ export function ChessBoard({
               className="ml-1 rounded-lg px-2 py-2 text-sm text-ink-muted transition hover:text-foreground"
               onClick={promotion.onCancel}
             >
-              Cancel
+              {dict.common.cancel}
             </button>
           </div>
         </div>
@@ -503,8 +497,9 @@ function PieceImage({ color, type }: { color: Color; type: PieceSymbol }) {
 function squareLabel(
   square: string,
   piece: { color: Color; type: PieceSymbol } | null,
+  dict: Dictionary,
 ) {
   if (!piece) return square
-  const color = piece.color === "w" ? "white" : "black"
-  return `${square}, ${color} ${PIECE_NAMES[piece.type]}`
+  const color = piece.color === "w" ? dict.puzzles.white : dict.puzzles.black
+  return `${square}, ${color} ${dict.board.pieces[piece.type]}`
 }

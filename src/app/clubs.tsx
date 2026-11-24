@@ -1,41 +1,45 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { AddClubForm } from "@/components/AddClubForm"
 import { PageShell } from "@/components/PageShell"
+import { fill, getDictionary, useDictionary, useRouteLoaderData, type Locale } from "@/lib/i18n"
 import { loadClubs } from "@/server/clubs"
 import { pageHead, webPageJsonLd } from "@/lib/seo"
 
-const TITLE = "Chess Clubs in Cameroon | mboachess"
-const DESCRIPTION =
-  "Find and join chess clubs across Cameroon. Discover meeting schedules, locations, and contact details for local chess communities."
+export function clubsHead(locale: Locale) {
+  const copy = getDictionary(locale).clubs
+  return pageHead({
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+    path: "/clubs",
+    locale,
+    jsonLd: webPageJsonLd({
+      title: copy.metaTitle,
+      description: copy.metaDescription,
+      path: "/clubs",
+      locale,
+    }),
+  })
+}
 
 export const Route = createFileRoute("/clubs")({
-  head: () =>
-    pageHead({
-      title: TITLE,
-      description: DESCRIPTION,
-      path: "/clubs",
-      jsonLd: webPageJsonLd({
-        title: TITLE,
-        description: DESCRIPTION,
-        path: "/clubs",
-      }),
-    }),
+  head: () => clubsHead("fr"),
   loader: () => loadClubs(),
   component: ClubsPage,
 })
 
-function ClubsPage() {
-  const clubs = Route.useLoaderData()
+export function ClubsPage() {
+  const dict = useDictionary()
+  const copy = dict.clubs
+  const clubs = useRouteLoaderData<Awaited<ReturnType<typeof loadClubs>>>()
 
   return (
     <PageShell>
       <header className="mb-6 sm:mb-8">
         <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">
-          Chess clubs
+          {copy.title}
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted">
-          Find and join clubs in your area. Add yours to connect with other
-          players.
+          {copy.lede}
         </p>
       </header>
 
@@ -43,12 +47,12 @@ function ClubsPage() {
 
       {clubs.length === 0 ? (
         <p className="py-10 text-center text-ink-muted">
-          No clubs yet. Be the first to add your chess club!
+          {copy.empty}
         </p>
       ) : (
         <section aria-labelledby="clubs-heading" className="space-y-4">
           <h2 id="clubs-heading" className="text-sm font-medium text-ink-muted">
-            All clubs ({clubs.length})
+            {fill(copy.all, { count: clubs.length })}
           </h2>
           {clubs.map((club, index) => (
             <article
@@ -64,7 +68,11 @@ function ClubsPage() {
               <div className="mt-3 space-y-1.5 text-sm text-foreground/90">
                 {club.location && <div>{club.location}</div>}
                 {club.meetingSchedule && <div>{club.meetingSchedule}</div>}
-                {club.contactName && <div>Contact: {club.contactName}</div>}
+                {club.contactName && (
+                  <div>
+                    {dict.common.contact}: {club.contactName}
+                  </div>
+                )}
                 {club.phone && (
                   <a
                     href={`tel:${club.phone}`}
@@ -91,7 +99,7 @@ function ClubsPage() {
                       rel="noopener noreferrer"
                       className="text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
                     >
-                      Visit website
+                      {dict.common.visitWebsite}
                     </a>
                   </div>
                 )}

@@ -1,6 +1,8 @@
-import { Link, useRouter } from "@tanstack/react-router"
+import { useRouter } from "@tanstack/react-router"
 import { useMemo, useState, type FormEvent } from "react"
 import { CrownIcon } from "@/components/CrownIcon"
+import { LocaleLink } from "@/components/LocaleLink"
+import { fill, intlLocale, translateApiError, useDictionary, useLocale, type Dictionary } from "@/lib/i18n"
 import {
   getCompetitionStatus,
   getCompetitionWinner,
@@ -10,8 +12,8 @@ import {
   type RatingType,
 } from "@/lib/ratingSpeedRunShared"
 
-function formatDateTime(date: Date): string {
-  return new Intl.DateTimeFormat(undefined, {
+function formatDateTime(date: Date, locale: ReturnType<typeof useLocale>): string {
+  return new Intl.DateTimeFormat(intlLocale(locale), {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(date))
@@ -36,16 +38,19 @@ function statColor(delta: number): string {
   return "text-zinc-900 dark:text-zinc-100"
 }
 
-function statusLabel(status: CompetitionStatus): string {
+function statusLabel(
+  status: CompetitionStatus,
+  copy: Dictionary["speedRun"],
+): string {
   switch (status) {
     case "registration-open":
-      return "Registration open"
+      return copy.status.registrationOpen
     case "upcoming":
-      return "Starting soon"
+      return copy.status.upcoming
     case "running":
-      return "Running"
+      return copy.status.running
     case "finished":
-      return "Finished"
+      return copy.status.finished
   }
 }
 
@@ -62,8 +67,11 @@ function statusClasses(status: CompetitionStatus): string {
   }
 }
 
-function ratingTypeLabel(ratingType: RatingType): string {
-  return ratingType.charAt(0).toUpperCase() + ratingType.slice(1)
+function ratingTypeLabel(
+  ratingType: RatingType,
+  dict: Dictionary,
+): string {
+  return dict.common[ratingType]
 }
 
 function getWinner(competition: RatingSpeedRunCompetition | null) {
@@ -79,18 +87,20 @@ function WinnerBanner({
   prize?: string
   ratingType: RatingType
 }) {
+  const copy = useDictionary().speedRun
+  const dict = useDictionary()
   const initial = winner.username.slice(0, 1).toUpperCase()
   const netLabel = `${winner.netPoints > 0 ? "+" : ""}${winner.netPoints}`
 
   return (
     <section
-      aria-label={`Winner: ${winner.username}`}
+      aria-label={fill(copy.winnerAria, { name: winner.username })}
       className="overflow-hidden rounded-2xl border-2 border-amber-300 bg-linear-to-br from-amber-50 via-white to-amber-100/80 shadow-md dark:border-amber-600/50 dark:from-amber-950/40 dark:via-zinc-900 dark:to-amber-950/20"
     >
       <div className="flex flex-col items-center gap-5 px-5 py-8 text-center sm:px-8 sm:py-10">
         <div className="inline-flex items-center gap-2 rounded-full bg-amber-200/80 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-amber-900 dark:bg-amber-500/20 dark:text-amber-200">
           <CrownIcon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-          Winner
+          {copy.winner}
         </div>
 
         <div className="relative">
@@ -125,7 +135,7 @@ function WinnerBanner({
             {winner.username}
           </a>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 sm:text-base">
-            Top {ratingTypeLabel(ratingType)} net gain
+            {fill(copy.topGain, { type: ratingTypeLabel(ratingType, dict) })}
           </p>
         </div>
 
@@ -136,13 +146,13 @@ function WinnerBanner({
             {netLabel}
           </div>
           <div className="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-            net rating points
+            {copy.netPoints}
           </div>
         </div>
 
         {prize ? (
           <div className="mt-1 rounded-xl bg-amber-100/90 px-5 py-3 text-sm font-semibold text-amber-950 dark:bg-amber-500/15 dark:text-amber-100 sm:text-base">
-            Prize: {prize}
+            {fill(copy.prizeBanner, { prize })}
           </div>
         ) : null}
       </div>
@@ -152,6 +162,8 @@ function WinnerBanner({
 
 function JoinCompetitionForm({ competitionId }: { competitionId: string }) {
   const router = useRouter()
+  const dict = useDictionary()
+  const copy = dict.speedRun
   const [username, setUsername] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
@@ -174,22 +186,20 @@ function JoinCompetitionForm({ competitionId }: { competitionId: string }) {
 
       if (!response.ok) {
         setError(
-          "error" in data && data.error
-            ? data.error
-            : "Could not join competition.",
+          translateApiError(
+            "error" in data ? data.error : undefined,
+            dict,
+            copy.joinFailed,
+          ),
         )
         return
       }
 
-      setMessage(
-        "already" in data && data.already
-          ? "This account is already registered."
-          : "Registration complete.",
-      )
+      setMessage("already" in data && data.already ? copy.already : copy.joined)
       setUsername("")
       await router.invalidate()
     } catch {
-      setError("Could not join competition.")
+      setError(copy.joinFailed)
     } finally {
       setSubmitting(false)
     }
@@ -202,7 +212,7 @@ function JoinCompetitionForm({ competitionId }: { competitionId: string }) {
     >
       <label className="flex flex-col gap-1 text-sm">
         <span className="font-medium text-zinc-700 dark:text-zinc-300">
-          Chess.com username
+          {copy.username}
         </span>
         <input
           value={username}
@@ -217,7 +227,7 @@ function JoinCompetitionForm({ competitionId }: { competitionId: string }) {
         disabled={submitting}
         className="mt-auto inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
       >
-        {submitting ? "Joining..." : "Join competition"}
+        {submitting ? copy.joining : copy.join}
       </button>
       {message ? (
         <p className="sm:col-span-2 text-sm text-emerald-700 dark:text-emerald-400">
@@ -240,6 +250,9 @@ export function RatingSpeedRunCompetitionView({
   competition: RatingSpeedRunCompetition
   showBackToList?: boolean
 }) {
+  const dict = useDictionary()
+  const copy = dict.speedRun
+  const locale = useLocale()
   const status = getCompetitionStatus(competition)
   const winner = useMemo(() => getWinner(competition), [competition])
 
@@ -250,13 +263,13 @@ export function RatingSpeedRunCompetitionView({
           <div>
             {showBackToList ? (
               <div className="mb-3">
-                <Link
+                <LocaleLink
                   to="/rating-speed-run"
                   search={{}}
                   className="text-sm text-emerald-700 underline decoration-emerald-700/30 underline-offset-2 hover:decoration-emerald-600 dark:text-emerald-400 dark:decoration-emerald-400/40"
                 >
-                  Back to all speed runs
-                </Link>
+                  {copy.backToList}
+                </LocaleLink>
               </div>
             ) : null}
             <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -264,21 +277,22 @@ export function RatingSpeedRunCompetitionView({
               <span
                 className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${statusClasses(status)}`}
               >
-                {statusLabel(status)}
+                {statusLabel(status, copy)}
               </span>
             </div>
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Tracking {ratingTypeLabel(competition.ratingType)} rating.
+              {fill(copy.tracking, { type: ratingTypeLabel(competition.ratingType, dict) })}
             </p>
           </div>
           {status === "registration-open" ? (
             <div className="rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-800 dark:bg-blue-900/20 dark:text-blue-300">
-              Registration closes in{" "}
-              {formatDuration(competition.registrationClosesAt)}
+              {fill(copy.registrationCloses, {
+                time: formatDuration(competition.registrationClosesAt),
+              })}
             </div>
           ) : status === "running" ? (
             <div className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300">
-              Ends in {formatDuration(competition.endDate)}
+              {fill(copy.endsIn, { time: formatDuration(competition.endDate) })}
             </div>
           ) : null}
         </div>
@@ -286,27 +300,27 @@ export function RatingSpeedRunCompetitionView({
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
           <div className="rounded-lg bg-zinc-50 p-4 dark:bg-zinc-800/60">
             <div className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              Registration window
+              {copy.registrationWindow}
             </div>
             <div className="mt-1 text-sm font-semibold">
-              {formatDateTime(competition.registrationOpenedAt)} to{" "}
-              {formatDateTime(competition.registrationClosesAt)}
+              {formatDateTime(competition.registrationOpenedAt, locale)} {copy.to}{" "}
+              {formatDateTime(competition.registrationClosesAt, locale)}
             </div>
           </div>
           <div className="rounded-lg bg-zinc-50 p-4 dark:bg-zinc-800/60">
             <div className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              Competition start
+              {copy.competitionStart}
             </div>
             <div className="mt-1 text-sm font-semibold">
-              {formatDateTime(competition.startDate)}
+              {formatDateTime(competition.startDate, locale)}
             </div>
           </div>
           <div className="rounded-lg bg-zinc-50 p-4 dark:bg-zinc-800/60">
             <div className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              Competition end
+              {copy.competitionEnd}
             </div>
             <div className="mt-1 text-sm font-semibold">
-              {formatDateTime(competition.endDate)}
+              {formatDateTime(competition.endDate, locale)}
             </div>
           </div>
         </div>
@@ -316,7 +330,7 @@ export function RatingSpeedRunCompetitionView({
             {competition.description ? (
               <div className="rounded-lg bg-zinc-50 p-4 dark:bg-zinc-800/60">
                 <div className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                  Description
+                  {copy.description}
                 </div>
                 <p className="mt-2 whitespace-pre-line text-sm leading-6 text-zinc-700 dark:text-zinc-300">
                   {competition.description}
@@ -326,7 +340,7 @@ export function RatingSpeedRunCompetitionView({
             {competition.prize ? (
               <div className="rounded-lg bg-amber-50 p-4 dark:bg-amber-900/20">
                 <div className="text-xs font-medium uppercase tracking-wide text-amber-700 dark:text-amber-300">
-                  Prize
+                  {copy.prize}
                 </div>
                 <p className="mt-2 text-sm font-semibold text-amber-900 dark:text-amber-100">
                   {competition.prize}
@@ -339,7 +353,7 @@ export function RatingSpeedRunCompetitionView({
         {status === "registration-open" ? (
           <div className="mt-6 border-t border-zinc-200 pt-6 dark:border-zinc-800">
             <h3 className="mb-3 text-base font-semibold">
-              Join this competition
+              {copy.joinTitle}
             </h3>
             <JoinCompetitionForm competitionId={competition.id} />
           </div>
@@ -357,19 +371,19 @@ export function RatingSpeedRunCompetitionView({
       <section className="rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
         <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-4 dark:border-zinc-800 sm:px-6">
           <div>
-            <h3 className="text-lg font-semibold">Leaderboard</h3>
+            <h3 className="text-lg font-semibold">{copy.leaderboard}</h3>
             <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-              Sorted by highest net gain from the competition start.
+              {copy.leaderboardLede}
             </p>
           </div>
           <div className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
-            Players: {competition.participants.length}
+            {fill(copy.playersCount, { count: competition.participants.length })}
           </div>
         </div>
 
         {competition.participants.length === 0 ? (
           <div className="px-4 py-8 text-center text-sm text-zinc-600 dark:text-zinc-400 sm:px-6">
-            No players registered yet.
+            {copy.noPlayers}
           </div>
         ) : (
           <>
@@ -391,10 +405,10 @@ export function RatingSpeedRunCompetitionView({
                           {isWinner ? (
                             <CrownIcon className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400" />
                           ) : null}
-                          Rank #{index + 1}
+                          {fill(copy.rank, { rank: index + 1 })}
                           {isWinner ? (
                             <span className="rounded-full bg-amber-200/80 px-2 py-0.5 text-[10px] font-bold text-amber-900 dark:bg-amber-500/20 dark:text-amber-200">
-                              Winner
+                              {copy.winner}
                             </span>
                           ) : null}
                         </div>
@@ -420,7 +434,7 @@ export function RatingSpeedRunCompetitionView({
                     <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                       <div className="rounded-lg bg-white px-3 py-2 dark:bg-zinc-900">
                         <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                          Start
+                          {copy.start}
                         </div>
                         <div className="mt-1 font-semibold tabular-nums">
                           {formatRatingValue(participant.startRating)}
@@ -428,7 +442,7 @@ export function RatingSpeedRunCompetitionView({
                       </div>
                       <div className="rounded-lg bg-white px-3 py-2 dark:bg-zinc-900">
                         <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                          Current
+                          {copy.current}
                         </div>
                         <div className="mt-1 font-semibold tabular-nums">
                           {formatRatingValue(participant.currentRating)}
@@ -436,7 +450,7 @@ export function RatingSpeedRunCompetitionView({
                       </div>
                       <div className="rounded-lg bg-white px-3 py-2 dark:bg-zinc-900">
                         <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                          Gained
+                          {copy.gained}
                         </div>
                         <div className="mt-1 font-semibold tabular-nums text-emerald-700 dark:text-emerald-400">
                           +{participant.gainedPoints}
@@ -444,7 +458,7 @@ export function RatingSpeedRunCompetitionView({
                       </div>
                       <div className="rounded-lg bg-white px-3 py-2 dark:bg-zinc-900">
                         <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                          Lost
+                          {copy.lost}
                         </div>
                         <div className="mt-1 font-semibold tabular-nums text-rose-700 dark:text-rose-400">
                           -{participant.lostPoints}
@@ -453,10 +467,10 @@ export function RatingSpeedRunCompetitionView({
                     </div>
 
                     <div className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">
-                      Last sync:{" "}
+                      {copy.lastSync}{" "}
                       {participant.lastSyncedAt
-                        ? formatDateTime(participant.lastSyncedAt)
-                        : "Waiting for start"}
+                        ? formatDateTime(participant.lastSyncedAt, locale)
+                        : copy.waiting}
                     </div>
 
                     {participant.error ? (
@@ -473,17 +487,17 @@ export function RatingSpeedRunCompetitionView({
               <table className="w-full min-w-225 text-left text-sm">
                 <thead>
                   <tr className="border-b border-zinc-200 dark:border-zinc-800">
-                    <th className="px-4 py-3 font-medium sm:px-6">Player</th>
-                    <th className="px-4 py-3 font-medium">Start</th>
-                    <th className="px-4 py-3 font-medium">Current</th>
+                    <th className="px-4 py-3 font-medium sm:px-6">{dict.prodigeArena.player}</th>
+                    <th className="px-4 py-3 font-medium">{copy.start}</th>
+                    <th className="px-4 py-3 font-medium">{copy.current}</th>
                     <th className="px-4 py-3 font-medium text-emerald-700 dark:text-emerald-400">
-                      Gained
+                      {copy.gained}
                     </th>
                     <th className="px-4 py-3 font-medium text-rose-700 dark:text-rose-400">
-                      Lost
+                      {copy.lost}
                     </th>
-                    <th className="px-4 py-3 font-medium">Net</th>
-                    <th className="px-4 py-3 font-medium">Last sync</th>
+                    <th className="px-4 py-3 font-medium">{copy.net}</th>
+                    <th className="px-4 py-3 font-medium">{copy.lastSync}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -515,7 +529,7 @@ export function RatingSpeedRunCompetitionView({
                             </a>
                             {isWinner ? (
                               <span className="rounded-full bg-amber-200/80 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-900 dark:bg-amber-500/20 dark:text-amber-200">
-                                Winner
+                                {copy.winner}
                               </span>
                             ) : null}
                           </div>
@@ -545,8 +559,8 @@ export function RatingSpeedRunCompetitionView({
                         </td>
                         <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
                           {participant.lastSyncedAt
-                            ? formatDateTime(participant.lastSyncedAt)
-                            : "Waiting for start"}
+                            ? formatDateTime(participant.lastSyncedAt, locale)
+                            : copy.waiting}
                         </td>
                       </tr>
                     )

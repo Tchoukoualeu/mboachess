@@ -1,5 +1,7 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router"
+import { createFileRoute, notFound } from "@tanstack/react-router"
+import { LocaleLink } from "@/components/LocaleLink"
 import { PageShell } from "@/components/PageShell"
+import { fill, getDictionary, useDictionary, useLocale, useRouteLoaderData, type Locale } from "@/lib/i18n"
 import { loadTournamentById } from "@/server/tournaments"
 import { pageHead } from "@/lib/seo"
 import type { TournamentWithWinners } from "@/lib/tournaments"
@@ -32,6 +34,7 @@ function getTimeRemaining(startDate: Date) {
 }
 
 function CountdownTimer({ startDate }: { startDate: Date }) {
+  const copy = useDictionary().tournaments
   const [timeRemaining, setTimeRemaining] = useState(() =>
     getTimeRemaining(startDate),
   )
@@ -49,50 +52,56 @@ function CountdownTimer({ startDate }: { startDate: Date }) {
   return (
     <div className="flex shrink-0 flex-col items-start gap-2 rounded-lg bg-wood/15 px-4 py-3 sm:items-end">
       <div className="text-xs font-semibold uppercase tracking-wide text-wood">
-        Starts in
+        {copy.startsIn}
       </div>
       <div className="flex items-center gap-2">
         <div className="flex flex-col items-center">
           <div className="text-2xl font-bold text-wood">
             {hours.toString().padStart(2, "0")}
           </div>
-          <div className="text-xs font-medium text-wood/80">hrs</div>
+          <div className="text-xs font-medium text-wood/80">{copy.hours}</div>
         </div>
         <div className="text-2xl font-bold text-wood">:</div>
         <div className="flex flex-col items-center">
           <div className="text-2xl font-bold text-wood">
             {minutes.toString().padStart(2, "0")}
           </div>
-          <div className="text-xs font-medium text-wood/80">min</div>
+          <div className="text-xs font-medium text-wood/80">{copy.minutes}</div>
         </div>
         <div className="text-2xl font-bold text-wood">:</div>
         <div className="flex flex-col items-center">
           <div className="text-2xl font-bold text-wood">
             {seconds.toString().padStart(2, "0")}
           </div>
-          <div className="text-xs font-medium text-wood/80">sec</div>
+          <div className="text-xs font-medium text-wood/80">{copy.seconds}</div>
         </div>
       </div>
     </div>
   )
 }
 
+export function tournamentHead(
+  locale: Locale,
+  loaderData: unknown,
+  id: string,
+) {
+  const copy = getDictionary(locale).tournaments
+  const tournament = loaderData as TournamentWithWinners | undefined
+  const name = tournament?.name
+  const title = name ? fill(copy.detailMeta, { name }) : copy.detailMetaFallback
+  const description = name
+    ? fill(copy.detailDescription, { name })
+    : copy.detailDescriptionFallback
+  return pageHead({
+    title,
+    description,
+    path: `/tournaments/${id}`,
+    locale,
+  })
+}
+
 export const Route = createFileRoute("/tournaments/$id")({
-  head: ({ loaderData, params }) => {
-    const tournament = loaderData as TournamentWithWinners | undefined
-    const name = tournament?.name
-    const title = name
-      ? `${name} | Chess tournament | mboachess`
-      : "Tournament Details | mboachess"
-    const description = name
-      ? `Details for ${name} on mboachess — dates, location, and how to join.`
-      : "View tournament information and details"
-    return pageHead({
-      title,
-      description,
-      path: `/tournaments/${params.id}`,
-    })
-  },
+  head: ({ loaderData, params }) => tournamentHead("fr", loaderData, params.id),
   loader: async ({ params }): Promise<TournamentWithWinners> => {
     const tournament = await loadTournamentById({ data: params.id })
     if (!tournament) throw notFound()
@@ -102,8 +111,11 @@ export const Route = createFileRoute("/tournaments/$id")({
   component: TournamentDetailPage,
 })
 
-function TournamentDetailPage() {
-  const tournament = Route.useLoaderData() as TournamentWithWinners
+export function TournamentDetailPage() {
+  const dict = useDictionary()
+  const copy = dict.tournaments
+  const locale = useLocale()
+  const tournament = useRouteLoaderData<TournamentWithWinners>()
   const daysUntil = getDaysUntil(tournament.startDate)
   const [userTimezone, setUserTimezone] = useState<string>("UTC")
 
@@ -120,12 +132,12 @@ function TournamentDetailPage() {
   return (
     <PageShell>
       <p className="mb-4">
-        <Link
+        <LocaleLink
           to="/tournaments"
           className="text-sm text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
         >
-          ← Tournaments
-        </Link>
+          {copy.back}
+        </LocaleLink>
       </p>
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -136,7 +148,7 @@ function TournamentDetailPage() {
             </h1>
             {tournament.isOnline && (
               <span className="inline-flex items-center rounded-md bg-brand-muted px-3 py-1 text-sm font-medium text-brand">
-                Online
+                {copy.online}
               </span>
             )}
           </div>
@@ -147,7 +159,7 @@ function TournamentDetailPage() {
           <div className="flex shrink-0 flex-col items-start gap-1 rounded-lg bg-brand-muted px-4 py-3 sm:items-end">
             <div className="text-3xl font-bold text-brand">{daysUntil}</div>
             <div className="text-sm font-medium uppercase text-brand">
-              {daysUntil === 1 ? "day left" : "days left"}
+              {daysUntil === 1 ? copy.dayLeft : copy.daysLeft}
             </div>
           </div>
         )}
@@ -159,7 +171,7 @@ function TournamentDetailPage() {
             id="desc-heading"
             className="mb-2 text-sm font-semibold uppercase tracking-wide text-ink-muted"
           >
-            Description
+            {copy.description}
           </h2>
           <p className="whitespace-pre-line wrap-break-word text-sm leading-relaxed text-ink-muted">
             {tournament.description}
@@ -176,7 +188,7 @@ function TournamentDetailPage() {
             id="winners-heading"
             className="mb-2 text-sm font-semibold uppercase tracking-wide text-wood"
           >
-            {tournament.winners.length === 1 ? "Winner" : "Winners"}
+            {tournament.winners.length === 1 ? copy.winner : copy.winners}
           </h2>
           <p className="text-sm text-foreground">
             {tournament.winners.map((username, index) => (
@@ -193,7 +205,7 @@ function TournamentDetailPage() {
               </span>
             ))}
             {tournament.winnersSource === "chesscom" ? (
-              <span className="ml-2 text-xs text-ink-muted">via Chess.com</span>
+              <span className="ml-2 text-xs text-ink-muted">{copy.viaChesscom}</span>
             ) : null}
           </p>
         </section>
@@ -204,32 +216,32 @@ function TournamentDetailPage() {
           id="details-heading"
           className="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-muted"
         >
-          Tournament details
+          {copy.details}
         </h2>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="rounded-lg border border-border bg-surface p-4">
             <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">
-              Start date
+              {copy.startDate}
             </div>
             <div className="mt-1 text-sm font-semibold text-foreground">
-              {formatDate(tournament.startDate, userTimezone)}
+              {formatDate(tournament.startDate, userTimezone, locale)}
             </div>
             <div className="mt-1 text-xs text-ink-muted">
-              German time: {formatDateInGermanTime(tournament.startDate)}
+              {fill(copy.germanTime, { time: formatDateInGermanTime(tournament.startDate, locale) })}
             </div>
           </div>
 
           {tournament.endDate && (
             <div className="rounded-lg border border-border bg-surface p-4">
               <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">
-                End date
+                {copy.endDate}
               </div>
               <div className="mt-1 text-sm font-semibold text-foreground">
-                {formatDate(tournament.endDate, userTimezone)}
+                {formatDate(tournament.endDate, userTimezone, locale)}
               </div>
               <div className="mt-1 text-xs text-ink-muted">
-                German time: {formatDateInGermanTime(tournament.endDate)}
+                {fill(copy.germanTime, { time: formatDateInGermanTime(tournament.endDate, locale) })}
               </div>
             </div>
           )}
@@ -237,7 +249,7 @@ function TournamentDetailPage() {
           {tournament.location && (
             <div className="rounded-lg border border-border bg-surface p-4">
               <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">
-                Location
+                {copy.location}
               </div>
               <div className="mt-1 text-sm font-semibold text-foreground">
                 {tournament.location}
@@ -248,7 +260,7 @@ function TournamentDetailPage() {
           {tournament.phone && (
             <div className="rounded-lg border border-border bg-surface p-4">
               <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">
-                Contact
+                {dict.common.contact}
               </div>
               <div className="mt-1">
                 <a
@@ -270,7 +282,7 @@ function TournamentDetailPage() {
               rel="noopener noreferrer"
               className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-6 py-3 text-sm font-medium text-white transition hover:bg-brand-soft sm:w-auto"
             >
-              View tournament details
+              {copy.viewDetails}
             </a>
           </div>
         )}

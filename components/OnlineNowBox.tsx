@@ -1,6 +1,7 @@
 import { useMemo } from "react"
 import type { PlayerLookupResult } from "@/lib/chesscom"
 import { ONLINE_WITHIN_SEC } from "@/lib/chesscom"
+import { fill, noun, useDictionary, useLocale } from "@/lib/i18n"
 
 const AVATAR_PX = 36
 
@@ -65,14 +66,20 @@ function PlayerChip({ player }: { player: PlayerLookupResult }) {
           {player.username}
         </span>
         <span className="block text-[10px] tabular-nums text-ink-muted">
-          {rating != null ? rating : "Unrated"}
+          {rating != null ? rating : useUnrated()}
         </span>
       </span>
     </a>
   )
 }
 
+function useUnrated() {
+  return useDictionary().common.unrated
+}
+
 export function OnlineNowBox({ rows }: Props) {
+  const dict = useDictionary()
+  const locale = useLocale()
   const online = useMemo(() => onlinePlayers(rows), [rows])
   const names = online.map((player) => player.username)
   const minutes = ONLINE_WITHIN_SEC / 60
@@ -91,15 +98,17 @@ export function OnlineNowBox({ rows }: Props) {
             className="font-display flex items-center gap-2 text-xl font-semibold tracking-tight sm:text-2xl"
           >
             <span className="online-live-dot" aria-hidden />
-            Online now
+            {dict.online.title}
           </h2>
           <p className="mt-1 text-sm text-ink-muted">
-            Tracked players with Chess.com activity in the last {minutes}{" "}
-            minutes.
+            {fill(dict.online.description, { minutes })}
           </p>
         </div>
         <p className="text-sm font-medium tabular-nums text-brand">
-          {online.length} {online.length === 1 ? "player" : "players"}
+          {fill(dict.online.count, {
+            count: online.length,
+            noun: noun(locale, online.length),
+          })}
         </p>
       </header>
 
@@ -114,11 +123,10 @@ export function OnlineNowBox({ rows }: Props) {
               className="mb-3 h-14 w-14 object-contain opacity-30"
             />
             <p className="text-sm font-medium text-foreground">
-              No one is online right now
+              {dict.online.emptyTitle}
             </p>
             <p className="mt-1 max-w-sm text-sm text-ink-muted">
-              This box fills with avatars when tracked players are active on
-              Chess.com.
+              {dict.online.emptyBody}
             </p>
           </div>
         ) : (
@@ -130,8 +138,8 @@ export function OnlineNowBox({ rows }: Props) {
             }
             aria-label={
               names.length === 1
-                ? `${names[0]} is online`
-                : `${names.join(", ")} are online`
+                ? fill(dict.online.oneOnline, { name: names[0] })
+                : fill(dict.online.manyOnline, { names: names.join(", ") })
             }
           >
             {online.map((player, index) => (

@@ -1,7 +1,10 @@
 import { useRouter } from "@tanstack/react-router"
 import { useState } from "react"
+import { translateApiError, useDictionary } from "@/lib/i18n"
 
 export function AddClubForm() {
+  const dict = useDictionary()
+  const copy = dict.clubs
   const router = useRouter()
   const [isExpanded, setIsExpanded] = useState(false)
   const [formData, setFormData] = useState({
@@ -25,7 +28,7 @@ export function AddClubForm() {
     setMessage(null)
 
     if (!formData.name.trim()) {
-      setMessage({ type: "err", text: "Club name is required." })
+      setMessage({ type: "err", text: copy.nameRequired })
       return
     }
 
@@ -43,13 +46,13 @@ export function AddClubForm() {
       if (!res.ok) {
         setMessage({
           type: "err",
-          text: data.error || "Request failed",
+          text: translateApiError(data.error, dict, dict.common.requestFailed),
         })
         return
       }
       setMessage({
         type: "ok",
-        text: "Club added successfully!",
+        text: copy.added,
       })
       setFormData({
         name: "",
@@ -63,7 +66,7 @@ export function AddClubForm() {
       })
       await router.invalidate()
     } catch {
-      setMessage({ type: "err", text: "Network error. Try again." })
+      setMessage({ type: "err", text: dict.common.networkError })
     } finally {
       setLoading(false)
     }
@@ -77,9 +80,9 @@ export function AddClubForm() {
         className="flex w-full items-center justify-between p-4 text-left transition hover:bg-zinc-50 dark:hover:bg-zinc-800/50 sm:p-6"
       >
         <div>
-          <h2 className="text-lg font-semibold">Add Your Chess Club</h2>
+          <h2 className="text-lg font-semibold">{copy.addTitle}</h2>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-            Share your club with the community
+            {copy.addLede}
           </p>
         </div>
         <svg
@@ -109,13 +112,13 @@ export function AddClubForm() {
               htmlFor="name"
               className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              Club Name *
+              {copy.name}
             </label>
             <input
               id="name"
               name="name"
               type="text"
-              placeholder="e.g. Yaoundé Chess Club"
+              placeholder={copy.namePlaceholder}
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
@@ -130,13 +133,13 @@ export function AddClubForm() {
               htmlFor="location"
               className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              Location
+              {copy.location}
             </label>
             <input
               id="location"
               name="location"
               type="text"
-              placeholder="e.g. Yaoundé, Cameroon"
+              placeholder={copy.locationPlaceholder}
               value={formData.location}
               onChange={(e) =>
                 setFormData({ ...formData, location: e.target.value })
@@ -151,13 +154,13 @@ export function AddClubForm() {
               htmlFor="meetingSchedule"
               className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              Meeting Schedule
+              {copy.schedule}
             </label>
             <input
               id="meetingSchedule"
               name="meetingSchedule"
               type="text"
-              placeholder="e.g. Every Saturday at 2 PM"
+              placeholder={copy.schedulePlaceholder}
               value={formData.meetingSchedule}
               onChange={(e) =>
                 setFormData({ ...formData, meetingSchedule: e.target.value })
@@ -172,13 +175,13 @@ export function AddClubForm() {
               htmlFor="description"
               className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              Description
+              {copy.description}
             </label>
             <textarea
               id="description"
               name="description"
               rows={3}
-              placeholder="Brief description of your club..."
+              placeholder={copy.descriptionPlaceholder}
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
@@ -194,13 +197,13 @@ export function AddClubForm() {
                 htmlFor="contactName"
                 className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
               >
-                Contact Person
+                {copy.contactPerson}
               </label>
               <input
                 id="contactName"
                 name="contactName"
                 type="text"
-                placeholder="Contact name"
+                placeholder={copy.contactPlaceholder}
                 value={formData.contactName}
                 onChange={(e) =>
                   setFormData({ ...formData, contactName: e.target.value })
@@ -215,13 +218,13 @@ export function AddClubForm() {
                 htmlFor="phone"
                 className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
               >
-                Phone
+                {copy.phone}
               </label>
               <input
                 id="phone"
                 name="phone"
                 type="tel"
-                placeholder="e.g. +237 659 46 17 38"
+                placeholder={copy.phonePlaceholder}
                 value={formData.phone}
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
@@ -238,13 +241,13 @@ export function AddClubForm() {
                 htmlFor="email"
                 className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
               >
-                Email
+                {copy.email}
               </label>
               <input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="club@example.com"
+                placeholder={copy.emailPlaceholder}
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
@@ -259,7 +262,7 @@ export function AddClubForm() {
                 htmlFor="website"
                 className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
               >
-                Website
+                {copy.website}
               </label>
               <input
                 id="website"
@@ -281,7 +284,7 @@ export function AddClubForm() {
             disabled={loading}
             className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 sm:w-auto"
           >
-            {loading ? "Adding…" : "Add Club"}
+            {loading ? dict.common.adding : copy.submit}
           </button>
 
           {message ? (

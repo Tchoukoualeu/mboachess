@@ -1,5 +1,6 @@
 import { useState } from "react"
 import type { PlayerLookupResult } from "@/lib/chesscom"
+import { fill, useDictionary } from "@/lib/i18n"
 
 type Props = {
   rows: PlayerLookupResult[]
@@ -144,6 +145,7 @@ function valueAt(points: Sample[], rating: number): number {
 }
 
 export function EloDistributionChart({ rows }: Props) {
+  const dict = useDictionary()
   const blitzValues = ratings(rows, "blitz")
   const rapidValues = ratings(rows, "rapid")
   const all = [...blitzValues, ...rapidValues]
@@ -152,8 +154,8 @@ export function EloDistributionChart({ rows }: Props) {
   if (all.length === 0) {
     return (
       <section className="mt-6 rounded-xl border border-dashed border-border bg-surface p-6 text-center">
-        <h2 className="font-display text-lg font-semibold">Rating distribution</h2>
-        <p className="mt-2 text-sm text-ink-muted">No rated players to chart yet.</p>
+        <h2 className="font-display text-lg font-semibold">{dict.chart.title}</h2>
+        <p className="mt-2 text-sm text-ink-muted">{dict.chart.empty}</p>
       </section>
     )
   }
@@ -196,48 +198,48 @@ export function EloDistributionChart({ rows }: Props) {
   return (
     <section
       className="mt-6 rounded-xl border border-border bg-surface shadow-sm"
-      aria-label="Rating distribution"
+      aria-label={dict.chart.title}
     >
       <div className="border-b border-border px-4 py-4 sm:px-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="font-display text-lg font-semibold">Rating distribution</h2>
+            <h2 className="font-display text-lg font-semibold">{dict.chart.title}</h2>
             <p className="mt-1 text-sm text-ink-muted">
-              How blitz and rapid ratings cluster across tracked players.
+              {dict.chart.description}
             </p>
           </div>
           <div className="flex flex-wrap gap-2 text-xs font-medium">
             <span className="inline-flex items-center gap-1.5 rounded-lg bg-brand-muted px-2.5 py-1.5 text-brand">
               <span className="h-2 w-2 rounded-full bg-brand" aria-hidden />
-              Blitz
+              {dict.common.blitz}
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-lg bg-wood/15 px-2.5 py-1.5 text-wood">
               <span className="h-2 w-2 rounded-full bg-wood" aria-hidden />
-              Rapid
+              {dict.common.rapid}
             </span>
           </div>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-3">
           <div className="rounded-lg bg-brand-muted/60 px-3 py-3">
             <div className="text-[11px] font-semibold uppercase tracking-wide text-brand">
-              Avg blitz
+              {dict.chart.avgBlitz}
             </div>
             <div className="mt-1 text-2xl font-semibold tabular-nums text-foreground">
               {avgBlitz ?? "—"}
             </div>
             <div className="mt-0.5 text-xs text-ink-muted">
-              {blitzValues.length} rated
+              {fill(dict.chart.rated, { count: blitzValues.length })}
             </div>
           </div>
           <div className="rounded-lg bg-wood/10 px-3 py-3">
             <div className="text-[11px] font-semibold uppercase tracking-wide text-wood">
-              Avg rapid
+              {dict.chart.avgRapid}
             </div>
             <div className="mt-1 text-2xl font-semibold tabular-nums text-foreground">
               {avgRapid ?? "—"}
             </div>
             <div className="mt-0.5 text-xs text-ink-muted">
-              {rapidValues.length} rated
+              {fill(dict.chart.rated, { count: rapidValues.length })}
             </div>
           </div>
         </div>
@@ -248,7 +250,10 @@ export function EloDistributionChart({ rows }: Props) {
           viewBox={`0 0 ${VB_W} ${VB_H}`}
           className="h-auto w-full"
           role="img"
-          aria-label={`Bell curve of ratings. Average blitz ${avgBlitz ?? "unavailable"}, average rapid ${avgRapid ?? "unavailable"}.`}
+          aria-label={fill(dict.chart.aria, {
+            blitz: avgBlitz ?? dict.chart.unavailable,
+            rapid: avgRapid ?? dict.chart.unavailable,
+          })}
           onMouseMove={onMove}
           onMouseLeave={() => setHover(null)}
         >
@@ -364,18 +369,18 @@ export function EloDistributionChart({ rows }: Props) {
             <div className="font-semibold tabular-nums">{Math.round(hover)}</div>
             {blitzValues.length > 0 ? (
               <div className="text-brand">
-                Blitz {valueAt(blitz, hover).toFixed(1)}
+                {fill(dict.chart.hoverBlitz, { value: valueAt(blitz, hover).toFixed(1) })}
               </div>
             ) : null}
             {rapidValues.length > 0 ? (
               <div className="text-wood">
-                Rapid {valueAt(rapid, hover).toFixed(1)}
+                {fill(dict.chart.hoverRapid, { value: valueAt(rapid, hover).toFixed(1) })}
               </div>
             ) : null}
           </div>
         ) : null}
         <p className="px-2 text-center text-[11px] text-ink-muted sm:px-4">
-          Players per 100 rating points. Dashed lines mark the averages.
+          {dict.chart.caption}
         </p>
       </div>
     </section>

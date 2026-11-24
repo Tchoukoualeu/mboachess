@@ -1,7 +1,9 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
+import { createFileRoute, useRouter, useRouterState } from "@tanstack/react-router"
 import { useState, type FormEvent } from "react"
 import { CrownIcon } from "@/components/CrownIcon"
+import { LocaleLink } from "@/components/LocaleLink"
 import { PageShell } from "@/components/PageShell"
+import { fill, getDictionary, intlLocale, translateApiError, useDictionary, useLocale, useRouteLoaderData, type Dictionary, type Locale } from "@/lib/i18n"
 import { pageHead, webPageJsonLd } from "@/lib/seo"
 import {
   getCompetitionStatus,
@@ -11,27 +13,23 @@ import {
 } from "@/lib/ratingSpeedRunShared"
 import { loadRatingSpeedRuns } from "@/server/ratingSpeedRun"
 
-function formatDateTime(date: Date): string {
-  return new Intl.DateTimeFormat(undefined, {
+function formatDateTime(date: Date, locale: Locale): string {
+  return new Intl.DateTimeFormat(intlLocale(locale), {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(date))
 }
 
-function ratingTypeLabel(ratingType: RatingType): string {
-  return ratingType.charAt(0).toUpperCase() + ratingType.slice(1)
-}
-
-function statusLabel(status: CompetitionStatus): string {
+function statusLabel(status: CompetitionStatus, copy: Dictionary["speedRun"]): string {
   switch (status) {
     case "registration-open":
-      return "Registration open"
+      return copy.status.registrationOpen
     case "upcoming":
-      return "Starting soon"
+      return copy.status.upcoming
     case "running":
-      return "Running"
+      return copy.status.running
     case "finished":
-      return "Finished"
+      return copy.status.finished
   }
 }
 
@@ -50,7 +48,9 @@ function statusClasses(status: CompetitionStatus): string {
 
 function CreateCompetitionForm() {
   const router = useRouter()
-  const [title, setTitle] = useState("Rating speed run")
+  const dict = useDictionary()
+  const copy = dict.speedRun
+  const [title, setTitle] = useState(copy.titlePlaceholder)
   const [description, setDescription] = useState("")
   const [prize, setPrize] = useState("")
   const [ratingType, setRatingType] = useState<RatingType>("blitz")
@@ -74,19 +74,21 @@ function CreateCompetitionForm() {
 
       if (!response.ok) {
         setError(
-          "error" in data
-            ? (data.error ?? "Could not create competition.")
-            : "Could not create competition.",
+          translateApiError(
+            "error" in data ? data.error : undefined,
+            dict,
+            copy.createFailed,
+          ),
         )
         return
       }
 
-      setMessage("Competition created. Registration is now open for 24 hours.")
+      setMessage(copy.created)
       setDescription("")
       setPrize("")
       await router.invalidate()
     } catch {
-      setError("Could not create competition.")
+      setError(copy.createFailed)
     } finally {
       setSubmitting(false)
     }
@@ -96,27 +98,24 @@ function CreateCompetitionForm() {
     <section className="mb-6 rounded-xl border border-border bg-surface p-4 sm:p-6">
       <div className="mb-4">
         <h2 className="font-display text-lg font-semibold">
-          Create a new speed run
+          {copy.createTitle}
         </h2>
-        <p className="mt-1 text-sm text-ink-muted">
-          Registration opens immediately and closes after 24 hours. The
-          competition then runs for exactly 2 days.
-        </p>
+        <p className="mt-1 text-sm text-ink-muted">{copy.createLede}</p>
       </div>
 
       <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
         <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium text-foreground">Title</span>
+          <span className="font-medium text-foreground">{copy.fieldTitle}</span>
           <input
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             className="rounded-lg border border-border bg-surface px-3 py-2 text-foreground outline-none placeholder:text-ink-muted focus:border-brand"
-            placeholder="Rating speed run"
+            placeholder={copy.titlePlaceholder}
           />
         </label>
 
         <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium text-foreground">Rating type</span>
+          <span className="font-medium text-foreground">{copy.ratingType}</span>
           <select
             value={ratingType}
             onChange={(event) =>
@@ -124,35 +123,34 @@ function CreateCompetitionForm() {
             }
             className="rounded-lg border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-brand"
           >
-            <option value="blitz">Blitz</option>
-            <option value="rapid">Rapid</option>
-            <option value="bullet">Bullet</option>
+            <option value="blitz">{dict.common.blitz}</option>
+            <option value="rapid">{dict.common.rapid}</option>
+            <option value="bullet">{dict.common.bullet}</option>
           </select>
         </label>
 
         <label className="flex flex-col gap-1 text-sm sm:col-span-2">
-          <span className="font-medium text-foreground">Description</span>
+          <span className="font-medium text-foreground">{copy.description}</span>
           <textarea
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             className="min-h-28 rounded-lg border border-border bg-surface px-3 py-2 text-foreground outline-none placeholder:text-ink-muted focus:border-brand"
-            placeholder="Explain the format, rules, and what players should know about this speed run."
+            placeholder={copy.descriptionPlaceholder}
           />
         </label>
 
         <label className="flex flex-col gap-1 text-sm sm:col-span-2">
-          <span className="font-medium text-foreground">Prize</span>
+          <span className="font-medium text-foreground">{copy.prize}</span>
           <input
             value={prize}
             onChange={(event) => setPrize(event.target.value)}
             className="rounded-lg border border-border bg-surface px-3 py-2 text-foreground outline-none placeholder:text-ink-muted focus:border-brand"
-            placeholder="Example: 25,000 FCFA + trophy"
+            placeholder={copy.prizePlaceholder}
           />
         </label>
 
         <div className="sm:col-span-2 rounded-lg bg-surface-muted px-4 py-3 text-sm text-ink-muted">
-          Every speed run follows the same schedule: 24 hours to register, then
-          2 days of rating competition.
+          {copy.scheduleNote}
         </div>
 
         <div className="sm:col-span-2 flex flex-col gap-2">
@@ -161,7 +159,7 @@ function CreateCompetitionForm() {
             disabled={submitting}
             className="inline-flex w-full items-center justify-center rounded-lg bg-brand px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-soft disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {submitting ? "Creating..." : "Create competition"}
+            {submitting ? copy.creating : copy.create}
           </button>
           {message ? <p className="text-sm text-brand">{message}</p> : null}
           {error ? <p className="text-sm text-rose-700">{error}</p> : null}
@@ -171,22 +169,24 @@ function CreateCompetitionForm() {
   )
 }
 
-const SPEED_RUN_TITLE = "Rating speed run | mboachess"
-const SPEED_RUN_DESCRIPTION =
-  "Create and track rating speed run competitions using Chess.com accounts."
+export function speedRunHead(locale: Locale) {
+  const copy = getDictionary(locale).speedRun
+  return pageHead({
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+    path: "/rating-speed-run",
+    locale,
+    jsonLd: webPageJsonLd({
+      title: copy.metaTitle,
+      description: copy.metaDescription,
+      path: "/rating-speed-run",
+      locale,
+    }),
+  })
+}
 
 export const Route = createFileRoute("/rating-speed-run/")({
-  head: () =>
-    pageHead({
-      title: SPEED_RUN_TITLE,
-      description: SPEED_RUN_DESCRIPTION,
-      path: "/rating-speed-run",
-      jsonLd: webPageJsonLd({
-        title: SPEED_RUN_TITLE,
-        description: SPEED_RUN_DESCRIPTION,
-        path: "/rating-speed-run",
-      }),
-    }),
+  head: () => speedRunHead("fr"),
   validateSearch: (search: Record<string, unknown>): { admin?: boolean } => {
     if (search.admin === "true" || search.admin === true) {
       return { admin: true }
@@ -197,30 +197,28 @@ export const Route = createFileRoute("/rating-speed-run/")({
   component: RatingSpeedRunIndexPage,
 })
 
-function RatingSpeedRunIndexPage() {
-  const competitions = Route.useLoaderData()
-  const { admin } = Route.useSearch()
-  const isAdmin = admin === true
+export function RatingSpeedRunIndexPage() {
+  const dict = useDictionary()
+  const copy = dict.speedRun
+  const locale = useLocale()
+  const competitions = useRouteLoaderData<Awaited<ReturnType<typeof loadRatingSpeedRuns>>>()
+  const searchStr = useRouterState({ select: (state) => state.location.searchStr })
+  const isAdmin = /(?:^|[?&])admin=true(?:&|$)/.test(searchStr)
 
   return (
     <PageShell wide>
       <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">
-            Rating speed run
+            {copy.title}
           </h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-ink-muted">
-            Contestants register with a Chess.com account during a 24-hour
-            signup window. Once registration closes, the speed run lasts 2 days
-            and the player with the highest net rating gain wins.
+            {copy.lede}
           </p>
         </div>
         <div className="rounded-xl bg-surface-muted px-4 py-3 text-sm text-ink-muted">
-          <div className="font-medium text-foreground">Eligibility</div>
-          <div>
-            Chess.com account must be at least 60 days old at start time, and
-            rated at least 400 in the competition category.
-          </div>
+          <div className="font-medium text-foreground">{copy.eligibility}</div>
+          <div>{copy.eligibilityBody}</div>
         </div>
       </header>
 
@@ -228,9 +226,7 @@ function RatingSpeedRunIndexPage() {
 
       {competitions.length === 0 ? (
         <p className="border border-dashed border-border py-10 text-center text-ink-muted">
-          {isAdmin
-            ? "No competition yet. Create one above to open registration."
-            : "No competition yet. Check back soon."}
+          {isAdmin ? copy.emptyAdmin : copy.empty}
         </p>
       ) : (
         <section aria-labelledby="speed-runs-heading" className="space-y-4">
@@ -238,7 +234,7 @@ function RatingSpeedRunIndexPage() {
             id="speed-runs-heading"
             className="text-sm font-medium text-ink-muted"
           >
-            Speed run competitions ({competitions.length})
+            {fill(copy.count, { count: competitions.length })}
           </h2>
           {competitions.map((competition) => {
             const status = getCompetitionStatus(competition)
@@ -249,7 +245,7 @@ function RatingSpeedRunIndexPage() {
               : null
 
             return (
-              <Link
+              <LocaleLink
                 key={competition.id}
                 to="/rating-speed-run/$id"
                 params={{ id: competition.id }}
@@ -268,11 +264,11 @@ function RatingSpeedRunIndexPage() {
                       <span
                         className={`inline-flex rounded-md px-3 py-1 text-xs font-semibold ${statusClasses(status)}`}
                       >
-                        {statusLabel(status)}
+                        {statusLabel(status, copy)}
                       </span>
                     </div>
                     <p className="text-sm text-ink-muted">
-                      {ratingTypeLabel(competition.ratingType)} rating
+                      {fill(copy.ratingOf, { type: dict.common[competition.ratingType] })}
                     </p>
                     {competition.description ? (
                       <p className="mt-2 line-clamp-2 text-sm text-ink-muted">
@@ -305,7 +301,7 @@ function RatingSpeedRunIndexPage() {
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-wood">
-                            Winner
+                            {copy.winner}
                           </div>
                           <div className="truncate font-mono text-base font-semibold text-foreground">
                             {winner.username}
@@ -316,7 +312,7 @@ function RatingSpeedRunIndexPage() {
                             {netLabel}
                           </div>
                           <div className="text-[11px] font-medium uppercase tracking-wide text-ink-muted">
-                            net
+                            {copy.net}
                           </div>
                         </div>
                       </div>
@@ -324,20 +320,20 @@ function RatingSpeedRunIndexPage() {
 
                     <div className="mt-3 grid gap-2 text-sm text-foreground/90 sm:grid-cols-2">
                       <div>
-                        <span className="font-medium">Starts:</span>{" "}
-                        {formatDateTime(competition.startDate)}
+                        <span className="font-medium">{copy.starts}</span>{" "}
+                        {formatDateTime(competition.startDate, locale)}
                       </div>
                       <div>
-                        <span className="font-medium">Ends:</span>{" "}
-                        {formatDateTime(competition.endDate)}
+                        <span className="font-medium">{copy.ends}</span>{" "}
+                        {formatDateTime(competition.endDate, locale)}
                       </div>
                       <div>
-                        <span className="font-medium">Players:</span>{" "}
+                        <span className="font-medium">{copy.players}</span>{" "}
                         {competition.participants.length}
                       </div>
                       {competition.prize ? (
                         <div>
-                          <span className="font-medium">Prize:</span>{" "}
+                          <span className="font-medium">{copy.prizeLabel}</span>{" "}
                           {competition.prize}
                         </div>
                       ) : null}
@@ -348,10 +344,10 @@ function RatingSpeedRunIndexPage() {
                       isFinished ? "text-wood" : "text-brand"
                     }`}
                   >
-                    {isFinished ? "See results →" : "Open competition →"}
+                    {isFinished ? copy.seeResults : copy.open}
                   </div>
                 </div>
-              </Link>
+              </LocaleLink>
             )
           })}
         </section>
