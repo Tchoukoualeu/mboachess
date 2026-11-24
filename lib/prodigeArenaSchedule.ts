@@ -1,6 +1,6 @@
 import { intlLocale, type Locale } from "@/lib/i18n"
 
-/** Qualification arenas for Prodige League 2026. Days 4–6 stay undated until announced. */
+/** Qualification arenas for Prodige League 2026. Days 5–6 stay undated until announced. */
 export const PRODIGE_ARENAS = [
   {
     day: 1,
@@ -17,7 +17,11 @@ export const PRODIGE_ARENAS = [
     date: "2026-11-22",
     chesscomId: "prodige-league-arene-3-31215858",
   },
-  { day: 4, date: null, chesscomId: null },
+  {
+    day: 4,
+    date: "2026-11-24",
+    chesscomId: "prodige-league-arene-4-31222798",
+  },
   { day: 5, date: null, chesscomId: null },
   { day: 6, date: null, chesscomId: null },
 ] as const

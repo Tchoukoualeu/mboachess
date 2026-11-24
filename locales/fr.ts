@@ -483,7 +483,7 @@ export const fr = {
     dates: "15 novembre – 31 décembre 2026",
     arenasTitle: "Les arènes",
     arenasLede:
-      "Six journées de qualification sur Chess.com. Les trois premières ont eu lieu le 15, le 19 et le 22 novembre 2026. Les dates des suivantes restent à définir.",
+      "Six journées de qualification sur Chess.com. Les quatre premières ont eu lieu le 15, le 19, le 22 et le 24 novembre 2026. Les dates des suivantes restent à définir.",
     day: "Jour {day}",
     first: "1er",
     pointsShort: "{points} pts",
