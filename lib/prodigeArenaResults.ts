@@ -340,11 +340,20 @@ function isComplete(snapshot: StoredArena): boolean {
   return snapshot.status === "finished" && snapshot.players.length > 0
 }
 
+function arenaStatus(status: string | null): ProdigeArenaView["status"] {
+  if (status === "finished" || status === "in_progress" || status === "registration") {
+    return status
+  }
+  return "results"
+}
+
 function toView(
   arena: ProdigeArenaDay,
   snapshot: StoredArena,
   notice: string | null,
   error: string | null,
+  noticeCode: ProdigeArenaView["noticeCode"] = null,
+  errorCode: ProdigeArenaView["errorCode"] = null,
 ): ProdigeArenaView {
   const records = new Map<
     string,
@@ -367,11 +376,16 @@ function toView(
 
   return {
     day: arena.day,
+    date: arena.date,
     dateLabel: formatArenaDate(arena.date),
     name: snapshot.name,
     chesscomUrl: snapshot.url,
+    status: arenaStatus(snapshot.status),
+    startTime: snapshot.startTime,
     statusLabel: statusLabel(snapshot.status),
     whenLabel: formatWhen(snapshot.startTime),
+    noticeCode,
+    errorCode,
     notice,
     error,
     players: snapshot.players.map((player) => {
@@ -392,6 +406,7 @@ function toView(
     }),
     games: snapshot.games.map((game) => ({
       url: game.url,
+      endTime: game.endTime,
       timeLabel: formatTime(game.endTime),
       white: game.white.username,
       whiteRating: game.white.rating,
@@ -405,11 +420,16 @@ function toView(
 function emptyView(arena: ProdigeArenaDay, error: string): ProdigeArenaView {
   return {
     day: arena.day,
+    date: arena.date,
     dateLabel: formatArenaDate(arena.date),
     name: "Prodige League",
     chesscomUrl: arena.chesscomId ? chesscomArenaUrl(arena.chesscomId) : "",
+    status: "results",
+    startTime: null,
     statusLabel: "Résultats",
     whenLabel: null,
+    noticeCode: null,
+    errorCode: "loadFailed",
     notice: null,
     error,
     players: [],
@@ -459,6 +479,8 @@ export async function loadProdigeArenaResults(
           fresh,
           "Résultats Chess.com affichés. L'enregistrement en base a échoué.",
           null,
+          "saveFailed",
+          null,
         )
       }
       if (isComplete(fresh)) return completeView(arena, fresh)
@@ -474,6 +496,8 @@ export async function loadProdigeArenaResults(
       cached,
       null,
       "Chess.com n'a pas répondu. Résultats enregistrés lors d'une visite précédente.",
+      null,
+      "stale",
     )
   }
 
@@ -535,7 +559,7 @@ async function loadFinishedArenas(): Promise<ProdigeArenaView[]> {
   return views.filter(
     (view): view is ProdigeArenaView =>
       view !== null &&
-      view.statusLabel === "Terminée" &&
+      view.status === "finished" &&
       view.players.length > 0,
   )
 }

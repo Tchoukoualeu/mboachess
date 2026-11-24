@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Await } from "@tanstack/react-router"
+import { fill, intlLocale, noun, useDictionary, useLocale } from "@/lib/i18n"
 import type { ProdigeLeaguePlayer } from "@/lib/prodigeLeague"
 
 const PAGE_SIZE = 20
@@ -16,10 +17,10 @@ function formatRating(value: number | null): string {
   return typeof value === "number" ? String(value) : "—"
 }
 
-function formatRegisteredAt(iso: string): string {
+function formatRegisteredAt(iso: string, locale: ReturnType<typeof useLocale>): string {
   const date = new Date(iso)
   if (Number.isNaN(date.getTime()) || date.getTime() === 0) return ""
-  return new Intl.DateTimeFormat("fr-FR", {
+  return new Intl.DateTimeFormat(intlLocale(locale), {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -33,8 +34,11 @@ function PlayerRow({
   player: ProdigeLeaguePlayer
   rank: number
 }) {
+  const dict = useDictionary()
+  const copy = dict.prodigeSignup
+  const locale = useLocale()
   const href = `https://www.chess.com/member/${encodeURIComponent(player.username)}`
-  const registered = formatRegisteredAt(player.registeredAt)
+  const registered = formatRegisteredAt(player.registeredAt, locale)
   const flag = player.countryCode ? countryCodeToFlag(player.countryCode) : null
 
   return (
@@ -67,7 +71,7 @@ function PlayerRow({
           {player.online ? (
             <span
               className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-surface bg-brand"
-              title="En ligne"
+              title={copy.online}
             />
           ) : null}
         </div>
@@ -81,9 +85,11 @@ function PlayerRow({
             ) : null}
           </p>
           <p className="mt-0.5 text-xs text-ink-muted">
-            {registered ? `Inscrit le ${registered}` : "Inscrit"}
+            {registered
+              ? fill(copy.registeredOn, { date: registered })
+              : copy.registered}
             {" · "}
-            Blitz {formatRating(player.blitz)}
+            {dict.common.blitz} {formatRating(player.blitz)}
           </p>
         </div>
         <div className="shrink-0 text-right">
@@ -91,7 +97,7 @@ function PlayerRow({
             {formatRating(player.rapid)}
           </p>
           <p className="text-[11px] uppercase tracking-wide text-ink-muted">
-            Rapide
+            {dict.common.rapid}
           </p>
         </div>
       </a>
@@ -100,12 +106,13 @@ function PlayerRow({
 }
 
 function PlayerList({ players }: { players: ProdigeLeaguePlayer[] | null }) {
+  const copy = useDictionary().prodigeSignup
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   if (players === null) {
     return (
       <p className="mt-3 rounded-xl border border-dashed border-border bg-surface px-4 py-10 text-center text-sm text-ink-muted">
-        La liste des joueurs n'a pas pu être chargée.
+        {copy.loadFailed}
       </p>
     )
   }
@@ -113,7 +120,7 @@ function PlayerList({ players }: { players: ProdigeLeaguePlayer[] | null }) {
   if (players.length === 0) {
     return (
       <p className="mt-3 rounded-xl border border-dashed border-border bg-surface px-4 py-10 text-center text-sm text-ink-muted">
-        Aucun joueur inscrit pour le moment.
+        {copy.empty}
       </p>
     )
   }
@@ -140,7 +147,7 @@ function PlayerList({ players }: { players: ProdigeLeaguePlayer[] | null }) {
             }
             className="inline-flex items-center justify-center rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition hover:border-brand/40 hover:bg-brand-muted/50"
           >
-            Voir plus ({nextBatch})
+            {fill(copy.more, { count: nextBatch })}
           </button>
         </div>
       ) : null}
@@ -148,32 +155,36 @@ function PlayerList({ players }: { players: ProdigeLeaguePlayer[] | null }) {
   )
 }
 
-function countLabel(players: ProdigeLeaguePlayer[] | null): string {
-  if (players === null) return ""
-  return `${players.length} ${players.length === 1 ? "joueur" : "joueurs"}`
-}
-
-export function ProdigeLeagueSignup({
+function SignupSummary({
   players,
 }: {
   players: Promise<ProdigeLeaguePlayer[] | null>
 }) {
+  const copy = useDictionary().prodigeSignup
+  const locale = useLocale()
   return (
     <section id="inscription" className="mb-4">
       <details className="group rounded-xl border border-border bg-surface">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 [&::-webkit-details-marker]:hidden">
           <span>
             <span className="font-display block text-lg font-semibold tracking-tight">
-              Inscription
+              {copy.title}
             </span>
             <span className="mt-0.5 block text-sm text-ink-muted">
-              Les inscriptions sont closes.
+              {copy.closed}
             </span>
           </span>
           <span className="flex shrink-0 items-center gap-3">
             <span className="text-sm text-ink-muted">
               <Await promise={players} fallback="…">
-                {(list) => countLabel(list)}
+                {(list) =>
+                  list
+                    ? fill(copy.count, {
+                        count: list.length,
+                        noun: noun(locale, list.length),
+                      })
+                    : ""
+                }
               </Await>
             </span>
             <svg
@@ -192,18 +203,16 @@ export function ProdigeLeagueSignup({
         </summary>
 
         <div className="border-t border-border px-4 py-4">
-          <p className="max-w-2xl text-sm leading-6 text-ink-muted">
-            La liste est classée par Elo rapide, la cadence de la saison.
-          </p>
+          <p className="max-w-2xl text-sm leading-6 text-ink-muted">{copy.sorted}</p>
           <h3 className="mt-4 font-display text-lg font-semibold tracking-tight">
-            Joueurs inscrits
+            {copy.playersTitle}
           </h3>
 
           <Await
             promise={players}
             fallback={
               <p className="mt-3 rounded-xl border border-dashed border-border bg-surface px-4 py-10 text-center text-sm text-ink-muted">
-                Chargement des joueurs…
+                {copy.loading}
               </p>
             }
           >
@@ -213,4 +222,12 @@ export function ProdigeLeagueSignup({
       </details>
     </section>
   )
+}
+
+export function ProdigeLeagueSignup({
+  players,
+}: {
+  players: Promise<ProdigeLeaguePlayer[] | null>
+}) {
+  return <SignupSummary players={players} />
 }

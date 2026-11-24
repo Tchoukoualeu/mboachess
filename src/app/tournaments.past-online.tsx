@@ -1,32 +1,38 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import { useState, useEffect } from "react"
+import { LocaleLink } from "@/components/LocaleLink"
 import { PageShell } from "@/components/PageShell"
+import { fill, getDictionary, useDictionary, useLocale, useRouteLoaderData, type Locale } from "@/lib/i18n"
 import { loadPastOnlineTournaments } from "@/server/tournaments"
 import { pageHead, webPageJsonLd } from "@/lib/seo"
 import { formatDate, getUserTimezone } from "@/lib/utils"
 
-const TITLE = "Past Online Chess Tournaments | mboachess"
-const DESCRIPTION =
-  "Browse past online chess tournaments. Relive previous online events from the mboachess community."
+export function pastTournamentsHead(locale: Locale) {
+  const copy = getDictionary(locale).tournaments
+  return pageHead({
+    title: copy.pastMetaTitle,
+    description: copy.pastMetaDescription,
+    path: "/tournaments/past-online",
+    locale,
+    jsonLd: webPageJsonLd({
+      title: copy.pastMetaTitle,
+      description: copy.pastMetaDescription,
+      path: "/tournaments/past-online",
+      locale,
+    }),
+  })
+}
 
 export const Route = createFileRoute("/tournaments/past-online")({
-  head: () =>
-    pageHead({
-      title: TITLE,
-      description: DESCRIPTION,
-      path: "/tournaments/past-online",
-      jsonLd: webPageJsonLd({
-        title: TITLE,
-        description: DESCRIPTION,
-        path: "/tournaments/past-online",
-      }),
-    }),
+  head: () => pastTournamentsHead("fr"),
   loader: () => loadPastOnlineTournaments(),
   component: PastOnlineTournamentsPage,
 })
 
-function PastOnlineTournamentsPage() {
-  const tournaments = Route.useLoaderData()
+export function PastOnlineTournamentsPage() {
+  const copy = useDictionary().tournaments
+  const locale = useLocale()
+  const tournaments = useRouteLoaderData<Awaited<ReturnType<typeof loadPastOnlineTournaments>>>()
   const [userTimezone, setUserTimezone] = useState<string>("UTC")
 
   useEffect(() => {
@@ -37,29 +43,28 @@ function PastOnlineTournamentsPage() {
     <PageShell>
       <header className="mb-6 sm:mb-8">
         <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">
-          Past online tournaments
+          {copy.pastTitle}
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted">
-          Online events that have already taken place. Winners are fetched from
-          Chess.com when the tournament link points to a Chess.com event.{" "}
-          <Link
+          {copy.pastLede}{" "}
+          <LocaleLink
             to="/tournaments"
             className="text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
           >
-            View upcoming tournaments
-          </Link>
+            {copy.upcomingLink}
+          </LocaleLink>
           .
         </p>
       </header>
 
       {tournaments.length === 0 ? (
         <p className="py-10 text-center text-ink-muted">
-          No past online tournaments yet.
+          {copy.pastEmpty}
         </p>
       ) : (
         <section aria-labelledby="past-heading" className="space-y-4">
           <h2 id="past-heading" className="text-sm font-medium text-ink-muted">
-            Past online ({tournaments.length})
+            {fill(copy.pastCount, { count: tournaments.length })}
           </h2>
           {tournaments.map((tournament) => (
             <article
@@ -71,10 +76,10 @@ function PastOnlineTournamentsPage() {
                   {tournament.name}
                 </h3>
                 <span className="inline-flex items-center rounded-md bg-brand-muted px-2.5 py-0.5 text-xs font-medium text-brand">
-                  Online
+                  {copy.online}
                 </span>
                 <span className="inline-flex items-center rounded-md bg-surface-muted px-2.5 py-0.5 text-xs font-medium text-ink-muted">
-                  Past
+                  {copy.past}
                 </span>
               </div>
               {tournament.description && (
@@ -85,7 +90,7 @@ function PastOnlineTournamentsPage() {
               {tournament.winners.length > 0 ? (
                 <p className="mt-2 text-sm text-wood">
                   <span className="font-medium">
-                    {tournament.winners.length === 1 ? "Winner" : "Winners"}:
+                    {tournament.winners.length === 1 ? copy.winner : copy.winners}:
                   </span>{" "}
                   {tournament.winners.map((username, index) => (
                     <span key={username}>
@@ -108,21 +113,21 @@ function PastOnlineTournamentsPage() {
                 </p>
               ) : tournament.link ? (
                 <p className="mt-2 text-xs text-ink-muted">
-                  Winner not available from Chess.com yet
+                  {copy.winnerMissing}
                 </p>
               ) : null}
               <div className="mt-3 space-y-1.5 text-sm text-foreground/90">
                 <div>
-                  Started:{" "}
+                  {copy.started}{" "}
                   <span className="font-medium">
-                    {formatDate(tournament.startDate, userTimezone)}
+                    {formatDate(tournament.startDate, userTimezone, locale)}
                   </span>
                 </div>
                 {tournament.endDate && (
                   <div>
-                    Ended:{" "}
+                    {copy.ended}{" "}
                     <span className="font-medium">
-                      {formatDate(tournament.endDate, userTimezone)}
+                      {formatDate(tournament.endDate, userTimezone, locale)}
                     </span>
                   </div>
                 )}
@@ -133,7 +138,7 @@ function PastOnlineTournamentsPage() {
                     rel="noopener noreferrer"
                     className="text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
                   >
-                    Tournament link
+                    {copy.link}
                   </a>
                 )}
               </div>

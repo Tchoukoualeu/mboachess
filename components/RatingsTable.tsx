@@ -3,6 +3,14 @@ import {
   isClosedChesscomAccount,
   type PlayerLookupResult,
 } from "@/lib/chesscom"
+import {
+  fill,
+  intlLocale,
+  useDictionary,
+  useLocale,
+  type Dictionary,
+  type Locale,
+} from "@/lib/i18n"
 
 /** Convert ISO country code to flag emoji (e.g., "CM" -> "🇨🇲"). */
 function countryCodeToFlag(code: string): string {
@@ -72,47 +80,69 @@ const COUNTRY_NAMES: Record<string, string> = {
   GQ: "Equatorial Guinea",
 }
 
-function getCountryName(code: string | null): string {
-  if (!code) return "Unknown"
-  return COUNTRY_NAMES[code.toUpperCase()] || code.toUpperCase()
+function getCountryName(
+  code: string | null,
+  locale: Locale,
+  unknown: string,
+): string {
+  if (!code) return unknown
+  const upper = code.toUpperCase()
+  try {
+    const name = new Intl.DisplayNames([intlLocale(locale)], {
+      type: "region",
+    }).of(upper)
+    if (name && name.toUpperCase() !== upper) return name
+  } catch {
+    // Fall back to the English names below.
+  }
+  return COUNTRY_NAMES[upper] || upper
 }
 
-function formatLastSeen(unix: number | null): string {
+function formatLastSeen(unix: number | null, copy: Dictionary["ratings"]): string {
   if (unix == null) return "—"
   const s = Date.now() / 1000 - unix
-  if (s < 60) return "just now"
-  if (s < 3600) return `${Math.floor(s / 60)}m ago`
-  if (s < 86400) return `${Math.floor(s / 3600)}h ago`
-  return `${Math.floor(s / 86400)}d ago`
+  if (s < 60) return copy.justNow
+  if (s < 3600) return fill(copy.minutesAgo, { count: Math.floor(s / 60) })
+  if (s < 86400) return fill(copy.hoursAgo, { count: Math.floor(s / 3600) })
+  return fill(copy.daysAgo, { count: Math.floor(s / 86400) })
 }
 
-function closedAccountLabel(accountStatus: string | null): string {
-  if (accountStatus === "closed:fair_play_violations") {
-    return "Closed (fair play)"
-  }
-  return "Closed"
+function closedAccountLabel(
+  accountStatus: string | null,
+  copy: Dictionary["ratings"],
+): string {
+  if (accountStatus === "closed:fair_play_violations") return copy.closedFairPlay
+  return copy.closed
 }
 
 function formatRating(
   value: number | null,
   error: string | undefined,
+  unrated: string,
 ): string | number {
   if (error && /not found/i.test(error)) return "—"
   if (value != null) return value
   if (error) return "—"
-  return "Unrated"
+  return unrated
 }
 
 type SortKey = "username" | "blitz" | "rapid" | "lastOnline"
 
 type SortDir = "asc" | "desc"
 
-const COLUMNS: { key: SortKey; label: string; numeric?: boolean }[] = [
-  { key: "username", label: "Player" },
-  { key: "blitz", label: "Blitz", numeric: true },
-  { key: "rapid", label: "Rapid", numeric: true },
-  { key: "lastOnline", label: "Last seen", numeric: true },
+const COLUMNS: { key: SortKey; numeric?: boolean }[] = [
+  { key: "username" },
+  { key: "blitz", numeric: true },
+  { key: "rapid", numeric: true },
+  { key: "lastOnline", numeric: true },
 ]
+
+function columnLabel(key: SortKey, dict: Dictionary): string {
+  if (key === "username") return dict.ratings.player
+  if (key === "blitz") return dict.common.blitz
+  if (key === "rapid") return dict.common.rapid
+  return dict.ratings.lastSeen
+}
 
 /** Rows shown before the "Show all" toggle. */
 const INITIAL_VISIBLE = 25
@@ -174,6 +204,7 @@ function profileUrl(username: string): string {
 }
 
 function PlayerAvatar({ row }: { row: PlayerLookupResult }) {
+  const copy = useDictionary().ratings
   return (
     <span className="relative h-8 w-8 shrink-0">
       <span className="flex h-full w-full overflow-hidden rounded-full border border-border bg-brand-muted">
@@ -195,8 +226,8 @@ function PlayerAvatar({ row }: { row: PlayerLookupResult }) {
       {row.online ? (
         <span
           role="img"
-          aria-label="Online"
-          title="Online"
+          aria-label={copy.online}
+          title={copy.online}
           className="absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full bg-brand ring-2 ring-surface"
         />
       ) : null}
@@ -206,6 +237,8 @@ function PlayerAvatar({ row }: { row: PlayerLookupResult }) {
 
 /** Username, closed-account badge, and flag for players outside Cameroon. */
 function PlayerIdentity({ row }: { row: PlayerLookupResult }) {
+  const dict = useDictionary()
+  const locale = useLocale()
   const closed = isClosedChesscomAccount(row.accountStatus)
   const foreign =
     row.countryCode != null && row.countryCode.toUpperCase() !== "CM"
@@ -223,8 +256,8 @@ function PlayerIdentity({ row }: { row: PlayerLookupResult }) {
       {foreign && row.countryCode ? (
         <span
           role="img"
-          aria-label={getCountryName(row.countryCode)}
-          title={getCountryName(row.countryCode)}
+          aria-label={getCountryName(row.countryCode, locale, dict.ratings.unknownCountry)}
+          title={getCountryName(row.countryCode, locale, dict.ratings.unknownCountry)}
           className="text-base leading-none"
         >
           {countryCodeToFlag(row.countryCode)}
@@ -234,12 +267,12 @@ function PlayerIdentity({ row }: { row: PlayerLookupResult }) {
         <span
           title={
             row.accountStatus === "closed:fair_play_violations"
-              ? "Chess.com closed this account for fair play violations"
-              : "Chess.com closed this account"
+              ? dict.ratings.closedFairPlayTitle
+              : dict.ratings.closedTitle
           }
           className="rounded-md bg-red-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-red-700 dark:bg-red-950/50 dark:text-red-400"
         >
-          {closedAccountLabel(row.accountStatus)}
+          {closedAccountLabel(row.accountStatus, dict.ratings)}
         </span>
       ) : null}
     </span>
@@ -251,6 +284,7 @@ type Props = {
 }
 
 export function RatingsTable({ rows }: Props) {
+  const dict = useDictionary()
   const searchId = useId()
   const sortId = useId()
   const [sortKey, setSortKey] = useState<SortKey>("rapid")
@@ -296,19 +330,19 @@ export function RatingsTable({ rows }: Props) {
     <div>
       <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center">
         <label htmlFor={searchId} className="sr-only">
-          Search players
+          {dict.ratings.searchLabel}
         </label>
         <input
           id={searchId}
           type="search"
-          placeholder="Search by username…"
+          placeholder={dict.ratings.searchPlaceholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="h-10 w-full rounded-lg border border-border bg-surface px-3 text-sm shadow-sm placeholder:text-ink-muted/70 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/25 sm:max-w-xs"
         />
         <div className="flex items-center gap-2 md:hidden">
           <label htmlFor={sortId} className="shrink-0 text-sm text-ink-muted">
-            Sort by
+            {dict.ratings.sortBy}
           </label>
           <select
             id={sortId}
@@ -318,25 +352,24 @@ export function RatingsTable({ rows }: Props) {
           >
             {COLUMNS.map((col) => (
               <option key={col.key} value={col.key}>
-                {col.key === "username" ? "Name" : col.label}
+                {col.key === "username" ? dict.ratings.name : columnLabel(col.key, dict)}
               </option>
             ))}
           </select>
         </div>
         <p className="text-sm text-ink-muted sm:ml-auto" aria-live="polite">
           {needle
-            ? `${matches.length} of ${rows.length} players`
-            : `Showing ${visible.length} of ${rows.length}`}
+            ? fill(dict.ratings.matches, { matches: matches.length, total: rows.length })
+            : fill(dict.ratings.showing, { visible: visible.length, total: rows.length })}
         </p>
       </div>
 
       {visible.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border bg-surface px-4 py-8 text-center text-sm text-ink-muted">
-          No player matches “{query.trim()}”.{" "}
+          {fill(dict.ratings.noMatch, { query: query.trim() })}{" "}
           <a href="#submit" className="font-medium text-brand hover:underline">
-            Add them to the list
+            {dict.ratings.addThem}
           </a>
-          .
         </div>
       ) : (
         <>
@@ -353,20 +386,20 @@ export function RatingsTable({ rows }: Props) {
                 <span className="min-w-0 flex-1">
                   <PlayerIdentity row={row} />
                   <span className="mt-0.5 block text-xs text-ink-muted">
-                    {formatLastSeen(row.lastOnline)}
+                    {formatLastSeen(row.lastOnline, dict.ratings)}
                   </span>
                 </span>
                 <span className="shrink-0 text-right text-xs tabular-nums">
                   <span className="block">
-                    <span className="text-ink-muted">Blitz </span>
+                    <span className="text-ink-muted">{dict.common.blitz} </span>
                     <span className="font-semibold">
-                      {formatRating(row.blitz, row.error)}
+                      {formatRating(row.blitz, row.error, dict.common.unrated)}
                     </span>
                   </span>
                   <span className="block">
-                    <span className="text-ink-muted">Rapid </span>
+                    <span className="text-ink-muted">{dict.common.rapid} </span>
                     <span className="font-semibold">
-                      {formatRating(row.rapid, row.error)}
+                      {formatRating(row.rapid, row.error, dict.common.unrated)}
                     </span>
                   </span>
                 </span>
@@ -408,7 +441,7 @@ export function RatingsTable({ rows }: Props) {
                           active ? "text-brand" : ""
                         }`}
                       >
-                        {col.label}
+                        {columnLabel(col.key, dict)}
                         <span
                           aria-hidden
                           className={active ? "" : "text-ink-muted opacity-40"}
@@ -437,13 +470,13 @@ export function RatingsTable({ rows }: Props) {
                     </span>
                   </td>
                   <td className="px-4 py-2.5 text-right tabular-nums">
-                    {formatRating(row.blitz, row.error)}
+                    {formatRating(row.blitz, row.error, dict.common.unrated)}
                   </td>
                   <td className="px-4 py-2.5 text-right font-semibold tabular-nums">
-                    {formatRating(row.rapid, row.error)}
+                    {formatRating(row.rapid, row.error, dict.common.unrated)}
                   </td>
                   <td className="px-4 py-2.5 text-right tabular-nums text-ink-muted">
-                    {formatLastSeen(row.lastOnline)}
+                    {formatLastSeen(row.lastOnline, dict.ratings)}
                   </td>
                 </tr>
               ))}
@@ -460,15 +493,15 @@ export function RatingsTable({ rows }: Props) {
             className="rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-brand shadow-sm transition hover:border-brand/40 hover:bg-brand-muted/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
             {showAll
-              ? `Show top ${INITIAL_VISIBLE}`
-              : `Show all ${rows.length} players`}
+              ? fill(dict.ratings.showTop, { count: INITIAL_VISIBLE })
+              : fill(dict.ratings.showAll, { count: rows.length })}
           </button>
         </div>
       ) : null}
 
       {rows.some((r) => r.error) ? (
         <p className="mt-3 text-xs text-wood">
-          Some rows may be missing ratings:{" "}
+          {dict.ratings.missingRatings}{" "}
           {rows
             .filter((r) => r.error)
             .map((r) => `${r.username} (${r.error})`)

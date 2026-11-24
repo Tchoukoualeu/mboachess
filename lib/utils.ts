@@ -1,3 +1,4 @@
+import { intlLocale, type Locale } from "./i18n"
 import { TOURNAMENT_TIMEZONE } from "./constants"
 
 /**
@@ -18,8 +19,12 @@ import { TOURNAMENT_TIMEZONE } from "./constants"
  * formatDate(new Date("2026-05-31T09:00:00Z"), "Africa/Douala")
  * // Returns: "Sat, May 31, 2026, 10:00" (UTC+1)
  */
-export function formatDate(date: Date, timezone?: string): string {
-  return new Date(date).toLocaleDateString("en-US", {
+export function formatDate(
+  date: Date,
+  timezone?: string,
+  locale: Locale = "fr",
+): string {
+  return new Date(date).toLocaleDateString(intlLocale(locale), {
     weekday: "short",
     year: "numeric",
     month: "short",
@@ -52,8 +57,11 @@ export function formatDateInUserTimezone(
  * @param date - The date to format
  * @returns Formatted date string in German timezone
  */
-export function formatDateInGermanTime(date: Date): string {
-  return formatDate(date, TOURNAMENT_TIMEZONE)
+export function formatDateInGermanTime(
+  date: Date,
+  locale: Locale = "fr",
+): string {
+  return formatDate(date, TOURNAMENT_TIMEZONE, locale)
 }
 
 /**
@@ -208,10 +216,13 @@ export function getUserTimezone(): string {
  * @param timezone - IANA timezone string
  * @returns Human-readable timezone name (e.g., "West Africa Standard Time")
  */
-export function getTimezoneName(timezone: string): string {
+export function getTimezoneName(
+  timezone: string,
+  locale: Locale = "fr",
+): string {
   try {
     const now = new Date()
-    const formatter = new Intl.DateTimeFormat("en-US", {
+    const formatter = new Intl.DateTimeFormat(intlLocale(locale), {
       timeZone: timezone,
       timeZoneName: "long",
     })
@@ -233,12 +244,13 @@ export function getTimezoneName(timezone: string): string {
 export function previewGermanTime(
   datetimeLocal: string,
   userTimezone: string,
+  locale: Locale = "fr",
 ): string | null {
   if (!datetimeLocal) return null
 
   try {
     const germanDate = datetimeLocalToGermanTime(datetimeLocal, userTimezone)
-    return formatDate(germanDate)
+    return formatDate(germanDate, TOURNAMENT_TIMEZONE, locale)
   } catch {
     return null
   }

@@ -22,6 +22,7 @@
     "src/**/*.tsx",
     "components/**/*.tsx",
     "lib/**/*.ts",
+    "locales/**/*.ts",
     "server/**/*.ts",
     "vite-env.d.ts"
   ],

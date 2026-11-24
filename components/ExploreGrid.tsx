@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 import { SiteNavLink } from "@/components/SiteNavLink"
+import { useDictionary } from "@/lib/i18n"
 import {
   SITE_LINKS,
   type SiteRoute,
@@ -74,6 +75,7 @@ function Icon({ route }: { route: SiteRoute }) {
 }
 
 export function ExploreGrid() {
+  const dict = useDictionary()
   const season = prodigeSeasonStatus()
   const featureProdige = season !== "ended"
   const items = SITE_LINKS.filter(
@@ -94,17 +96,17 @@ export function ExploreGrid() {
           <span className="min-w-0 flex-1">
             <span className="flex flex-wrap items-center gap-2">
               <span className="font-display text-lg font-semibold sm:text-xl">
-                {prodige.label}
+                {dict.nav.links.prodige.label}
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-gold ring-1 ring-gold/30">
                 {season === "live" ? (
                   <span className="h-1.5 w-1.5 rounded-full bg-gold" aria-hidden />
                 ) : null}
-                {season === "live" ? "Season live" : "Starts 15 Nov"}
+                {season === "live" ? dict.explore.seasonLive : dict.explore.seasonStarts}
               </span>
             </span>
             <span className="mt-1 block text-sm text-white/75">
-              {prodige.blurb}. Results, standings and sign-up.
+              {dict.explore.prodigeMore}
             </span>
           </span>
           <span
@@ -127,10 +129,10 @@ export function ExploreGrid() {
           </span>
           <span>
             <span className="block font-medium text-foreground group-hover:text-brand">
-              {item.label}
+              {dict.nav.links[item.id].label}
             </span>
             <span className="mt-0.5 block text-sm leading-5 text-ink-muted">
-              {item.blurb}
+              {dict.nav.links[item.id].blurb}
             </span>
           </span>
         </SiteNavLink>

@@ -1,7 +1,9 @@
 import { useRouter } from "@tanstack/react-router";
 import { useState } from "react";
+import { translateApiError, useDictionary } from "@/lib/i18n";
 
 export function SubmitUsernameForm() {
+  const dict = useDictionary();
   const router = useRouter();
   const [value, setValue] = useState("");
   const [message, setMessage] = useState<{
@@ -15,7 +17,7 @@ export function SubmitUsernameForm() {
     setMessage(null);
     const username = value.trim();
     if (!username) {
-      setMessage({ type: "err", text: "Enter your Chess.com username." });
+      setMessage({ type: "err", text: dict.usernameForm.required });
       return;
     }
     setLoading(true);
@@ -33,14 +35,14 @@ export function SubmitUsernameForm() {
       if (!res.ok) {
         setMessage({
           type: "err",
-          text: data.error || "Request failed",
+          text: translateApiError(data.error, dict, dict.common.requestFailed),
         });
         return;
       }
       if (data.already) {
         setMessage({
           type: "ok",
-          text: "That username is already in the list.",
+          text: dict.usernameForm.already,
         });
         setValue("");
         await router.invalidate();
@@ -48,12 +50,12 @@ export function SubmitUsernameForm() {
       }
       setMessage({
         type: "ok",
-        text: "Your username was added. It will show in the ratings table.",
+        text: dict.usernameForm.added,
       });
       setValue("");
       await router.invalidate();
     } catch {
-      setMessage({ type: "err", text: "Network error. Try again." });
+      setMessage({ type: "err", text: dict.common.networkError });
     } finally {
       setLoading(false);
     }
@@ -70,14 +72,14 @@ export function SubmitUsernameForm() {
             htmlFor="chess-username"
             className="mb-1 block text-sm font-medium text-foreground"
           >
-            Add your Chess.com username
+            {dict.usernameForm.label}
           </label>
           <input
             id="chess-username"
             name="username"
             type="text"
             autoComplete="username"
-            placeholder="e.g. hikaru"
+            placeholder={dict.usernameForm.placeholder}
             value={value}
             onChange={(e) => setValue(e.target.value)}
             disabled={loading}
@@ -89,7 +91,7 @@ export function SubmitUsernameForm() {
           disabled={loading}
           className="h-10 shrink-0 rounded-lg bg-brand px-5 text-sm font-semibold text-white transition hover:bg-brand-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-50"
         >
-          {loading ? "Adding…" : "Add player"}
+          {loading ? dict.common.adding : dict.usernameForm.submit}
         </button>
       </form>
       {message ? (

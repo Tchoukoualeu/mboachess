@@ -1,3 +1,10 @@
+import {
+  getDictionary,
+  localizePath,
+  ogLocale,
+  type Locale,
+} from "@/lib/i18n"
+
 const SITE_URL = "https://mboachess.com"
 const SITE_NAME = "mboachess"
 const OG_IMAGE = `${SITE_URL}/og.png`
@@ -5,7 +12,9 @@ const OG_IMAGE = `${SITE_URL}/og.png`
 type PageSeo = {
   title: string
   description: string
+  /** Unprefixed path, such as `/puzzles`. */
   path: string
+  locale?: Locale
   type?: "website" | "article"
   /** Site path (`/file.jpg`) or absolute URL. Defaults to the site share image. */
   image?: string
@@ -19,6 +28,7 @@ export function pageHead({
   title,
   description,
   path,
+  locale = "fr",
   type = "website",
   image,
   imageAlt,
@@ -26,7 +36,11 @@ export function pageHead({
   imageHeight,
   jsonLd,
 }: PageSeo) {
-  const url = `${SITE_URL}${path}`
+  const localizedPath = localizePath(path, locale)
+  const url = `${SITE_URL}${localizedPath}`
+  const frenchUrl = `${SITE_URL}${localizePath(path, "fr")}`
+  const englishUrl = `${SITE_URL}${localizePath(path, "en")}`
+  const alternateLocale = locale === "fr" ? "en_US" : "fr_FR"
   const imageUrl = image
     ? image.startsWith("http")
       ? image
@@ -61,7 +75,8 @@ export function pageHead({
       ...(imageHeight
         ? [{ property: "og:image:height", content: String(imageHeight) }]
         : []),
-      { property: "og:locale", content: "en_US" },
+      { property: "og:locale", content: ogLocale(locale) },
+      { property: "og:locale:alternate", content: alternateLocale },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: title },
       { name: "twitter:description", content: description },
@@ -70,19 +85,24 @@ export function pageHead({
         ? [{ name: "twitter:image:alt", content: imageAlt }]
         : []),
     ],
-    links: [{ rel: "canonical", href: url }],
+    links: [
+      { rel: "canonical", href: url },
+      { rel: "alternate", hrefLang: "fr", href: frenchUrl },
+      { rel: "alternate", hrefLang: "en", href: englishUrl },
+      { rel: "alternate", hrefLang: "x-default", href: frenchUrl },
+    ],
     scripts,
   }
 }
 
-export function websiteJsonLd() {
+export function websiteJsonLd(locale: Locale = "fr") {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: SITE_NAME,
     url: SITE_URL,
-    description:
-      "The hub for chess in Cameroon. Track players, clubs, tournaments, and the community.",
+    inLanguage: locale,
+    description: getDictionary(locale).home.jsonLd,
     publisher: {
       "@type": "Organization",
       name: SITE_NAME,
@@ -96,17 +116,20 @@ export function webPageJsonLd({
   title,
   description,
   path,
+  locale = "fr",
 }: {
   title: string
   description: string
   path: string
+  locale?: Locale
 }) {
   return {
     "@context": "https://schema.org",
     "@type": "WebPage",
     name: title,
     description,
-    url: `${SITE_URL}${path}`,
+    inLanguage: locale,
+    url: `${SITE_URL}${localizePath(path, locale)}`,
     isPartOf: {
       "@type": "WebSite",
       name: SITE_NAME,

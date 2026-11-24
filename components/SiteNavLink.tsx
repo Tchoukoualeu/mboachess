@@ -1,5 +1,6 @@
-import { Link } from "@tanstack/react-router"
 import type { ReactNode } from "react"
+import { LocaleLink } from "@/components/LocaleLink"
+import { useDictionary } from "@/lib/i18n"
 import type { SiteLink } from "@/lib/navigation"
 
 type Props = {
@@ -10,30 +11,18 @@ type Props = {
 }
 
 export function SiteNavLink({ item, className, onClick, children }: Props) {
-  const content = children ?? item.label
-
-  // This route validates search params, so the link must pass an explicit object.
-  if (item.to === "/rating-speed-run") {
-    return (
-      <Link
-        to="/rating-speed-run"
-        search={{}}
-        className={className}
-        onClick={onClick}
-      >
-        {content}
-      </Link>
-    )
-  }
+  const dict = useDictionary()
+  const content = children ?? dict.nav.links[item.id].label
 
   return (
-    <Link
+    <LocaleLink
       to={item.to}
+      search={item.to === "/rating-speed-run" ? {} : undefined}
       className={className}
       onClick={onClick}
       activeOptions={{ exact: item.to === "/" }}
     >
       {content}
-    </Link>
+    </LocaleLink>
   )
 }

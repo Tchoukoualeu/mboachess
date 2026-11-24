@@ -1,3 +1,4 @@
+import { useDictionary } from "@/lib/i18n";
 import { GITHUB_URL } from "@/lib/site";
 
 function GitHubIcon({ className }: { className?: string }) {
@@ -14,6 +15,7 @@ function GitHubIcon({ className }: { className?: string }) {
 }
 
 export function GitHubLink() {
+  const dict = useDictionary();
   return (
     <a
       href={GITHUB_URL}
@@ -22,7 +24,7 @@ export function GitHubLink() {
       className="inline-flex shrink-0 items-center justify-center rounded-lg border border-border p-2 text-ink-muted transition hover:border-brand/40 hover:text-brand"
     >
       <GitHubIcon className="h-5 w-5" />
-      <span className="sr-only">View source on GitHub</span>
+      <span className="sr-only">{dict.nav.github}</span>
     </a>
   );
 }
