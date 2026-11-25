@@ -410,8 +410,10 @@ function toView(
       timeLabel: formatTime(game.endTime),
       white: game.white.username,
       whiteRating: game.white.rating,
+      whiteResult: game.white.result,
       black: game.black.username,
       blackRating: game.black.rating,
+      blackResult: game.black.result,
       score: gameScore(game.white.result, game.black.result),
     })),
   }
@@ -532,7 +534,7 @@ const GENERAL_TOP = 16
 /** Excluded from the overall top 16. Arena result pages stay unchanged. */
 const BANNED_USERNAMES = new Set(["m_sergeaubry"])
 
-function isBannedUsername(username: string): boolean {
+export function isProdigeLeagueBanned(username: string): boolean {
   return BANNED_USERNAMES.has(username.toLowerCase())
 }
 
@@ -542,7 +544,7 @@ function isScheduled(arena: ProdigeArenaDay): arena is ScheduledArena {
   return arena.chesscomId !== null
 }
 
-async function loadFinishedArenas(): Promise<ProdigeArenaView[]> {
+export async function loadFinishedArenas(): Promise<ProdigeArenaView[]> {
   const arenas = PRODIGE_ARENAS.filter(isScheduled)
   const unseen = arenas.filter((arena) => !completeViews.has(arena.chesscomId))
   const stored = await readStoredMany(
@@ -650,10 +652,10 @@ export async function loadProdigeArenaDigest(): Promise<{
   })
 
   const sorted = collectOverallRows(views)
-  const eligible = sorted.filter((row) => !isBannedUsername(row.username))
+  const eligible = sorted.filter((row) => !isProdigeLeagueBanned(row.username))
   const leaders = withRanks(eligible.slice(0, GENERAL_TOP))
   const banned = withRanks(
-    sorted.filter((row) => isBannedUsername(row.username)),
+    sorted.filter((row) => isProdigeLeagueBanned(row.username)),
   )
 
   return { winners, leaders, banned }
@@ -784,10 +786,10 @@ export async function loadProdigePlayerProfile(
 
   const sorted = collectOverallRows(views)
   const row = sorted.find((entry) => entry.username.toLowerCase() === key)
-  const banned = isBannedUsername(username)
+  const banned = isProdigeLeagueBanned(username)
   const ranked = banned
     ? null
-    : withRanks(sorted.filter((entry) => !isBannedUsername(entry.username))).find(
+    : withRanks(sorted.filter((entry) => !isProdigeLeagueBanned(entry.username))).find(
         (entry) => entry.username.toLowerCase() === key,
       )
 

@@ -488,6 +488,10 @@ export const en = {
     standingsTitle: "Overall standings",
     standingsLede: "Top 16 by points accumulated in finished arenas.",
     standingsEmpty: "Standings will appear after the first arena.",
+    rewardsTitle: "Rewards",
+    rewardsLede:
+      "Several prizes are calculated from the same arenas: most wins, the biggest upset, attendance, the longest streak, and others. They update when an arena finishes.",
+    rewardsLink: "See the rewards",
     bannedTitle: "Banned players",
     bannedLede: "Left out of the top 16. Their points do not count toward qualification.",
     banned: "Banned",
@@ -595,6 +599,148 @@ export const en = {
     registered: "Registered",
     online: "Online",
     count: "{count} {noun}",
+  },
+  prodigeRewards: {
+    metaTitle: "Rewards · Prodige League | mboachess",
+    metaDescription:
+      "Prodige League rewards, calculated from finished arenas: wins, upsets, attendance, streaks, podiums and checkmates.",
+    kicker: "2026 season",
+    title: "Rewards",
+    lede: "Every prize is recalculated from the finished arenas saved on mboachess. Nothing is entered by hand.",
+    update:
+      "Finished arenas included: {arenas}. Saved games: {games}. When a new arena is added to the schedule and its games are saved, the winners change on the next visit. An arena still in progress is left out.",
+    bannedNote:
+      "Players banned from the top 16 do not receive a reward. Their games still count for everyone else: a win against a banned player is still a win.",
+    shared: "Shared by {count} players.",
+    holder: "Reward",
+    empty: "Nobody yet.",
+    nextUpsets: "The next largest gaps, to put the rewarded game in context.",
+    gameLine:
+      "{winner} ({winnerRating}) with {color} beat {loser} ({loserRating}), {finish}.",
+    white: "White",
+    black: "Black",
+    finish: {
+      checkmated: "checkmate",
+      resigned: "resignation",
+    },
+    stats: {
+      wins: "{primary} wins · {secondary} games",
+      giantKiller: "+{primary} rating points · day {secondary}",
+      upsets: "{primary} upset wins · {secondary} rating points of margin in total",
+      games: "{primary} games · {secondary} arenas",
+      attendance: "Every finished arena ({count})",
+      streak: "{primary} wins in a row · day {secondary}",
+      black: "{primary} wins with Black · {secondary} games with Black",
+      podiums: "Podiums: {primary} · First places: {secondary}",
+      checkmates: "{primary} checkmates",
+    },
+    rewards: {
+      wins: {
+        title: "Most wins",
+        body: [
+          "This reward goes to the player who has won the most games across every finished arena.",
+          "A win is a game Chess.com scored as a win. The total is the same as the W column of each arena, added up over the season.",
+        ],
+        rules: [
+          "Checkmates, resignations, opponents leaving the arena, and flags all count as one win.",
+          "Draws and losses do not count.",
+          "If several players have the same number of wins, they share the reward.",
+        ],
+      },
+      giantKiller: {
+        title: "Giant killer",
+        body: [
+          "This reward goes to the game with the largest rating gap between the winner and the loser.",
+          "The rating is the one Chess.com showed at the time of that game, not the player's rating today.",
+        ],
+        rules: [
+          "Only games that ended by checkmate or resignation count.",
+          "A win because the opponent left the arena, or because their clock hit zero, does not count.",
+          "The gap is the opponent's rating minus the winner's. It has to be strictly positive.",
+          "If two games have the exact same gap, they share the reward.",
+        ],
+      },
+      upsets: {
+        title: "Upset hunter",
+        body: [
+          "This reward goes to the player who has most often beaten a higher-rated opponent.",
+          "Each win of that kind counts as one, whether the gap is small or large. The sum of the gaps is only used to break a tie.",
+        ],
+        rules: [
+          "As with the giant killer, only wins by checkmate or resignation count.",
+          "Beating an opponent of the same rating, or a lower-rated one, does not count.",
+          "If two players have the same number of upset wins, the one with the larger total gap ranks first.",
+          "If they are still tied, they share the reward.",
+        ],
+      },
+      games: {
+        title: "Most games",
+        body: [
+          "This reward goes to the player who has played the most games in finished arenas.",
+          "It rewards time spent playing, not the score. A win, a draw and a loss each count as one game.",
+        ],
+        rules: [
+          "Every saved game counts for both players.",
+          "If several players have played the same number of games, they share the reward.",
+        ],
+      },
+      attendance: {
+        title: "Full attendance",
+        body: [
+          "This reward goes to every player who appears in the standings of every finished arena.",
+          "Appearing in the standings is enough: the number of games played in the arena does not matter. When a new arena finishes, a player has to have played that one too, or the reward is lost. A past arena is not played again.",
+        ],
+        rules: [
+          "An arena that is upcoming, or still in progress, is not part of the count yet.",
+          "Several players can hold the reward at the same time.",
+        ],
+      },
+      streak: {
+        title: "Longest streak",
+        body: [
+          "This reward goes to the player with the longest run of consecutive wins inside a single arena.",
+          "Games are read in the order they ended. A win extends the streak. A draw or a loss resets it to zero. The streak does not carry from one arena to the next: each day starts again at zero.",
+        ],
+        rules: [
+          "Every win scored by Chess.com extends the streak, including when the opponent leaves or loses on time.",
+          "The day shown is the arena where the streak was made.",
+          "If several players reach the same length, they share the reward.",
+        ],
+      },
+      black: {
+        title: "Best with Black",
+        body: [
+          "This reward goes to the player who has won the most games with the black pieces.",
+          "Games played with White do not count, even when they were won. It picks out players who win without moving first.",
+        ],
+        rules: [
+          "A win with Black is a game where Chess.com gave the win to the player who had Black.",
+          "If several players have the same number of wins with Black, they share the reward.",
+        ],
+      },
+      podiums: {
+        title: "Podiums",
+        body: [
+          "This reward goes to the player who has most often finished in the top three of an arena.",
+          "The place is the Chess.com standing saved at the end of the arena. A first, a second and a third each count as one podium.",
+        ],
+        rules: [
+          "The number of first places is shown alongside, but it does not break a tie. Only the number of podiums decides.",
+          "If several players have the same number of podiums, they share the reward.",
+        ],
+      },
+      checkmates: {
+        title: "Checkmates",
+        body: [
+          "This reward goes to the player who has delivered the most checkmates.",
+          "It does not count every win. A resignation, an opponent leaving the arena, or a flag counts toward most wins, but not as a checkmate.",
+        ],
+        rules: [
+          "A game counts only when the opponent's result is checkmate.",
+          "If several players have the same number of checkmates, they share the reward.",
+        ],
+      },
+    },
   },
   speedRun: {
     metaTitle: "Rating speed run | mboachess",

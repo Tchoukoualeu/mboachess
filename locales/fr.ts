@@ -492,6 +492,10 @@ export const fr = {
     standingsTitle: "Classement général",
     standingsLede: "Top 16 des points accumulés sur les arènes terminées.",
     standingsEmpty: "Le classement apparaîtra après la première arène.",
+    rewardsTitle: "Récompenses",
+    rewardsLede:
+      "Plusieurs prix sont calculés sur les mêmes arènes : le plus de victoires, la plus grosse surprise, l'assiduité, la plus longue série, et d'autres. Ils se mettent à jour quand une arène se termine.",
+    rewardsLink: "Voir les récompenses",
     bannedTitle: "Joueurs bannis",
     bannedLede:
       "Exclus du top 16. Leurs points ne comptent pas pour la qualification.",
@@ -604,6 +608,148 @@ export const fr = {
     registered: "Inscrit",
     online: "En ligne",
     count: "{count} {noun}",
+  },
+  prodigeRewards: {
+    metaTitle: "Récompenses · Prodige League | mboachess",
+    metaDescription:
+      "Récompenses de la Prodige League, calculées sur les arènes terminées : victoires, surprises, assiduité, série, podiums et mats.",
+    kicker: "Saison 2026",
+    title: "Récompenses",
+    lede: "Chaque prix est recalculé à partir des arènes terminées enregistrées sur mboachess. Rien n'est saisi à la main.",
+    update:
+      "Arènes terminées prises en compte : {arenas}. Parties enregistrées : {games}. Quand une nouvelle arène est ajoutée au calendrier et que ses parties sont enregistrées, les vainqueurs changent à la visite suivante. Une arène encore en cours n'est pas comptée.",
+    bannedNote:
+      "Les joueurs bannis du top 16 ne reçoivent pas de récompense. Leurs parties comptent pour les autres : une victoire contre un joueur banni reste une victoire.",
+    shared: "Partagée par {count} joueurs.",
+    holder: "Récompense",
+    empty: "Personne pour le moment.",
+    nextUpsets: "Les autres grands écarts, pour situer la partie qui tient la récompense.",
+    gameLine:
+      "{winner} ({winnerRating}) avec {color} a battu {loser} ({loserRating}), {finish}.",
+    white: "les Blancs",
+    black: "les Noirs",
+    finish: {
+      checkmated: "échec et mat",
+      resigned: "abandon",
+    },
+    stats: {
+      wins: "{primary} victoires · {secondary} parties",
+      giantKiller: "+{primary} points de classement · jour {secondary}",
+      upsets: "{primary} victoires surprise · {secondary} points d'écart au total",
+      games: "{primary} parties · {secondary} arènes",
+      attendance: "Toutes les arènes terminées ({count})",
+      streak: "{primary} victoires d'affilée · jour {secondary}",
+      black: "{primary} victoires avec les Noirs · {secondary} parties avec les Noirs",
+      podiums: "Podiums : {primary} · Premières places : {secondary}",
+      checkmates: "{primary} mats",
+    },
+    rewards: {
+      wins: {
+        title: "Plus de victoires",
+        body: [
+          "Cette récompense va au joueur qui a gagné le plus de parties sur l'ensemble des arènes terminées.",
+          "Une victoire est une partie que Chess.com a comptée comme gagnée. Le total est le même que la colonne V de chaque arène, additionné sur la saison.",
+        ],
+        rules: [
+          "Les mats, les abandons, les départs de l'arène et les drapeaux comptent tous comme une victoire.",
+          "Les nulles et les défaites ne comptent pas.",
+          "Si plusieurs joueurs ont le même nombre de victoires, ils partagent la récompense.",
+        ],
+      },
+      giantKiller: {
+        title: "Coup de géant",
+        body: [
+          "Cette récompense va à la partie où l'écart de classement entre le vainqueur et le perdant est le plus grand.",
+          "Le classement est celui affiché par Chess.com au moment de la partie, pas le classement actuel du joueur.",
+        ],
+        rules: [
+          "Seules les parties finies par échec et mat ou par abandon comptent.",
+          "Une victoire parce que l'adversaire a quitté l'arène, ou parce que son temps est tombé à zéro, ne compte pas.",
+          "L'écart est le classement de l'adversaire moins celui du vainqueur. Il doit être strictement positif.",
+          "Si deux parties ont exactement le même écart, elles partagent la récompense.",
+        ],
+      },
+      upsets: {
+        title: "Chasseur de favoris",
+        body: [
+          "Cette récompense va au joueur qui a battu le plus souvent un adversaire mieux classé que lui.",
+          "Chaque victoire de ce type compte pour un, que l'écart soit petit ou grand. La somme des écarts ne sert qu'à départager une égalité.",
+        ],
+        rules: [
+          "Comme pour le coup de géant, seules les victoires par mat ou par abandon comptent.",
+          "Battre un adversaire du même classement, ou moins bien classé, ne compte pas.",
+          "Si deux joueurs ont le même nombre de victoires surprise, celui dont la somme des écarts est la plus grande passe devant.",
+          "S'ils restent à égalité, ils partagent la récompense.",
+        ],
+      },
+      games: {
+        title: "Plus de parties",
+        body: [
+          "Cette récompense va au joueur qui a disputé le plus de parties dans les arènes terminées.",
+          "Elle récompense le temps passé à jouer, pas le score. Une victoire, une nulle et une défaite comptent chacune pour une partie.",
+        ],
+        rules: [
+          "Chaque partie enregistrée compte pour les deux joueurs.",
+          "Si plusieurs joueurs ont le même nombre de parties, ils partagent la récompense.",
+        ],
+      },
+      attendance: {
+        title: "Assiduité",
+        body: [
+          "Cette récompense va à chaque joueur présent au classement de toutes les arènes terminées.",
+          "Apparaître au classement suffit : le nombre de parties jouées dans l'arène ne change rien. Quand une nouvelle arène se termine, il faut aussi y avoir joué, sinon la récompense est perdue. Une arène passée ne se rejoue pas.",
+        ],
+        rules: [
+          "Une arène à venir, ou encore en cours, ne fait pas encore partie du compte.",
+          "Plusieurs joueurs peuvent détenir la récompense en même temps.",
+        ],
+      },
+      streak: {
+        title: "Plus longue série",
+        body: [
+          "Cette récompense va au joueur qui a enchaîné le plus de victoires d'affilée à l'intérieur d'une même arène.",
+          "Les parties sont lues dans l'ordre où elles se sont terminées. Une victoire prolonge la série. Une nulle ou une défaite la remet à zéro. La série ne passe pas d'une arène à l'autre : chaque journée repart de zéro.",
+        ],
+        rules: [
+          "Toutes les victoires comptées par Chess.com prolongent la série, y compris quand l'adversaire quitte ou perd au temps.",
+          "Le jour affiché est celui de l'arène où la série a été réalisée.",
+          "Si plusieurs joueurs atteignent la même longueur, ils partagent la récompense.",
+        ],
+      },
+      black: {
+        title: "Meilleur avec les Noirs",
+        body: [
+          "Cette récompense va au joueur qui a gagné le plus de parties avec les pièces noires.",
+          "Les parties jouées avec les Blancs ne comptent pas, même gagnées. Elle distingue les joueurs qui gagnent sans avoir l'avantage du premier trait.",
+        ],
+        rules: [
+          "Une victoire avec les Noirs est une partie où Chess.com a donné la victoire au joueur qui avait les Noirs.",
+          "Si plusieurs joueurs ont le même nombre de victoires avec les Noirs, ils partagent la récompense.",
+        ],
+      },
+      podiums: {
+        title: "Podiums",
+        body: [
+          "Cette récompense va au joueur qui a fini le plus souvent dans les trois premiers d'une arène.",
+          "La place est celle du classement Chess.com enregistré à la fin de l'arène. Une première, une deuxième et une troisième comptent chacune pour un podium.",
+        ],
+        rules: [
+          "Le nombre de premières places est affiché à côté, mais il ne départage pas. Seul le nombre de podiums décide.",
+          "Si plusieurs joueurs ont le même nombre de podiums, ils partagent la récompense.",
+        ],
+      },
+      checkmates: {
+        title: "Échecs et mat",
+        body: [
+          "Cette récompense va au joueur qui a fait le plus d'échecs et mat.",
+          "Elle ne reprend pas toutes les victoires. Un abandon, un départ de l'arène ou un drapeau compte pour le plus de victoires, mais pas comme un mat.",
+        ],
+        rules: [
+          "Une partie compte seulement quand le résultat de l'adversaire est un échec et mat.",
+          "Si plusieurs joueurs ont le même nombre de mats, ils partagent la récompense.",
+        ],
+      },
+    },
   },
   speedRun: {
     metaTitle: "Course au classement | mboachess",

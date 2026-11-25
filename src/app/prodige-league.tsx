@@ -308,6 +308,26 @@ export function ProdigeLeaguePage() {
           ) : null}
         </section>
 
+        <section aria-labelledby="rewards-heading" className="mb-10">
+          <h2
+            id="rewards-heading"
+            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
+          >
+            {copy.rewardsTitle}
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted">
+            {copy.rewardsLede}
+          </p>
+          <p className="mt-3">
+            <LocaleLink
+              to="/prodige-league/rewards"
+              className="text-sm font-semibold text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
+            >
+              {copy.rewardsLink}
+            </LocaleLink>
+          </p>
+        </section>
+
         <section aria-labelledby="path-heading" className="mb-10">
           <h2
             id="path-heading"
