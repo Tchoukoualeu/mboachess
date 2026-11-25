@@ -74,8 +74,10 @@ export type ProdigeArenaGameView = {
   timeLabel: string | null
   white: string
   whiteRating: number | null
+  whiteResult: string
   black: string
   blackRating: number | null
+  blackResult: string
   score: string
 }
 

@@ -143,6 +143,7 @@ export const PUBLIC_ROUTES = [
   { path: "/puzzles", changefreq: "weekly", priority: "0.8" },
   { path: "/chess-cameroon", changefreq: "weekly", priority: "0.8" },
   { path: "/prodige-league", changefreq: "weekly", priority: "0.8" },
+  { path: "/prodige-league/rewards", changefreq: "weekly", priority: "0.7" },
   { path: "/prodige-league/arena/1", changefreq: "weekly", priority: "0.6" },
   { path: "/prodige-league/arena/2", changefreq: "weekly", priority: "0.6" },
   { path: "/prodige-league/arena/3", changefreq: "weekly", priority: "0.6" },
