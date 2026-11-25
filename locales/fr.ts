@@ -103,7 +103,8 @@ export const fr = {
       "Promouvoir les échecs auprès des joueurs camerounais, et de celles et ceux qui veulent suivre leurs amis et coéquipiers sur Chess.com.",
   },
   home: {
-    metaTitle: "Mboachess — Les échecs au Cameroun | Joueurs, clubs et tournois",
+    metaTitle:
+      "Mboachess — Les échecs au Cameroun | Joueurs, clubs et tournois",
     metaDescription:
       "Le rendez-vous des échecs au Cameroun. Suivez les classements, trouvez un club, consultez les tournois et rejoignez la communauté.",
     kicker: "Mboachess",
@@ -206,7 +207,8 @@ export const fr = {
     metaDescription:
       "Résolvez des tactiques de la base Lichess. Choisissez un thème et une difficulté, trouvez le meilleur coup et enchaînez.",
     title: "Problèmes d'échecs",
-    ledeBefore: "L'adversaire joue en premier. Trouvez la meilleure réponse, puis continuez jusqu'à la fin de la tactique. Les problèmes viennent de",
+    ledeBefore:
+      "L'adversaire joue en premier. Trouvez la meilleure réponse, puis continuez jusqu'à la fin de la tactique. Les problèmes viennent de",
     ledeAfter: ".",
     loading: "Chargement d'un problème…",
     loadingDaily: "Chargement du problème du jour…",
@@ -355,7 +357,8 @@ export const fr = {
     pastLink: "Voir les tournois en ligne passés",
     prodigeKicker: "Saison 2026",
     prodigeTitle: "Prodige League",
-    prodigeLede: "Rapide en ligne sur Chess.com, du 15 nov. au 31 déc. Voir la saison.",
+    prodigeLede:
+      "Rapide en ligne sur Chess.com, du 15 nov. au 31 déc. Voir la saison.",
     empty: "Aucun tournoi à venir. Ajoutez le premier !",
     upcoming: "À venir ({count})",
     online: "En ligne",
@@ -381,7 +384,8 @@ export const fr = {
     ended: "Terminé :",
     detailMeta: "{name} | Tournoi d'échecs | mboachess",
     detailMetaFallback: "Détail du tournoi | mboachess",
-    detailDescription: "Détails de {name} sur mboachess : dates, lieu et inscription.",
+    detailDescription:
+      "Détails de {name} sur mboachess : dates, lieu et inscription.",
     detailDescriptionFallback: "Informations sur le tournoi",
     back: "← Tournois",
     startsIn: "Commence dans",
@@ -445,15 +449,18 @@ export const fr = {
     newLede:
       "Si vous commencez les échecs au Cameroun, ou si vous y revenez, un bon parcours est :",
     step1: "Apprendre les bases (mats, tactique, finales) et jouer en rapide.",
-    step2: "Rejoindre un groupe local et jouer sur l'échiquier quand c'est possible.",
-    step3: "Suivre vos progrès en ligne (classement, revue de parties, séries de problèmes).",
+    step2:
+      "Rejoindre un groupe local et jouer sur l'échiquier quand c'est possible.",
+    step3:
+      "Suivre vos progrès en ligne (classement, revue de parties, séries de problèmes).",
     also: "Voir aussi les",
     tournaments: "tournois",
     and: "et les",
     creators: "créateurs de contenu",
   },
   topPlayers: {
-    metaTitle: "Top 100 des joueurs camerounais sur Chess.com | Blitz et rapide",
+    metaTitle:
+      "Top 100 des joueurs camerounais sur Chess.com | Blitz et rapide",
     metaDescription:
       "Les 100 joueurs camerounais les mieux classés sur Chess.com, en blitz et en rapide. Parcourez le classement.",
     title: "Meilleurs joueurs camerounais",
@@ -521,7 +528,11 @@ export const fr = {
         detail: "15 nov. → 26 déc.",
         note: "Inscriptions illimitées",
       },
-      { title: "Classement général", detail: "Accumulation des points", note: "" },
+      {
+        title: "Classement général",
+        detail: "Accumulation des points",
+        note: "",
+      },
       { title: "Top 16", detail: "Meilleurs joueurs du classement", note: "" },
       { title: "Masters des Prodiges", detail: "Top 16 → Top 4", note: "" },
       { title: "Échecs d'Or", detail: "Grande finale Top 4", note: "" },
@@ -538,7 +549,8 @@ export const fr = {
     metaTitle: "Arène {day} · Prodige League | mboachess",
     metaDescription:
       "Classement et parties de l'arène {day} de la Prodige League ({date}).",
-    metaDescriptionFallback: "Classement et parties d'une arène de la Prodige League.",
+    metaDescriptionFallback:
+      "Classement et parties d'une arène de la Prodige League.",
     back: "← Prodige League",
     day: "Jour {day}",
     summary:
@@ -552,7 +564,8 @@ export const fr = {
     wins: "V",
     draws: "N",
     losses: "D",
-    legend: "V victoires, N nulles, D défaites, d'après les parties de l'arène.",
+    legend:
+      "V victoires, N nulles, D défaites, d'après les parties de l'arène.",
     games: "Parties",
     noGames: "Aucune partie enregistrée pour cette arène.",
     viewGame: "Voir la partie",
@@ -621,9 +634,10 @@ export const fr = {
     bannedNote:
       "Les joueurs bannis du top 16 ne reçoivent pas de récompense. Leurs parties comptent pour les autres : une victoire contre un joueur banni reste une victoire.",
     shared: "Partagée par {count} joueurs.",
-    holder: "Récompense",
+    holder: "W",
     empty: "Personne pour le moment.",
-    nextUpsets: "Les autres grands écarts, pour situer la partie qui tient la récompense.",
+    nextUpsets:
+      "Les autres grands écarts, pour situer la partie qui tient la récompense.",
     gameLine:
       "{winner} ({winnerRating}) avec {color} a battu {loser} ({loserRating}), {finish}.",
     white: "les Blancs",
@@ -635,11 +649,13 @@ export const fr = {
     stats: {
       wins: "{primary} victoires · {secondary} parties",
       giantKiller: "+{primary} points de classement · jour {secondary}",
-      upsets: "{primary} victoires surprise · {secondary} points d'écart au total",
+      upsets:
+        "{primary} victoires surprise · {secondary} points d'écart au total",
       games: "{primary} parties · {secondary} arènes",
       attendance: "Toutes les arènes terminées ({count})",
       streak: "{primary} victoires d'affilée · jour {secondary}",
-      black: "{primary} victoires avec les Noirs · {secondary} parties avec les Noirs",
+      black:
+        "{primary} victoires avec les Noirs · {secondary} parties avec les Noirs",
       podiums: "Podiums : {primary} · Premières places : {secondary}",
       checkmates: "{primary} mats",
     },
@@ -775,9 +791,11 @@ export const fr = {
       "Chaque course suit le même calendrier : 24 heures pour s'inscrire, puis 2 jours de compétition.",
     creating: "Création…",
     create: "Créer la compétition",
-    created: "Compétition créée. Les inscriptions sont ouvertes pendant 24 heures.",
+    created:
+      "Compétition créée. Les inscriptions sont ouvertes pendant 24 heures.",
     createFailed: "Impossible de créer la compétition.",
-    emptyAdmin: "Aucune compétition. Créez-en une ci-dessus pour ouvrir les inscriptions.",
+    emptyAdmin:
+      "Aucune compétition. Créez-en une ci-dessus pour ouvrir les inscriptions.",
     empty: "Aucune compétition pour le moment. Revenez bientôt.",
     count: "Courses au classement ({count})",
     ratingOf: "Classement {type}",
@@ -794,7 +812,8 @@ export const fr = {
       "Suivez {name} sur mboachess : inscriptions, classement et résultats.",
     detailDescriptionFallback: "Une course au classement.",
     back: "← Courses au classement",
-    detailLede: "Inscriptions, règles, prix et classement complet de cette compétition.",
+    detailLede:
+      "Inscriptions, règles, prix et classement complet de cette compétition.",
     backToList: "Toutes les courses",
     tracking: "Suivi du classement {type}.",
     registrationCloses: "Inscriptions closes dans {time}",

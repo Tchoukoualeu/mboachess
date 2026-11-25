@@ -122,9 +122,11 @@ export const en = {
     ratingsDescription:
       "Blitz and rapid from the Chess.com public API. The green dot marks activity within the last {minutes} minutes.",
     leadersTitle: "Leaders",
-    leadersDescription: "Top three blitz and rapid ratings among tracked players.",
+    leadersDescription:
+      "Top three blitz and rapid ratings among tracked players.",
     exploreTitle: "Explore",
-    exploreDescription: "Tournaments, clubs, creators, and more across Cameroon chess.",
+    exploreDescription:
+      "Tournaments, clubs, creators, and more across Cameroon chess.",
     submitTitle: "Add a player",
     submitDescription:
       "Not in the list? Submit a Chess.com username and it will appear in the ratings table.",
@@ -152,7 +154,8 @@ export const en = {
     closed: "Closed",
     closedFairPlay: "Closed (fair play)",
     closedTitle: "Chess.com closed this account",
-    closedFairPlayTitle: "Chess.com closed this account for fair play violations",
+    closedFairPlayTitle:
+      "Chess.com closed this account for fair play violations",
     unknownCountry: "Unknown",
     online: "Online",
   },
@@ -176,10 +179,12 @@ export const en = {
   },
   online: {
     title: "Online now",
-    description: "Tracked players with Chess.com activity in the last {minutes} minutes.",
+    description:
+      "Tracked players with Chess.com activity in the last {minutes} minutes.",
     count: "{count} {noun}",
     emptyTitle: "No one is online right now",
-    emptyBody: "This box fills with avatars when tracked players are active on Chess.com.",
+    emptyBody:
+      "This box fills with avatars when tracked players are active on Chess.com.",
     oneOnline: "{name} is online",
     manyOnline: "{names} are online",
   },
@@ -377,7 +382,8 @@ export const en = {
     ended: "Ended:",
     detailMeta: "{name} | Chess tournament | mboachess",
     detailMetaFallback: "Tournament Details | mboachess",
-    detailDescription: "Details for {name} on mboachess — dates, location, and how to join.",
+    detailDescription:
+      "Details for {name} on mboachess — dates, location, and how to join.",
     detailDescriptionFallback: "View tournament information and details",
     back: "← Tournaments",
     startsIn: "Starts in",
@@ -440,7 +446,8 @@ export const en = {
     newTitle: "New to chess?",
     newLede:
       "If you’re new to chess in Cameroon (or returning after a break), a good starting path is:",
-    step1: "Learn the basics (checkmates, tactics, endgames) and play rapid games.",
+    step1:
+      "Learn the basics (checkmates, tactics, endgames) and play rapid games.",
     step2: "Join a local community and play over-the-board when you can.",
     step3: "Track your progress online (ratings, game review, puzzle streaks).",
     also: "Also see",
@@ -493,7 +500,8 @@ export const en = {
       "Several prizes are calculated from the same arenas: most wins, the biggest upset, attendance, the longest streak, and others. They update when an arena finishes.",
     rewardsLink: "See the rewards",
     bannedTitle: "Banned players",
-    bannedLede: "Left out of the top 16. Their points do not count toward qualification.",
+    bannedLede:
+      "Left out of the top 16. Their points do not count toward qualification.",
     banned: "Banned",
     points: "Pts",
     dayPoints: "D{day} {points}",
@@ -531,7 +539,8 @@ export const en = {
   },
   prodigeArena: {
     metaTitle: "Arena {day} · Prodige League | mboachess",
-    metaDescription: "Standings and games from Prodige League arena {day} ({date}).",
+    metaDescription:
+      "Standings and games from Prodige League arena {day} ({date}).",
     metaDescriptionFallback: "Standings and games from a Prodige League arena.",
     back: "← Prodige League",
     day: "Day {day}",
@@ -557,8 +566,10 @@ export const en = {
       registration: "Registration open",
       results: "Results",
     },
-    saveFailed: "Chess.com results are shown. Saving them to the database failed.",
-    stale: "Chess.com did not respond. Showing results saved on an earlier visit.",
+    saveFailed:
+      "Chess.com results are shown. Saving them to the database failed.",
+    stale:
+      "Chess.com did not respond. Showing results saved on an earlier visit.",
     loadFailed: "Results could not be loaded from Chess.com.",
   },
   prodigePlayer: {
@@ -567,7 +578,8 @@ export const en = {
       "Prodige League profile for {username}: {points} points, {arenas} arenas, {games} games.",
     metaDescriptionFallback: "Prodige League profile for {username}.",
     lede: "Points, results, and games from the qualification arenas already played.",
-    bannedNote: "This player is banned: their points do not count toward the top 16.",
+    bannedNote:
+      "This player is banned: their points do not count toward the top 16.",
     chesscom: "Chess.com profile",
     season: "Season",
     rank: "Rank",
@@ -612,7 +624,7 @@ export const en = {
     bannedNote:
       "Players banned from the top 16 do not receive a reward. Their games still count for everyone else: a win against a banned player is still a win.",
     shared: "Shared by {count} players.",
-    holder: "Reward",
+    holder: "W",
     empty: "Nobody yet.",
     nextUpsets: "The next largest gaps, to put the rewarded game in context.",
     gameLine:
@@ -626,7 +638,8 @@ export const en = {
     stats: {
       wins: "{primary} wins · {secondary} games",
       giantKiller: "+{primary} rating points · day {secondary}",
-      upsets: "{primary} upset wins · {secondary} rating points of margin in total",
+      upsets:
+        "{primary} upset wins · {secondary} rating points of margin in total",
       games: "{primary} games · {secondary} arenas",
       attendance: "Every finished arena ({count})",
       streak: "{primary} wins in a row · day {secondary}",
@@ -744,7 +757,8 @@ export const en = {
   },
   speedRun: {
     metaTitle: "Rating speed run | mboachess",
-    metaDescription: "Create and track rating speed run competitions using Chess.com accounts.",
+    metaDescription:
+      "Create and track rating speed run competitions using Chess.com accounts.",
     title: "Rating speed run",
     lede: "Contestants register with a Chess.com account during a 24-hour signup window. Once registration closes, the speed run lasts 2 days and the player with the highest net rating gain wins.",
     eligibility: "Eligibility",
@@ -784,7 +798,8 @@ export const en = {
       "Follow {name} on mboachess — registration, leaderboard, and results.",
     detailDescriptionFallback: "View a single rating speed run competition.",
     back: "← Speed runs",
-    detailLede: "Registration, rules, prize, and the full leaderboard for this competition.",
+    detailLede:
+      "Registration, rules, prize, and the full leaderboard for this competition.",
     backToList: "Back to all speed runs",
     tracking: "Tracking {type} rating.",
     registrationCloses: "Registration closes in {time}",

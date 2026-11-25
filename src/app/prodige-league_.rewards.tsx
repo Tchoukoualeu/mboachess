@@ -74,8 +74,10 @@ export function ProdigeRewardsPageView() {
   const copy = dict.prodigeRewards
   const arenaCopy = dict.prodigeArena
   const board = useRouteLoaderData<ProdigeRewardsPage>()
-  const leaders = (rows: ProdigeRewardRowView[]) => rows.filter((row) => row.leader).length
-  const hasFollowers = (rows: ProdigeRewardRowView[]) => rows.some((row) => !row.leader)
+  const leaders = (rows: ProdigeRewardRowView[]) =>
+    rows.filter((row) => row.leader).length
+  const hasFollowers = (rows: ProdigeRewardRowView[]) =>
+    rows.some((row) => !row.leader)
 
   return (
     <PageShell>
@@ -147,7 +149,9 @@ export function ProdigeRewardsPageView() {
                     </p>
                   ) : null}
                   {reward.id === "giantKiller" && hasFollowers(reward.rows) ? (
-                    <p className={`text-sm text-ink-muted ${shared > 1 ? "mt-2" : "mt-4"}`}>
+                    <p
+                      className={`text-sm text-ink-muted ${shared > 1 ? "mt-2" : "mt-4"}`}
+                    >
                       {copy.nextUpsets}
                     </p>
                   ) : null}
@@ -180,7 +184,12 @@ export function ProdigeRewardsPageView() {
                                 ) : null}
                               </span>
                               <span className="mt-0.5 block text-sm tabular-nums text-ink-muted">
-                                {statLine(reward.id, row, copy, board.arenaCount)}
+                                {statLine(
+                                  reward.id,
+                                  row,
+                                  copy,
+                                  board.arenaCount,
+                                )}
                               </span>
                             </span>
                           </LocaleLink>
