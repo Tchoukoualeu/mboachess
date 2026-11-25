@@ -49,7 +49,9 @@ import { Route as EnTournamentsIndexRouteImport } from './app/en.tournaments.ind
 import { Route as EnTournamentsIdRouteImport } from './app/en.tournaments.$id'
 import { Route as EnTournamentsPastOnlineRouteImport } from './app/en.tournaments.past-online'
 import { Route as ProdigeLeagueArenaDayRouteImport } from './app/prodige-league_.arena.$day'
+import { Route as ProdigeLeaguePlayerUsernameRouteImport } from './app/prodige-league_.player.$username'
 import { Route as EnProdigeLeagueArenaDayRouteImport } from './app/en.prodige-league_.arena.$day'
+import { Route as EnProdigeLeaguePlayerUsernameRouteImport } from './app/en.prodige-league_.player.$username'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -252,11 +254,23 @@ const ProdigeLeagueArenaDayRoute = ProdigeLeagueArenaDayRouteImport.update({
   path: '/prodige-league/arena/$day',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProdigeLeaguePlayerUsernameRoute =
+  ProdigeLeaguePlayerUsernameRouteImport.update({
+    id: '/prodige-league_/player/$username',
+    path: '/prodige-league/player/$username',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const EnProdigeLeagueArenaDayRoute = EnProdigeLeagueArenaDayRouteImport.update({
   id: '/prodige-league_/arena/$day',
   path: '/prodige-league/arena/$day',
   getParentRoute: () => EnRoute,
 } as any)
+const EnProdigeLeaguePlayerUsernameRoute =
+  EnProdigeLeaguePlayerUsernameRouteImport.update({
+    id: '/prodige-league_/player/$username',
+    path: '/prodige-league/player/$username',
+    getParentRoute: () => EnRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -297,9 +311,11 @@ export interface FileRoutesByFullPath {
   '/en/tournaments/$id': typeof EnTournamentsIdRoute
   '/en/tournaments/past-online': typeof EnTournamentsPastOnlineRoute
   '/prodige-league/arena/$day': typeof ProdigeLeagueArenaDayRoute
+  '/prodige-league/player/$username': typeof ProdigeLeaguePlayerUsernameRoute
   '/en/rating-speed-run/': typeof EnRatingSpeedRunIndexRoute
   '/en/tournaments/': typeof EnTournamentsIndexRoute
   '/en/prodige-league/arena/$day': typeof EnProdigeLeagueArenaDayRoute
+  '/en/prodige-league/player/$username': typeof EnProdigeLeaguePlayerUsernameRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -337,9 +353,11 @@ export interface FileRoutesByTo {
   '/en/tournaments/$id': typeof EnTournamentsIdRoute
   '/en/tournaments/past-online': typeof EnTournamentsPastOnlineRoute
   '/prodige-league/arena/$day': typeof ProdigeLeagueArenaDayRoute
+  '/prodige-league/player/$username': typeof ProdigeLeaguePlayerUsernameRoute
   '/en/rating-speed-run': typeof EnRatingSpeedRunIndexRoute
   '/en/tournaments': typeof EnTournamentsIndexRoute
   '/en/prodige-league/arena/$day': typeof EnProdigeLeagueArenaDayRoute
+  '/en/prodige-league/player/$username': typeof EnProdigeLeaguePlayerUsernameRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -381,9 +399,11 @@ export interface FileRoutesById {
   '/en/tournaments/$id': typeof EnTournamentsIdRoute
   '/en/tournaments/past-online': typeof EnTournamentsPastOnlineRoute
   '/prodige-league_/arena/$day': typeof ProdigeLeagueArenaDayRoute
+  '/prodige-league_/player/$username': typeof ProdigeLeaguePlayerUsernameRoute
   '/en/rating-speed-run/': typeof EnRatingSpeedRunIndexRoute
   '/en/tournaments/': typeof EnTournamentsIndexRoute
   '/en/prodige-league_/arena/$day': typeof EnProdigeLeagueArenaDayRoute
+  '/en/prodige-league_/player/$username': typeof EnProdigeLeaguePlayerUsernameRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -426,9 +446,11 @@ export interface FileRouteTypes {
     | '/en/tournaments/$id'
     | '/en/tournaments/past-online'
     | '/prodige-league/arena/$day'
+    | '/prodige-league/player/$username'
     | '/en/rating-speed-run/'
     | '/en/tournaments/'
     | '/en/prodige-league/arena/$day'
+    | '/en/prodige-league/player/$username'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -466,9 +488,11 @@ export interface FileRouteTypes {
     | '/en/tournaments/$id'
     | '/en/tournaments/past-online'
     | '/prodige-league/arena/$day'
+    | '/prodige-league/player/$username'
     | '/en/rating-speed-run'
     | '/en/tournaments'
     | '/en/prodige-league/arena/$day'
+    | '/en/prodige-league/player/$username'
   id:
     | '__root__'
     | '/'
@@ -509,9 +533,11 @@ export interface FileRouteTypes {
     | '/en/tournaments/$id'
     | '/en/tournaments/past-online'
     | '/prodige-league_/arena/$day'
+    | '/prodige-league_/player/$username'
     | '/en/rating-speed-run/'
     | '/en/tournaments/'
     | '/en/prodige-league_/arena/$day'
+    | '/en/prodige-league_/player/$username'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -539,6 +565,7 @@ export interface RootRouteChildren {
   ApiRatingSpeedRunCreateRoute: typeof ApiRatingSpeedRunCreateRoute
   ApiRatingSpeedRunJoinRoute: typeof ApiRatingSpeedRunJoinRoute
   ProdigeLeagueArenaDayRoute: typeof ProdigeLeagueArenaDayRoute
+  ProdigeLeaguePlayerUsernameRoute: typeof ProdigeLeaguePlayerUsernameRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -823,11 +850,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProdigeLeagueArenaDayRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/prodige-league_/player/$username': {
+      id: '/prodige-league_/player/$username'
+      path: '/prodige-league/player/$username'
+      fullPath: '/prodige-league/player/$username'
+      preLoaderRoute: typeof ProdigeLeaguePlayerUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/en/prodige-league_/arena/$day': {
       id: '/en/prodige-league_/arena/$day'
       path: '/prodige-league/arena/$day'
       fullPath: '/en/prodige-league/arena/$day'
       preLoaderRoute: typeof EnProdigeLeagueArenaDayRouteImport
+      parentRoute: typeof EnRoute
+    }
+    '/en/prodige-league_/player/$username': {
+      id: '/en/prodige-league_/player/$username'
+      path: '/prodige-league/player/$username'
+      fullPath: '/en/prodige-league/player/$username'
+      preLoaderRoute: typeof EnProdigeLeaguePlayerUsernameRouteImport
       parentRoute: typeof EnRoute
     }
   }
@@ -860,6 +901,7 @@ interface EnRouteChildren {
   EnTournamentsPastOnlineRoute: typeof EnTournamentsPastOnlineRoute
   EnTournamentsIndexRoute: typeof EnTournamentsIndexRoute
   EnProdigeLeagueArenaDayRoute: typeof EnProdigeLeagueArenaDayRoute
+  EnProdigeLeaguePlayerUsernameRoute: typeof EnProdigeLeaguePlayerUsernameRoute
 }
 
 const EnRouteChildren: EnRouteChildren = {
@@ -876,6 +918,7 @@ const EnRouteChildren: EnRouteChildren = {
   EnTournamentsPastOnlineRoute: EnTournamentsPastOnlineRoute,
   EnTournamentsIndexRoute: EnTournamentsIndexRoute,
   EnProdigeLeagueArenaDayRoute: EnProdigeLeagueArenaDayRoute,
+  EnProdigeLeaguePlayerUsernameRoute: EnProdigeLeaguePlayerUsernameRoute,
 }
 
 const EnRouteWithChildren = EnRoute._addFileChildren(EnRouteChildren)
@@ -919,6 +962,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiRatingSpeedRunCreateRoute: ApiRatingSpeedRunCreateRoute,
   ApiRatingSpeedRunJoinRoute: ApiRatingSpeedRunJoinRoute,
   ProdigeLeagueArenaDayRoute: ProdigeLeagueArenaDayRoute,
+  ProdigeLeaguePlayerUsernameRoute: ProdigeLeaguePlayerUsernameRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

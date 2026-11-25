@@ -86,10 +86,9 @@ function StandingRow({
   const copy = useDictionary().prodige
   return (
     <li className="border-b border-border last:border-b-0">
-      <a
-        href={player.profileUrl}
-        target="_blank"
-        rel="noreferrer"
+      <LocaleLink
+        to="/prodige-league/player/$username"
+        params={{ username: player.username }}
         className="group flex items-center gap-3 px-3 py-3 transition hover:bg-brand-muted/40 sm:gap-4 sm:px-4"
       >
         <span
@@ -139,7 +138,7 @@ function StandingRow({
             {copy.points}
           </p>
         </div>
-      </a>
+      </LocaleLink>
     </li>
   )
 }

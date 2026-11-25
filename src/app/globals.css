@@ -13,6 +13,8 @@
   --ink-muted: #4a554e;
   --border: #d4ddd6;
   --gold: #e3c78f;
+  --loss: #b42318;
+  --loss-muted: #f8d6d3;
 }
 
 @theme inline {
@@ -28,6 +30,8 @@
   --color-ink-muted: var(--ink-muted);
   --color-border: var(--border);
   --color-gold: var(--gold);
+  --color-loss: var(--loss);
+  --color-loss-muted: var(--loss-muted);
   --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Fraunces", ui-serif, Georgia, serif;
   --font-mono: ui-monospace, monospace;
@@ -46,6 +50,8 @@
     --surface-muted: #1c2420;
     --ink-muted: #9aaba0;
     --border: #2a3530;
+    --loss: #f0a8a2;
+    --loss-muted: #3a1c1a;
   }
 }
 
