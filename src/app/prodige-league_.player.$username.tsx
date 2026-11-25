@@ -50,10 +50,10 @@ function placeLabel(place: number, locale: Locale): string {
   return `${place}${suffix}`
 }
 
-function resultClass(result: ProdigePlayerGameResult): string {
-  if (result === "win") return "text-brand"
-  if (result === "loss") return "text-wood"
-  return "text-ink-muted"
+function resultBadgeClass(result: ProdigePlayerGameResult): string {
+  if (result === "win") return "bg-brand-muted text-brand"
+  if (result === "loss") return "bg-loss-muted text-loss"
+  return "bg-surface-muted text-ink-muted"
 }
 
 export function playerHead(
@@ -91,13 +91,35 @@ export const Route = createFileRoute("/prodige-league_/player/$username")({
   component: ProdigePlayerPage,
 })
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({
+  label,
+  value,
+  tone,
+}: {
+  label: string
+  value: string
+  tone?: "win" | "draw" | "loss"
+}) {
+  const toneClass =
+    tone === "win"
+      ? "border-brand/30 bg-brand-muted"
+      : tone === "loss"
+        ? "border-loss/40 bg-loss-muted"
+        : tone === "draw"
+          ? "border-border bg-surface-muted"
+          : "border-border bg-surface"
+  const valueClass =
+    tone === "win"
+      ? "text-brand"
+      : tone === "loss"
+        ? "text-loss"
+        : "text-foreground"
   return (
-    <li className="rounded-xl border border-border bg-surface px-3 py-3">
+    <li className={`rounded-xl border px-3 py-3 ${toneClass}`}>
       <p className="text-xs font-medium uppercase tracking-wide text-ink-muted">
         {label}
       </p>
-      <p className="mt-1 font-mono text-lg font-semibold tabular-nums text-foreground">
+      <p className={`mt-1 font-mono text-lg font-semibold tabular-nums ${valueClass}`}>
         {value}
       </p>
     </li>
@@ -208,9 +230,9 @@ export function ProdigePlayerPage() {
           <Stat label={copy.points} value={formatPoints(player.points)} />
           <Stat label={copy.arenas} value={String(player.arenas.length)} />
           <Stat label={copy.games} value={String(player.gamesPlayed)} />
-          <Stat label={copy.wins} value={String(player.wins)} />
-          <Stat label={copy.draws} value={String(player.draws)} />
-          <Stat label={copy.losses} value={String(player.losses)} />
+          <Stat label={copy.wins} value={String(player.wins)} tone="win" />
+          <Stat label={copy.draws} value={String(player.draws)} tone="draw" />
+          <Stat label={copy.losses} value={String(player.losses)} tone="loss" />
         </ul>
       </section>
 
@@ -268,13 +290,15 @@ export function ProdigePlayerPage() {
                       {index + 1}
                     </span>
                     <p className="min-w-0 flex-1 text-sm leading-6">
-                      <span className={`font-medium ${resultClass(game.result)}`}>
+                      <span
+                        className={`mr-2 inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${resultBadgeClass(game.result)}`}
+                      >
                         {resultLabel(game.result)}
                       </span>
-                      <span className="mx-2 font-semibold tabular-nums">
+                      <span className="font-semibold tabular-nums">
                         {game.score}
                       </span>
-                      <span className="text-ink-muted">
+                      <span className="ml-2 text-ink-muted">
                         {game.color === "white" ? copy.white : copy.black}
                         {game.rating != null ? ` (${game.rating})` : ""}
                         {copy.against}
