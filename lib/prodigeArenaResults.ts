@@ -564,15 +564,52 @@ async function loadFinishedArenas(): Promise<ProdigeArenaView[]> {
   )
 }
 
-function toLeader(
-  row: {
-    username: string
-    points: number
-    profileUrl: string
-    days: ProdigeArenaLeaderDay[]
-  },
-  rank: number,
-): ProdigeArenaLeader {
+type OverallRow = {
+  username: string
+  points: number
+  profileUrl: string
+  days: ProdigeArenaLeaderDay[]
+}
+
+function collectOverallRows(views: ProdigeArenaView[]): OverallRow[] {
+  const byUser = new Map<string, OverallRow & { sourceDay: number }>()
+
+  for (const view of views) {
+    for (const player of view.players) {
+      const key = player.username.toLowerCase()
+      const row = byUser.get(key) ?? {
+        username: player.username,
+        points: 0,
+        profileUrl: player.profileUrl,
+        sourceDay: view.day,
+        days: [],
+      }
+      row.points += player.points
+      row.days.push({ day: view.day, points: player.points })
+      if (view.day >= row.sourceDay) {
+        row.username = player.username
+        row.profileUrl = player.profileUrl
+        row.sourceDay = view.day
+      }
+      byUser.set(key, row)
+    }
+  }
+
+  const rows: OverallRow[] = [...byUser.values()].map((row) => ({
+    username: row.username,
+    points: row.points,
+    profileUrl: row.profileUrl,
+    days: row.days,
+  }))
+
+  return rows.sort((a, b) => {
+      if (a.points !== b.points) return b.points - a.points
+      if (a.days.length !== b.days.length) return b.days.length - a.days.length
+      return a.username.localeCompare(b.username, "fr", { sensitivity: "base" })
+    })
+}
+
+function toLeader(row: OverallRow, rank: number): ProdigeArenaLeader {
   return {
     rank,
     username: row.username,
@@ -582,14 +619,7 @@ function toLeader(
   }
 }
 
-function withRanks(
-  rows: {
-    username: string
-    points: number
-    profileUrl: string
-    days: ProdigeArenaLeaderDay[]
-  }[],
-): ProdigeArenaLeader[] {
+function withRanks(rows: OverallRow[]): ProdigeArenaLeader[] {
   let rank = 0
   let previousPoints: number | null = null
   return rows.map((row, index) => {
@@ -619,44 +649,7 @@ export async function loadProdigeArenaDigest(): Promise<{
     }
   })
 
-  const byUser = new Map<
-    string,
-    {
-      username: string
-      points: number
-      profileUrl: string
-      sourceDay: number
-      days: ProdigeArenaLeaderDay[]
-    }
-  >()
-
-  for (const view of views) {
-    for (const player of view.players) {
-      const key = player.username.toLowerCase()
-      const row = byUser.get(key) ?? {
-        username: player.username,
-        points: 0,
-        profileUrl: player.profileUrl,
-        sourceDay: view.day,
-        days: [],
-      }
-      row.points += player.points
-      row.days.push({ day: view.day, points: player.points })
-      if (view.day >= row.sourceDay) {
-        row.username = player.username
-        row.profileUrl = player.profileUrl
-        row.sourceDay = view.day
-      }
-      byUser.set(key, row)
-    }
-  }
-
-  const sorted = [...byUser.values()].sort((a, b) => {
-    if (a.points !== b.points) return b.points - a.points
-    if (a.days.length !== b.days.length) return b.days.length - a.days.length
-    return a.username.localeCompare(b.username, "fr", { sensitivity: "base" })
-  })
-
+  const sorted = collectOverallRows(views)
   const eligible = sorted.filter((row) => !isBannedUsername(row.username))
   const leaders = withRanks(eligible.slice(0, GENERAL_TOP))
   const banned = withRanks(
@@ -664,4 +657,150 @@ export async function loadProdigeArenaDigest(): Promise<{
   )
 
   return { winners, leaders, banned }
+}
+
+export type ProdigePlayerGameResult = "win" | "draw" | "loss" | "unknown"
+
+export type ProdigePlayerGameView = {
+  url: string
+  timeLabel: string | null
+  color: "white" | "black"
+  opponent: string
+  opponentRating: number | null
+  rating: number | null
+  score: string
+  result: ProdigePlayerGameResult
+}
+
+export type ProdigePlayerArenaStat = {
+  day: number
+  date: string | null
+  name: string
+  place: number | null
+  points: number
+  wins: number
+  draws: number
+  losses: number
+  games: ProdigePlayerGameView[]
+}
+
+export type ProdigePlayerProfile = {
+  username: string
+  chesscomUrl: string
+  banned: boolean
+  rank: number | null
+  points: number
+  wins: number
+  draws: number
+  losses: number
+  gamesPlayed: number
+  arenas: ProdigePlayerArenaStat[]
+}
+
+function resultForScore(
+  score: string,
+  color: "white" | "black",
+): ProdigePlayerGameResult {
+  const normalized = score.replace(/-/g, "–")
+  if (normalized === "½–½") return "draw"
+  if (normalized === "1–0") return color === "white" ? "win" : "loss"
+  if (normalized === "0–1") return color === "black" ? "win" : "loss"
+  return "unknown"
+}
+
+function nameInView(view: ProdigeArenaView, key: string): string | null {
+  const standing = view.players.find(
+    (player) => player.username.toLowerCase() === key,
+  )
+  if (standing) return standing.username
+  for (const game of view.games) {
+    if (game.white.toLowerCase() === key) return game.white
+    if (game.black.toLowerCase() === key) return game.black
+  }
+  return null
+}
+
+function gamesForPlayer(
+  view: ProdigeArenaView,
+  key: string,
+): ProdigePlayerGameView[] {
+  const games: ProdigePlayerGameView[] = []
+  for (const game of view.games) {
+    const white = game.white.toLowerCase() === key
+    const black = game.black.toLowerCase() === key
+    if (!white && !black) continue
+    const color = white ? "white" : "black"
+    games.push({
+      url: game.url,
+      timeLabel: game.timeLabel,
+      color,
+      opponent: white ? game.black : game.white,
+      opponentRating: white ? game.blackRating : game.whiteRating,
+      rating: white ? game.whiteRating : game.blackRating,
+      score: game.score,
+      result: resultForScore(game.score, color),
+    })
+  }
+  return games
+}
+
+/** Arena record for one player: season rank, per-arena scores, and every game. */
+export async function loadProdigePlayerProfile(
+  usernameRaw: string,
+): Promise<ProdigePlayerProfile | null> {
+  const key = usernameRaw.trim().toLowerCase()
+  if (!key) return null
+
+  const views = [...(await loadFinishedArenas())].sort((a, b) => a.day - b.day)
+  const arenas: ProdigePlayerArenaStat[] = []
+  let username: string | null = null
+
+  for (const view of views) {
+    const foundName = nameInView(view, key)
+    if (!foundName) continue
+    username = foundName
+    const standing = view.players.find(
+      (player) => player.username.toLowerCase() === key,
+    )
+    const games = gamesForPlayer(view, key)
+
+    arenas.push({
+      day: view.day,
+      date: view.date,
+      name: view.name,
+      place: standing?.place ?? null,
+      points: standing?.points ?? 0,
+      wins: standing?.wins ?? games.filter((game) => game.result === "win").length,
+      draws:
+        standing?.draws ?? games.filter((game) => game.result === "draw").length,
+      losses:
+        standing?.losses ??
+        games.filter((game) => game.result === "loss").length,
+      games,
+    })
+  }
+
+  if (!username || arenas.length === 0) return null
+
+  const sorted = collectOverallRows(views)
+  const row = sorted.find((entry) => entry.username.toLowerCase() === key)
+  const banned = isBannedUsername(username)
+  const ranked = banned
+    ? null
+    : withRanks(sorted.filter((entry) => !isBannedUsername(entry.username))).find(
+        (entry) => entry.username.toLowerCase() === key,
+      )
+
+  return {
+    username: row?.username ?? username,
+    chesscomUrl: profileUrl(row?.username ?? username),
+    banned,
+    rank: ranked?.rank ?? null,
+    points: row?.points ?? arenas.reduce((sum, arena) => sum + arena.points, 0),
+    wins: arenas.reduce((sum, arena) => sum + arena.wins, 0),
+    draws: arenas.reduce((sum, arena) => sum + arena.draws, 0),
+    losses: arenas.reduce((sum, arena) => sum + arena.losses, 0),
+    gamesPlayed: arenas.reduce((sum, arena) => sum + arena.games.length, 0),
+    arenas,
+  }
 }
