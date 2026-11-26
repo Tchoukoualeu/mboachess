@@ -96,6 +96,10 @@ export const fr = {
         label: "Chess Cameroon",
         blurb: "Le point de départ pour « chess cameroon »",
       },
+      eloGains: {
+        label: "Gains",
+        blurb: "Les plus fortes progressions du mois",
+      },
     },
   },
   footer: {
@@ -850,6 +854,19 @@ export const fr = {
       running: "En cours",
       finished: "Terminée",
     },
+  },
+  eloGains: {
+    metaTitle: "Gains mensuels | Mboachess",
+    metaDescription:
+      "Les trois plus fortes progressions en rapide et en blitz parmi les joueurs suivis, jour après jour.",
+    title: "Gains mensuels",
+    lede: "Chaque soir, le classement Chess.com des joueurs suivis est enregistré. À la fin du mois, les trois plus fortes progressions en rapide et en blitz apparaissent ici, avec leur courbe quotidienne.",
+    waiting:
+      "Les relevés ont commencé. Le premier graphique, celui de décembre, sera affiché le 1er janvier.",
+    months: "Mois",
+    gain: "{gain} sur le mois",
+    empty: "Pas encore de classement {cadence} pour ce mois.",
+    aria: "Courbe quotidienne en {cadence} pour {month}.",
   },
 } as const
 

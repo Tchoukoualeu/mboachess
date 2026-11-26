@@ -2,18 +2,7 @@ import { createServerFn } from "@tanstack/react-start"
 import { getSubmittedUsernames } from "@/lib/chesscomUsernames"
 import { type PlayerLookupResult, fetchPlayerSnapshot } from "@/lib/chesscom"
 import { topByRating } from "@/lib/ratingLeaders"
-
-const TRACKED_USERNAMES = [
-  "menxele",
-  "brlliantmoves",
-  "aris2021222324",
-  "amicodi1pelato",
-  "open2doorwithin",
-] as const
-
-function uniqueSortedUsernames(a: readonly string[], b: string[]): string[] {
-  return [...new Set([...a, ...b])].sort((x, y) => x.localeCompare(y))
-}
+import { mergeFollowedUsernames } from "@/lib/trackedPlayers"
 
 function sortByRapidDesc(rows: PlayerLookupResult[]) {
   rows.sort((a, b) => {
@@ -62,7 +51,7 @@ const FETCH_CONCURRENCY = 8
 export const loadHomeData = createServerFn({ method: "GET" }).handler(
   async (): Promise<HomeData> => {
     const fromDb = await getSubmittedUsernames()
-    const usernames = uniqueSortedUsernames(TRACKED_USERNAMES, fromDb)
+    const usernames = mergeFollowedUsernames(fromDb)
 
     // Caching (SWR + in-flight coalesce) lives in fetchPlayerSnapshot.
     const rows = await mapWithConcurrency(

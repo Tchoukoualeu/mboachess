@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './app/index'
 import { Route as ChessCameroonRouteImport } from './app/chess-cameroon'
 import { Route as ClubsRouteImport } from './app/clubs'
 import { Route as ContentCreatorsRouteImport } from './app/content-creators'
+import { Route as EloGainsRouteImport } from './app/elo-gains'
 import { Route as EnRouteImport } from './app/en'
 import { Route as ProdigeLeagueRouteImport } from './app/prodige-league'
 import { Route as PuzzlesRouteImport } from './app/puzzles'
@@ -31,6 +32,7 @@ import { Route as EnIndexRouteImport } from './app/en.index'
 import { Route as EnChessCameroonRouteImport } from './app/en.chess-cameroon'
 import { Route as EnClubsRouteImport } from './app/en.clubs'
 import { Route as EnContentCreatorsRouteImport } from './app/en.content-creators'
+import { Route as EnEloGainsRouteImport } from './app/en.elo-gains'
 import { Route as EnProdigeLeagueRouteImport } from './app/en.prodige-league'
 import { Route as EnPuzzlesRouteImport } from './app/en.puzzles'
 import { Route as EnRatingSpeedRunRouteImport } from './app/en.rating-speed-run'
@@ -42,6 +44,7 @@ import { Route as RatingSpeedRunIdRouteImport } from './app/rating-speed-run.$id
 import { Route as TournamentsIndexRouteImport } from './app/tournaments.index'
 import { Route as TournamentsIdRouteImport } from './app/tournaments.$id'
 import { Route as TournamentsPastOnlineRouteImport } from './app/tournaments.past-online'
+import { Route as ApiCronEloSnapshotsRouteImport } from './app/api/cron/elo-snapshots'
 import { Route as ApiRatingSpeedRunCreateRouteImport } from './app/api/rating-speed-run/create'
 import { Route as ApiRatingSpeedRunJoinRouteImport } from './app/api/rating-speed-run/join'
 import { Route as EnProdigeLeagueRewardsRouteImport } from './app/en.prodige-league_.rewards'
@@ -73,6 +76,11 @@ const ClubsRoute = ClubsRouteImport.update({
 const ContentCreatorsRoute = ContentCreatorsRouteImport.update({
   id: '/content-creators',
   path: '/content-creators',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EloGainsRoute = EloGainsRouteImport.update({
+  id: '/elo-gains',
+  path: '/elo-gains',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnRoute = EnRouteImport.update({
@@ -165,6 +173,11 @@ const EnContentCreatorsRoute = EnContentCreatorsRouteImport.update({
   path: '/content-creators',
   getParentRoute: () => EnRoute,
 } as any)
+const EnEloGainsRoute = EnEloGainsRouteImport.update({
+  id: '/elo-gains',
+  path: '/elo-gains',
+  getParentRoute: () => EnRoute,
+} as any)
 const EnProdigeLeagueRoute = EnProdigeLeagueRouteImport.update({
   id: '/prodige-league',
   path: '/prodige-league',
@@ -219,6 +232,11 @@ const TournamentsIdRoute = TournamentsIdRouteImport.update({
 const TournamentsPastOnlineRoute = TournamentsPastOnlineRouteImport.update({
   id: '/tournaments/past-online',
   path: '/tournaments/past-online',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCronEloSnapshotsRoute = ApiCronEloSnapshotsRouteImport.update({
+  id: '/api/cron/elo-snapshots',
+  path: '/api/cron/elo-snapshots',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiRatingSpeedRunCreateRoute = ApiRatingSpeedRunCreateRouteImport.update({
@@ -289,6 +307,7 @@ export interface FileRoutesByFullPath {
   '/chess-cameroon': typeof ChessCameroonRoute
   '/clubs': typeof ClubsRoute
   '/content-creators': typeof ContentCreatorsRoute
+  '/elo-gains': typeof EloGainsRoute
   '/en': typeof EnRouteWithChildren
   '/prodige-league': typeof ProdigeLeagueRoute
   '/puzzles': typeof PuzzlesRoute
@@ -306,6 +325,7 @@ export interface FileRoutesByFullPath {
   '/en/chess-cameroon': typeof EnChessCameroonRoute
   '/en/clubs': typeof EnClubsRoute
   '/en/content-creators': typeof EnContentCreatorsRoute
+  '/en/elo-gains': typeof EnEloGainsRoute
   '/en/prodige-league': typeof EnProdigeLeagueRoute
   '/en/puzzles': typeof EnPuzzlesRoute
   '/en/rating-speed-run': typeof EnRatingSpeedRunRouteWithChildren
@@ -318,6 +338,7 @@ export interface FileRoutesByFullPath {
   '/en/': typeof EnIndexRoute
   '/rating-speed-run/': typeof RatingSpeedRunIndexRoute
   '/tournaments/': typeof TournamentsIndexRoute
+  '/api/cron/elo-snapshots': typeof ApiCronEloSnapshotsRoute
   '/api/rating-speed-run/create': typeof ApiRatingSpeedRunCreateRoute
   '/api/rating-speed-run/join': typeof ApiRatingSpeedRunJoinRoute
   '/en/prodige-league/rewards': typeof EnProdigeLeagueRewardsRoute
@@ -336,6 +357,7 @@ export interface FileRoutesByTo {
   '/chess-cameroon': typeof ChessCameroonRoute
   '/clubs': typeof ClubsRoute
   '/content-creators': typeof ContentCreatorsRoute
+  '/elo-gains': typeof EloGainsRoute
   '/prodige-league': typeof ProdigeLeagueRoute
   '/puzzles': typeof PuzzlesRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -351,6 +373,7 @@ export interface FileRoutesByTo {
   '/en/chess-cameroon': typeof EnChessCameroonRoute
   '/en/clubs': typeof EnClubsRoute
   '/en/content-creators': typeof EnContentCreatorsRoute
+  '/en/elo-gains': typeof EnEloGainsRoute
   '/en/prodige-league': typeof EnProdigeLeagueRoute
   '/en/puzzles': typeof EnPuzzlesRoute
   '/en/top-cameroon-chess-players': typeof EnTopCameroonChessPlayersRoute
@@ -362,6 +385,7 @@ export interface FileRoutesByTo {
   '/en': typeof EnIndexRoute
   '/rating-speed-run': typeof RatingSpeedRunIndexRoute
   '/tournaments': typeof TournamentsIndexRoute
+  '/api/cron/elo-snapshots': typeof ApiCronEloSnapshotsRoute
   '/api/rating-speed-run/create': typeof ApiRatingSpeedRunCreateRoute
   '/api/rating-speed-run/join': typeof ApiRatingSpeedRunJoinRoute
   '/en/prodige-league/rewards': typeof EnProdigeLeagueRewardsRoute
@@ -381,6 +405,7 @@ export interface FileRoutesById {
   '/chess-cameroon': typeof ChessCameroonRoute
   '/clubs': typeof ClubsRoute
   '/content-creators': typeof ContentCreatorsRoute
+  '/elo-gains': typeof EloGainsRoute
   '/en': typeof EnRouteWithChildren
   '/prodige-league': typeof ProdigeLeagueRoute
   '/puzzles': typeof PuzzlesRoute
@@ -398,6 +423,7 @@ export interface FileRoutesById {
   '/en/chess-cameroon': typeof EnChessCameroonRoute
   '/en/clubs': typeof EnClubsRoute
   '/en/content-creators': typeof EnContentCreatorsRoute
+  '/en/elo-gains': typeof EnEloGainsRoute
   '/en/prodige-league': typeof EnProdigeLeagueRoute
   '/en/puzzles': typeof EnPuzzlesRoute
   '/en/rating-speed-run': typeof EnRatingSpeedRunRouteWithChildren
@@ -410,6 +436,7 @@ export interface FileRoutesById {
   '/en/': typeof EnIndexRoute
   '/rating-speed-run/': typeof RatingSpeedRunIndexRoute
   '/tournaments/': typeof TournamentsIndexRoute
+  '/api/cron/elo-snapshots': typeof ApiCronEloSnapshotsRoute
   '/api/rating-speed-run/create': typeof ApiRatingSpeedRunCreateRoute
   '/api/rating-speed-run/join': typeof ApiRatingSpeedRunJoinRoute
   '/en/prodige-league_/rewards': typeof EnProdigeLeagueRewardsRoute
@@ -430,6 +457,7 @@ export interface FileRouteTypes {
     | '/chess-cameroon'
     | '/clubs'
     | '/content-creators'
+    | '/elo-gains'
     | '/en'
     | '/prodige-league'
     | '/puzzles'
@@ -447,6 +475,7 @@ export interface FileRouteTypes {
     | '/en/chess-cameroon'
     | '/en/clubs'
     | '/en/content-creators'
+    | '/en/elo-gains'
     | '/en/prodige-league'
     | '/en/puzzles'
     | '/en/rating-speed-run'
@@ -459,6 +488,7 @@ export interface FileRouteTypes {
     | '/en/'
     | '/rating-speed-run/'
     | '/tournaments/'
+    | '/api/cron/elo-snapshots'
     | '/api/rating-speed-run/create'
     | '/api/rating-speed-run/join'
     | '/en/prodige-league/rewards'
@@ -477,6 +507,7 @@ export interface FileRouteTypes {
     | '/chess-cameroon'
     | '/clubs'
     | '/content-creators'
+    | '/elo-gains'
     | '/prodige-league'
     | '/puzzles'
     | '/robots.txt'
@@ -492,6 +523,7 @@ export interface FileRouteTypes {
     | '/en/chess-cameroon'
     | '/en/clubs'
     | '/en/content-creators'
+    | '/en/elo-gains'
     | '/en/prodige-league'
     | '/en/puzzles'
     | '/en/top-cameroon-chess-players'
@@ -503,6 +535,7 @@ export interface FileRouteTypes {
     | '/en'
     | '/rating-speed-run'
     | '/tournaments'
+    | '/api/cron/elo-snapshots'
     | '/api/rating-speed-run/create'
     | '/api/rating-speed-run/join'
     | '/en/prodige-league/rewards'
@@ -521,6 +554,7 @@ export interface FileRouteTypes {
     | '/chess-cameroon'
     | '/clubs'
     | '/content-creators'
+    | '/elo-gains'
     | '/en'
     | '/prodige-league'
     | '/puzzles'
@@ -538,6 +572,7 @@ export interface FileRouteTypes {
     | '/en/chess-cameroon'
     | '/en/clubs'
     | '/en/content-creators'
+    | '/en/elo-gains'
     | '/en/prodige-league'
     | '/en/puzzles'
     | '/en/rating-speed-run'
@@ -550,6 +585,7 @@ export interface FileRouteTypes {
     | '/en/'
     | '/rating-speed-run/'
     | '/tournaments/'
+    | '/api/cron/elo-snapshots'
     | '/api/rating-speed-run/create'
     | '/api/rating-speed-run/join'
     | '/en/prodige-league_/rewards'
@@ -569,6 +605,7 @@ export interface RootRouteChildren {
   ChessCameroonRoute: typeof ChessCameroonRoute
   ClubsRoute: typeof ClubsRoute
   ContentCreatorsRoute: typeof ContentCreatorsRoute
+  EloGainsRoute: typeof EloGainsRoute
   EnRoute: typeof EnRouteWithChildren
   ProdigeLeagueRoute: typeof ProdigeLeagueRoute
   PuzzlesRoute: typeof PuzzlesRoute
@@ -587,6 +624,7 @@ export interface RootRouteChildren {
   TournamentsIdRoute: typeof TournamentsIdRoute
   TournamentsPastOnlineRoute: typeof TournamentsPastOnlineRoute
   TournamentsIndexRoute: typeof TournamentsIndexRoute
+  ApiCronEloSnapshotsRoute: typeof ApiCronEloSnapshotsRoute
   ApiRatingSpeedRunCreateRoute: typeof ApiRatingSpeedRunCreateRoute
   ApiRatingSpeedRunJoinRoute: typeof ApiRatingSpeedRunJoinRoute
   ProdigeLeagueArenaDayRoute: typeof ProdigeLeagueArenaDayRoute
@@ -621,6 +659,13 @@ declare module '@tanstack/react-router' {
       path: '/content-creators'
       fullPath: '/content-creators'
       preLoaderRoute: typeof ContentCreatorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/elo-gains': {
+      id: '/elo-gains'
+      path: '/elo-gains'
+      fullPath: '/elo-gains'
+      preLoaderRoute: typeof EloGainsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en': {
@@ -749,6 +794,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnContentCreatorsRouteImport
       parentRoute: typeof EnRoute
     }
+    '/en/elo-gains': {
+      id: '/en/elo-gains'
+      path: '/elo-gains'
+      fullPath: '/en/elo-gains'
+      preLoaderRoute: typeof EnEloGainsRouteImport
+      parentRoute: typeof EnRoute
+    }
     '/en/prodige-league': {
       id: '/en/prodige-league'
       path: '/prodige-league'
@@ -824,6 +876,13 @@ declare module '@tanstack/react-router' {
       path: '/tournaments/past-online'
       fullPath: '/tournaments/past-online'
       preLoaderRoute: typeof TournamentsPastOnlineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/elo-snapshots': {
+      id: '/api/cron/elo-snapshots'
+      path: '/api/cron/elo-snapshots'
+      fullPath: '/api/cron/elo-snapshots'
+      preLoaderRoute: typeof ApiCronEloSnapshotsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/rating-speed-run/create': {
@@ -930,6 +989,7 @@ interface EnRouteChildren {
   EnChessCameroonRoute: typeof EnChessCameroonRoute
   EnClubsRoute: typeof EnClubsRoute
   EnContentCreatorsRoute: typeof EnContentCreatorsRoute
+  EnEloGainsRoute: typeof EnEloGainsRoute
   EnProdigeLeagueRoute: typeof EnProdigeLeagueRoute
   EnPuzzlesRoute: typeof EnPuzzlesRoute
   EnRatingSpeedRunRoute: typeof EnRatingSpeedRunRouteWithChildren
@@ -948,6 +1008,7 @@ const EnRouteChildren: EnRouteChildren = {
   EnChessCameroonRoute: EnChessCameroonRoute,
   EnClubsRoute: EnClubsRoute,
   EnContentCreatorsRoute: EnContentCreatorsRoute,
+  EnEloGainsRoute: EnEloGainsRoute,
   EnProdigeLeagueRoute: EnProdigeLeagueRoute,
   EnPuzzlesRoute: EnPuzzlesRoute,
   EnRatingSpeedRunRoute: EnRatingSpeedRunRouteWithChildren,
@@ -983,6 +1044,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChessCameroonRoute: ChessCameroonRoute,
   ClubsRoute: ClubsRoute,
   ContentCreatorsRoute: ContentCreatorsRoute,
+  EloGainsRoute: EloGainsRoute,
   EnRoute: EnRouteWithChildren,
   ProdigeLeagueRoute: ProdigeLeagueRoute,
   PuzzlesRoute: PuzzlesRoute,
@@ -1001,6 +1063,7 @@ const rootRouteChildren: RootRouteChildren = {
   TournamentsIdRoute: TournamentsIdRoute,
   TournamentsPastOnlineRoute: TournamentsPastOnlineRoute,
   TournamentsIndexRoute: TournamentsIndexRoute,
+  ApiCronEloSnapshotsRoute: ApiCronEloSnapshotsRoute,
   ApiRatingSpeedRunCreateRoute: ApiRatingSpeedRunCreateRoute,
   ApiRatingSpeedRunJoinRoute: ApiRatingSpeedRunJoinRoute,
   ProdigeLeagueArenaDayRoute: ProdigeLeagueArenaDayRoute,

@@ -223,6 +223,13 @@ async function fetchPlayerSnapshotUncached(
   }
 }
 
+/** Fresh Chess.com snapshot for the daily job. Skips the homepage cache. */
+export function fetchPlayerSnapshotFresh(
+  username: string,
+): Promise<PlayerLookupResult> {
+  return fetchPlayerSnapshotUncached(username)
+}
+
 /**
  * Player snapshot via Chess.com Pub API with in-memory stale-while-revalidate
  * cache (60s) and in-flight request coalescing. Shared by home, speed runs, etc.
