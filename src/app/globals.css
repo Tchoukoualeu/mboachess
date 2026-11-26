@@ -292,3 +292,282 @@ body {
     transform: scale(1);
   }
 }
+
+.fame-wall {
+  background-color: #0c1210;
+  background-image:
+    radial-gradient(ellipse at 50% -8%, rgb(61 155 99 / 0.22), transparent 46%),
+    radial-gradient(ellipse at 80% 100%, rgb(224 180 90 / 0.08), transparent 42%),
+    linear-gradient(180deg, #121a16 0%, #0c1210 100%);
+  color: #fff;
+}
+
+.fame-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2.25rem 1.5rem;
+  margin-top: 2.5rem;
+  padding-bottom: 1rem;
+}
+
+.fame-slot {
+  width: min(280px, 100%);
+  perspective: 1100px;
+}
+
+.fame-slot::after {
+  content: "";
+  display: block;
+  height: 18px;
+  margin: 10px 18% 0;
+  background: radial-gradient(ellipse, rgb(0 0 0 / 0.45), transparent 70%);
+  filter: blur(1px);
+}
+
+.fame-hit {
+  display: block;
+  aspect-ratio: 1;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 28px;
+}
+
+.fame-hit:focus-visible {
+  outline: 2px solid rgb(255 255 255 / 0.8);
+  outline-offset: 4px;
+}
+
+.fame-card {
+  position: relative;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 28px;
+  color: #fff;
+  background: #18211d;
+  box-shadow:
+    0 24px 40px rgb(0 0 0 / 0.32),
+    inset 0 0 0 1px rgb(255 255 255 / 0.14);
+  transform: rotateX(var(--rx, 5deg)) rotateY(var(--ry, var(--rest-ry, -3deg)));
+  transition: transform 0.5s cubic-bezier(0.22, 0.8, 0.2, 1);
+}
+
+.fame-slot:hover .fame-card,
+.fame-slot:focus-within .fame-card {
+  transition-duration: 0.06s;
+}
+
+.fame-card--legend {
+  --fame-pill: rgb(224 180 90 / 0.22);
+  --fame-pill-ink: #f8e7c2;
+  --fame-pill-line: rgb(224 180 90 / 0.45);
+}
+.fame-card--champion {
+  --fame-pill: rgb(125 196 255 / 0.18);
+  --fame-pill-ink: #d7eeff;
+  --fame-pill-line: rgb(125 196 255 / 0.4);
+}
+.fame-card--elite {
+  --fame-pill: rgb(255 255 255 / 0.14);
+  --fame-pill-ink: #f4f7f5;
+  --fame-pill-line: rgb(255 255 255 / 0.28);
+}
+
+.fame-card__well {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 30%, #2a3a32, #121916 72%);
+}
+
+.fame-card__photo,
+.fame-card__mono {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.fame-card__photo {
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+.fame-card__mono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 5.5rem;
+  font-weight: 600;
+  color: rgb(255 255 255 / 0.82);
+}
+
+.fame-card__holo,
+.fame-card__glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.fame-card__holo {
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgb(255 255 255 / 0.28) 42%,
+    rgb(180 230 255 / 0.18) 52%,
+    transparent 68%
+  );
+  background-size: 220% 220%;
+  background-position: 0% 40%;
+  mix-blend-mode: soft-light;
+  opacity: 0.35;
+  animation: fame-holo-drift 8s ease-in-out infinite;
+}
+
+.fame-slot:hover .fame-card__holo {
+  animation: none;
+  background-position: var(--mx, 30%) var(--my, 20%);
+  opacity: 0.7;
+}
+
+.fame-card__glare {
+  background: radial-gradient(
+    circle at var(--mx, 28%) var(--my, 16%),
+    rgb(255 255 255 / 0.35),
+    transparent 42%
+  );
+  opacity: 0;
+}
+
+.fame-slot:hover .fame-card__glare {
+  opacity: 1;
+}
+
+.fame-card__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(8 12 10 / 0.55) 0%,
+    rgb(8 12 10 / 0.05) 34%,
+    rgb(8 12 10 / 0.15) 52%,
+    rgb(8 12 10 / 0.88) 100%
+  );
+  pointer-events: none;
+}
+
+.fame-card__top,
+.fame-card__body {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  z-index: 1;
+}
+
+.fame-card__top {
+  top: 14px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.fame-card__tier {
+  border-radius: 999px;
+  border: 1px solid var(--fame-pill-line, rgb(255 255 255 / 0.28));
+  background: var(--fame-pill, rgb(255 255 255 / 0.14));
+  padding: 5px 10px;
+  color: var(--fame-pill-ink, #fff);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  backdrop-filter: blur(10px);
+}
+
+.fame-card__score {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  text-shadow: 0 1px 10px rgb(0 0 0 / 0.45);
+}
+
+.fame-card__hp-num {
+  font-size: 1.7rem;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.fame-card__hp-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.78);
+}
+
+.fame-card__body {
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fame-card__name {
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fame-card__rapid,
+.fame-card__stats {
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: rgb(255 255 255 / 0.68);
+}
+
+.fame-card__honor {
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+@keyframes fame-holo-drift {
+  0% {
+    background-position:
+      0% 40%,
+      0 0;
+  }
+  50% {
+    background-position:
+      100% 60%,
+      0 0;
+  }
+  100% {
+    background-position:
+      0% 40%,
+      0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fame-card {
+    transform: none;
+    transition: none;
+  }
+
+  .fame-card__holo {
+    animation: none;
+  }
+}

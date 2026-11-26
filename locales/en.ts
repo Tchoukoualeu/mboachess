@@ -755,6 +755,37 @@ export const en = {
       },
     },
   },
+  prodigeFame: {
+    metaTitle: "Wall of fame · Prodige League | mboachess",
+    metaDescription:
+      "Prodige League wall of fame: arena winners and the overall podium of the 2026 season.",
+    kicker: "2026 season",
+    title: "Wall of fame",
+    sectionLede:
+      "A card for every arena winner and for the overall podium.",
+    lede: "These players have won a finished arena, or they hold the overall podium. The wall updates as arenas finish. Players banned from the top 16 are left off.",
+    link: "See the wall of fame",
+    empty: "The wall fills in once an arena has finished.",
+    points: "PTS",
+    rapid: "Rapid {rating}",
+    winOne: "{count} win",
+    wins: "{count} wins",
+    arenaOne: "{count} arena",
+    arenas: "{count} arenas",
+    best: "best {points}",
+    set: "Prodige 26",
+    honors: {
+      leader: "Season leader",
+      rank: "#{rank} overall",
+      arena: "Day {day} winner",
+      arenas: "Winner of days {days}",
+    },
+    tiers: {
+      legend: "Legend",
+      champion: "Champion",
+      elite: "Elite",
+    },
+  },
   speedRun: {
     metaTitle: "Rating speed run | mboachess",
     metaDescription:
