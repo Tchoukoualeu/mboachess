@@ -767,6 +767,37 @@ export const fr = {
       },
     },
   },
+  prodigeFame: {
+    metaTitle: "Mur de la renommée · Prodige League | mboachess",
+    metaDescription:
+      "Mur de la renommée de la Prodige League : vainqueurs d'arène et podium du classement général de la saison 2026.",
+    kicker: "Saison 2026",
+    title: "Mur de la renommée",
+    sectionLede:
+      "Une carte pour chaque vainqueur d'arène et pour le podium du classement général.",
+    lede: "Ces joueurs ont gagné une arène terminée, ou ils occupent le podium du classement général. Le mur se met à jour avec les arènes. Les joueurs bannis du top 16 n'y figurent pas.",
+    link: "Voir le mur de la renommée",
+    empty: "Le mur se remplira quand une arène sera terminée.",
+    points: "PTS",
+    rapid: "Rapide {rating}",
+    winOne: "{count} victoire",
+    wins: "{count} victoires",
+    arenaOne: "{count} arène",
+    arenas: "{count} arènes",
+    best: "meilleur {points}",
+    set: "Prodige 26",
+    honors: {
+      leader: "Leader de la saison",
+      rank: "#{rank} au général",
+      arena: "Vainqueur du jour {day}",
+      arenas: "Vainqueur des jours {days}",
+    },
+    tiers: {
+      legend: "Légende",
+      champion: "Champion",
+      elite: "Élite",
+    },
+  },
   speedRun: {
     metaTitle: "Course au classement | mboachess",
     metaDescription:

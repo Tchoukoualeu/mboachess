@@ -37,6 +37,7 @@ import { Route as EnRatingSpeedRunRouteImport } from './app/en.rating-speed-run'
 import { Route as EnTopCameroonChessPlayersRouteImport } from './app/en.top-cameroon-chess-players'
 import { Route as EnTopPlayersRouteImport } from './app/en.top-players'
 import { Route as ProdigeLeagueRewardsRouteImport } from './app/prodige-league_.rewards'
+import { Route as ProdigeLeagueWallOfFameRouteImport } from './app/prodige-league_.wall-of-fame'
 import { Route as RatingSpeedRunIndexRouteImport } from './app/rating-speed-run.index'
 import { Route as RatingSpeedRunIdRouteImport } from './app/rating-speed-run.$id'
 import { Route as TournamentsIndexRouteImport } from './app/tournaments.index'
@@ -45,6 +46,7 @@ import { Route as TournamentsPastOnlineRouteImport } from './app/tournaments.pas
 import { Route as ApiRatingSpeedRunCreateRouteImport } from './app/api/rating-speed-run/create'
 import { Route as ApiRatingSpeedRunJoinRouteImport } from './app/api/rating-speed-run/join'
 import { Route as EnProdigeLeagueRewardsRouteImport } from './app/en.prodige-league_.rewards'
+import { Route as EnProdigeLeagueWallOfFameRouteImport } from './app/en.prodige-league_.wall-of-fame'
 import { Route as EnRatingSpeedRunIndexRouteImport } from './app/en.rating-speed-run.index'
 import { Route as EnRatingSpeedRunIdRouteImport } from './app/en.rating-speed-run.$id'
 import { Route as EnTournamentsIndexRouteImport } from './app/en.tournaments.index'
@@ -196,6 +198,11 @@ const ProdigeLeagueRewardsRoute = ProdigeLeagueRewardsRouteImport.update({
   path: '/prodige-league/rewards',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProdigeLeagueWallOfFameRoute = ProdigeLeagueWallOfFameRouteImport.update({
+  id: '/prodige-league_/wall-of-fame',
+  path: '/prodige-league/wall-of-fame',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RatingSpeedRunIndexRoute = RatingSpeedRunIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -236,6 +243,12 @@ const EnProdigeLeagueRewardsRoute = EnProdigeLeagueRewardsRouteImport.update({
   path: '/prodige-league/rewards',
   getParentRoute: () => EnRoute,
 } as any)
+const EnProdigeLeagueWallOfFameRoute =
+  EnProdigeLeagueWallOfFameRouteImport.update({
+    id: '/prodige-league_/wall-of-fame',
+    path: '/prodige-league/wall-of-fame',
+    getParentRoute: () => EnRoute,
+  } as any)
 const EnRatingSpeedRunIndexRoute = EnRatingSpeedRunIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -312,6 +325,7 @@ export interface FileRoutesByFullPath {
   '/en/top-cameroon-chess-players': typeof EnTopCameroonChessPlayersRoute
   '/en/top-players': typeof EnTopPlayersRoute
   '/prodige-league/rewards': typeof ProdigeLeagueRewardsRoute
+  '/prodige-league/wall-of-fame': typeof ProdigeLeagueWallOfFameRoute
   '/rating-speed-run/$id': typeof RatingSpeedRunIdRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/tournaments/past-online': typeof TournamentsPastOnlineRoute
@@ -321,6 +335,7 @@ export interface FileRoutesByFullPath {
   '/api/rating-speed-run/create': typeof ApiRatingSpeedRunCreateRoute
   '/api/rating-speed-run/join': typeof ApiRatingSpeedRunJoinRoute
   '/en/prodige-league/rewards': typeof EnProdigeLeagueRewardsRoute
+  '/en/prodige-league/wall-of-fame': typeof EnProdigeLeagueWallOfFameRoute
   '/en/rating-speed-run/$id': typeof EnRatingSpeedRunIdRoute
   '/en/tournaments/$id': typeof EnTournamentsIdRoute
   '/en/tournaments/past-online': typeof EnTournamentsPastOnlineRoute
@@ -356,6 +371,7 @@ export interface FileRoutesByTo {
   '/en/top-cameroon-chess-players': typeof EnTopCameroonChessPlayersRoute
   '/en/top-players': typeof EnTopPlayersRoute
   '/prodige-league/rewards': typeof ProdigeLeagueRewardsRoute
+  '/prodige-league/wall-of-fame': typeof ProdigeLeagueWallOfFameRoute
   '/rating-speed-run/$id': typeof RatingSpeedRunIdRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/tournaments/past-online': typeof TournamentsPastOnlineRoute
@@ -365,6 +381,7 @@ export interface FileRoutesByTo {
   '/api/rating-speed-run/create': typeof ApiRatingSpeedRunCreateRoute
   '/api/rating-speed-run/join': typeof ApiRatingSpeedRunJoinRoute
   '/en/prodige-league/rewards': typeof EnProdigeLeagueRewardsRoute
+  '/en/prodige-league/wall-of-fame': typeof EnProdigeLeagueWallOfFameRoute
   '/en/rating-speed-run/$id': typeof EnRatingSpeedRunIdRoute
   '/en/tournaments/$id': typeof EnTournamentsIdRoute
   '/en/tournaments/past-online': typeof EnTournamentsPastOnlineRoute
@@ -404,6 +421,7 @@ export interface FileRoutesById {
   '/en/top-cameroon-chess-players': typeof EnTopCameroonChessPlayersRoute
   '/en/top-players': typeof EnTopPlayersRoute
   '/prodige-league_/rewards': typeof ProdigeLeagueRewardsRoute
+  '/prodige-league_/wall-of-fame': typeof ProdigeLeagueWallOfFameRoute
   '/rating-speed-run/$id': typeof RatingSpeedRunIdRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/tournaments/past-online': typeof TournamentsPastOnlineRoute
@@ -413,6 +431,7 @@ export interface FileRoutesById {
   '/api/rating-speed-run/create': typeof ApiRatingSpeedRunCreateRoute
   '/api/rating-speed-run/join': typeof ApiRatingSpeedRunJoinRoute
   '/en/prodige-league_/rewards': typeof EnProdigeLeagueRewardsRoute
+  '/en/prodige-league_/wall-of-fame': typeof EnProdigeLeagueWallOfFameRoute
   '/en/rating-speed-run/$id': typeof EnRatingSpeedRunIdRoute
   '/en/tournaments/$id': typeof EnTournamentsIdRoute
   '/en/tournaments/past-online': typeof EnTournamentsPastOnlineRoute
@@ -453,6 +472,7 @@ export interface FileRouteTypes {
     | '/en/top-cameroon-chess-players'
     | '/en/top-players'
     | '/prodige-league/rewards'
+    | '/prodige-league/wall-of-fame'
     | '/rating-speed-run/$id'
     | '/tournaments/$id'
     | '/tournaments/past-online'
@@ -462,6 +482,7 @@ export interface FileRouteTypes {
     | '/api/rating-speed-run/create'
     | '/api/rating-speed-run/join'
     | '/en/prodige-league/rewards'
+    | '/en/prodige-league/wall-of-fame'
     | '/en/rating-speed-run/$id'
     | '/en/tournaments/$id'
     | '/en/tournaments/past-online'
@@ -497,6 +518,7 @@ export interface FileRouteTypes {
     | '/en/top-cameroon-chess-players'
     | '/en/top-players'
     | '/prodige-league/rewards'
+    | '/prodige-league/wall-of-fame'
     | '/rating-speed-run/$id'
     | '/tournaments/$id'
     | '/tournaments/past-online'
@@ -506,6 +528,7 @@ export interface FileRouteTypes {
     | '/api/rating-speed-run/create'
     | '/api/rating-speed-run/join'
     | '/en/prodige-league/rewards'
+    | '/en/prodige-league/wall-of-fame'
     | '/en/rating-speed-run/$id'
     | '/en/tournaments/$id'
     | '/en/tournaments/past-online'
@@ -544,6 +567,7 @@ export interface FileRouteTypes {
     | '/en/top-cameroon-chess-players'
     | '/en/top-players'
     | '/prodige-league_/rewards'
+    | '/prodige-league_/wall-of-fame'
     | '/rating-speed-run/$id'
     | '/tournaments/$id'
     | '/tournaments/past-online'
@@ -553,6 +577,7 @@ export interface FileRouteTypes {
     | '/api/rating-speed-run/create'
     | '/api/rating-speed-run/join'
     | '/en/prodige-league_/rewards'
+    | '/en/prodige-league_/wall-of-fame'
     | '/en/rating-speed-run/$id'
     | '/en/tournaments/$id'
     | '/en/tournaments/past-online'
@@ -584,6 +609,7 @@ export interface RootRouteChildren {
   ApiSubmitTournamentRoute: typeof ApiSubmitTournamentRoute
   ApiSubmitUsernameRoute: typeof ApiSubmitUsernameRoute
   ProdigeLeagueRewardsRoute: typeof ProdigeLeagueRewardsRoute
+  ProdigeLeagueWallOfFameRoute: typeof ProdigeLeagueWallOfFameRoute
   TournamentsIdRoute: typeof TournamentsIdRoute
   TournamentsPastOnlineRoute: typeof TournamentsPastOnlineRoute
   TournamentsIndexRoute: typeof TournamentsIndexRoute
@@ -791,6 +817,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProdigeLeagueRewardsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/prodige-league_/wall-of-fame': {
+      id: '/prodige-league_/wall-of-fame'
+      path: '/prodige-league/wall-of-fame'
+      fullPath: '/prodige-league/wall-of-fame'
+      preLoaderRoute: typeof ProdigeLeagueWallOfFameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rating-speed-run/': {
       id: '/rating-speed-run/'
       path: '/'
@@ -845,6 +878,13 @@ declare module '@tanstack/react-router' {
       path: '/prodige-league/rewards'
       fullPath: '/en/prodige-league/rewards'
       preLoaderRoute: typeof EnProdigeLeagueRewardsRouteImport
+      parentRoute: typeof EnRoute
+    }
+    '/en/prodige-league_/wall-of-fame': {
+      id: '/en/prodige-league_/wall-of-fame'
+      path: '/prodige-league/wall-of-fame'
+      fullPath: '/en/prodige-league/wall-of-fame'
+      preLoaderRoute: typeof EnProdigeLeagueWallOfFameRouteImport
       parentRoute: typeof EnRoute
     }
     '/en/rating-speed-run/': {
@@ -937,6 +977,7 @@ interface EnRouteChildren {
   EnTopPlayersRoute: typeof EnTopPlayersRoute
   EnIndexRoute: typeof EnIndexRoute
   EnProdigeLeagueRewardsRoute: typeof EnProdigeLeagueRewardsRoute
+  EnProdigeLeagueWallOfFameRoute: typeof EnProdigeLeagueWallOfFameRoute
   EnTournamentsIdRoute: typeof EnTournamentsIdRoute
   EnTournamentsPastOnlineRoute: typeof EnTournamentsPastOnlineRoute
   EnTournamentsIndexRoute: typeof EnTournamentsIndexRoute
@@ -955,6 +996,7 @@ const EnRouteChildren: EnRouteChildren = {
   EnTopPlayersRoute: EnTopPlayersRoute,
   EnIndexRoute: EnIndexRoute,
   EnProdigeLeagueRewardsRoute: EnProdigeLeagueRewardsRoute,
+  EnProdigeLeagueWallOfFameRoute: EnProdigeLeagueWallOfFameRoute,
   EnTournamentsIdRoute: EnTournamentsIdRoute,
   EnTournamentsPastOnlineRoute: EnTournamentsPastOnlineRoute,
   EnTournamentsIndexRoute: EnTournamentsIndexRoute,
@@ -998,6 +1040,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiSubmitTournamentRoute: ApiSubmitTournamentRoute,
   ApiSubmitUsernameRoute: ApiSubmitUsernameRoute,
   ProdigeLeagueRewardsRoute: ProdigeLeagueRewardsRoute,
+  ProdigeLeagueWallOfFameRoute: ProdigeLeagueWallOfFameRoute,
   TournamentsIdRoute: TournamentsIdRoute,
   TournamentsPastOnlineRoute: TournamentsPastOnlineRoute,
   TournamentsIndexRoute: TournamentsIndexRoute,

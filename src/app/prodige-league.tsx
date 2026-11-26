@@ -308,6 +308,26 @@ export function ProdigeLeaguePage() {
           ) : null}
         </section>
 
+        <section aria-labelledby="fame-heading" className="mb-10">
+          <h2
+            id="fame-heading"
+            className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
+          >
+            {dict.prodigeFame.title}
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted">
+            {dict.prodigeFame.sectionLede}
+          </p>
+          <p className="mt-3">
+            <LocaleLink
+              to="/prodige-league/wall-of-fame"
+              className="text-sm font-semibold text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
+            >
+              {dict.prodigeFame.link}
+            </LocaleLink>
+          </p>
+        </section>
+
         <section aria-labelledby="rewards-heading" className="mb-10">
           <h2
             id="rewards-heading"
