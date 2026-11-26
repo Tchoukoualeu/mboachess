@@ -12,6 +12,7 @@ Create `.env` (or `.env.local`):
 - **`MONGODB_DB_NAME`** — optional; default database name is `mboachess`.
 - **`VITE_GITHUB_URL`** — optional override for the GitHub link.
 - **`VITE_WHATSAPP_URL`** — optional override for the WhatsApp community link.
+- **`CRON_SECRET`** — required for the daily Elo snapshot. Vercel Cron calls `GET /api/cron/elo-snapshots` at 22:00 UTC (23:00 in Cameroon) with `Authorization: Bearer <CRON_SECRET>`. Set the same value in the project environment. The route rejects every request when it is missing.
 
 If `MONGODB_URI` is missing, the site still runs and the table works for the static list only; **Save** will return a 503 from the API.
 
@@ -26,7 +27,7 @@ Open [http://localhost:3000](http://localhost:3000). For production: `npm run bu
 
 ## Changing the player list
 
-- **Admins / defaults:** edit the `TRACKED_USERNAMES` array in `server/home.ts` (lowercase usernames, as in Chess.com profile URLs).
+- **Admins / defaults:** edit the `TRACKED_USERNAMES` array in `lib/trackedPlayers.ts` (lowercase usernames, as in Chess.com profile URLs). The homepage and the daily snapshot job both use this list.
 - **Public submissions:** usernames are stored in the `player_usernames` collection. Chess.com fetch logic is in `lib/chesscom.ts`; persistence and validation are in `lib/chesscomUsernames.ts` and `lib/mongodb.ts`.
 
 ## Online column

@@ -154,6 +154,7 @@ export const PUBLIC_ROUTES = [
   { path: "/clubs", changefreq: "weekly", priority: "0.7" },
   { path: "/content-creators", changefreq: "weekly", priority: "0.7" },
   { path: "/rating-speed-run", changefreq: "daily", priority: "0.7" },
+  { path: "/elo-gains", changefreq: "monthly", priority: "0.6" },
 ] as const
 
 export { SITE_URL, SITE_NAME, OG_IMAGE }

@@ -8,6 +8,7 @@ export type SiteRoute =
   | "/prodige-league"
   | "/tournaments/past-online"
   | "/rating-speed-run"
+  | "/elo-gains"
   | "/clubs"
   | "/content-creators"
   | "/chess-cameroon"
@@ -42,6 +43,7 @@ export const SITE_LINKS: readonly SiteLink[] = [
     inExplore: true,
   },
   { to: "/rating-speed-run", id: "speedRun", inHeader: true, inExplore: true },
+  { to: "/elo-gains", id: "eloGains", inHeader: true, inExplore: true },
   { to: "/clubs", id: "clubs", inHeader: true, inExplore: true },
   { to: "/content-creators", id: "creators", inHeader: true, inExplore: true },
   {

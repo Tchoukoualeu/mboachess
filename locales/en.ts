@@ -98,6 +98,10 @@ export const en = {
         label: "Chess Cameroon",
         blurb: "Start here if you searched for chess cameroon",
       },
+      eloGains: {
+        label: "Gains",
+        blurb: "The biggest rating climbs each month",
+      },
     },
   },
   footer: {
@@ -836,5 +840,18 @@ export const en = {
       running: "Running",
       finished: "Finished",
     },
+  },
+  eloGains: {
+    metaTitle: "Monthly gains | Mboachess",
+    metaDescription:
+      "The three biggest rapid and blitz rating climbs among tracked players, day by day.",
+    title: "Monthly gains",
+    lede: "Each evening the Chess.com ratings of tracked players are saved. At the end of the month, the three biggest rapid and blitz climbs appear here, with a line for every day.",
+    waiting:
+      "Daily snapshots have started. The first chart, for December, will be shown on 1 January.",
+    months: "Months",
+    gain: "{gain} this month",
+    empty: "No {cadence} ratings saved for this month yet.",
+    aria: "Daily {cadence} rating lines for {month}.",
   },
 } satisfies Dictionary

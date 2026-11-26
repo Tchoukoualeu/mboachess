@@ -35,6 +35,13 @@ const ICON_PATHS: Partial<Record<SiteRoute, ReactNode>> = {
     </>
   ),
   "/rating-speed-run": <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z" />,
+  "/elo-gains": (
+    <>
+      <path d="M4 19V5" />
+      <path d="M4 19h16" />
+      <path d="M7 15l3.5-4 3 2.5L18 7" />
+    </>
+  ),
   "/clubs": (
     <>
       <circle cx="9" cy="8" r="3" />
