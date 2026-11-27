@@ -1,8 +1,10 @@
 {
-  "crons": [
-    {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "schedules": {
+    "elo-snapshots": {
+      "schedule": "0 22 * * *",
       "path": "/api/cron/elo-snapshots",
-      "schedule": "0 22 * * *"
+      "requestMethod": "GET"
     }
-  ]
+  }
 }
